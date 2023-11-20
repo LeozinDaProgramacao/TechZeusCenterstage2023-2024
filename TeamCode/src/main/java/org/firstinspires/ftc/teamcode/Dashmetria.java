@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+@Disabled
 @TeleOp(name = "Dashmetria")
 public class Dashmetria extends OpMode{
     private ElapsedTime runtime = new ElapsedTime();
