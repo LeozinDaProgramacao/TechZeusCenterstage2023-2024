@@ -12,22 +12,30 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.CRServo;
+
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.util.Encoder;
+import org.openftc.easyopencv.OpenCvCamera;
+import org.openftc.easyopencv.OpenCvCameraFactory;
+import org.openftc.easyopencv.OpenCvCameraRotation;
+import org.openftc.easyopencv.OpenCvWebcam;
 
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 
-@TeleOp(name = "CenterstageMain")
+@TeleOp(name = "Doutor Opmode")
 
-public class CenterstageMain extends LinearOpMode {
+public class DoutorOpmode extends LinearOpMode {
+    ElapsedTime elapsedTime = new ElapsedTime();
 
     private DcMotor frontRight;
     private DcMotor backRight;
@@ -67,6 +75,7 @@ public class CenterstageMain extends LinearOpMode {
     double powerbraco;
     double finalgoalbraco = 0;
     double goalbraco;
+    OpenCvWebcam webcam;
     //PID pid_turn = new PID(0.5,0.005,0.0,0.4);
     PID pid_turn = new PID(0.6,0.000,0.0,0.3);
     //PID pid_braco = new PID(0.005,0.01,0.003);
@@ -74,6 +83,11 @@ public class CenterstageMain extends LinearOpMode {
     double Artpos =0;
     boolean autoGrab = false;
     boolean AutoGrabDone=true;
+    double startingIMU;
+    double startFLencoder;
+    double startFRencoder;
+    double startBLencoder;
+    double startBRencoder;
 
     /**
      * This function is executed when this Op Mode is selected.
@@ -130,13 +144,36 @@ public class CenterstageMain extends LinearOpMode {
 
         //define variaveis essenciais e inicializa funções
 
+
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
+        BlueDetector detector = new BlueDetector(telemetry);
+        webcam.setPipeline(detector);
+        webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            @Override
+            public void onOpened() {
+                webcam.startStreaming(1280, 720, OpenCvCameraRotation.UPSIDE_DOWN);
+            }
+
+            @Override
+            public void onError(int errorCode) {
+            }
+        });
+
         YawPitchRollAngles orientation = null;
         AngularVelocity angularVelocity;
         PlaneLauncher.setPosition(0.5);
-
+        telemetry.addData("Webcam Status","To check webcam status click on the three dots in the top right and select 'camera stream'");
+        telemetry.update();
         waitForStart();
+        webcam.stopStreaming();
 
         double CurrentFront = 0;
+        double startingIMU = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+        double startFLencoder = frontLeft.getCurrentPosition();
+        double startFRencoder = frontLeft.getCurrentPosition();
+        double startBLencoder = frontLeft.getCurrentPosition();
+        double startBRencoder = frontLeft.getCurrentPosition();
 
         while  (opModeIsActive()) {
             braco();
@@ -149,14 +186,6 @@ public class CenterstageMain extends LinearOpMode {
     }
     private void inputs(){
         //get gamepad axis
-        /*
-        raw_drive = gamepad1.left_stick_y*-1;
-        raw_turn = gamepad1.right_stick_x;
-        raw_strafe = gamepad1.left_stick_x;
-        drive = Accelerator(raw_drive,drive);
-        turn = Accelerator(raw_turn,turn);
-        strafe = Accelerator(raw_strafe,strafe);
-        */
         if (gamepad1.left_bumper){
             drive = gamepad1.left_stick_y*-1*0.4;
             turn = gamepad1.right_stick_x*0.4;
@@ -204,41 +233,37 @@ public class CenterstageMain extends LinearOpMode {
         if (Math.abs(turn)<0.001){
             turn = pid_turn.CalculatePID(ConvertAngle(CurrentAngle),0,true)*-1;
             if (Math.abs(turn)<0.1){
-        turn =0;
+                turn =0;
             }
         }
     }
     private void moveBase(){
         if (!autoGrab&&AutoGrabDone){
-        //muda a direção de movimento com base na orientação ro robo
-        double rotX = strafe*Math.cos(orientation.getYaw(AngleUnit.RADIANS))+drive*Math.sin(orientation.getYaw(AngleUnit.RADIANS));
-        double rotY = strafe*Math.sin(-orientation.getYaw(AngleUnit.RADIANS))+drive*Math.cos(-orientation.getYaw(AngleUnit.RADIANS));
+            //muda a direção de movimento com base na orientação ro robo
+            double rotX = strafe*Math.cos(orientation.getYaw(AngleUnit.RADIANS))+drive*Math.sin(orientation.getYaw(AngleUnit.RADIANS));
+            double rotY = strafe*Math.sin(-orientation.getYaw(AngleUnit.RADIANS))+drive*Math.cos(-orientation.getYaw(AngleUnit.RADIANS));
 
-        //define as velocidades de cada motor
-        double maximo = Math.max(Math.abs(rotX)+Math.abs(rotY)+Math.abs(turn),1);
+            //define as velocidades de cada motor
+            double maximo = Math.max(Math.abs(rotX)+Math.abs(rotY)+Math.abs(turn),1);
 
 
-        DfL= (rotY+rotX+turn)/maximo;
-        DfR=(rotY-rotX-turn)/maximo;
-        DbL=(rotY-rotX+turn)/maximo;
-        DbR=(rotY+rotX-turn)/maximo;
-        fL = Accelerator(DfL,fL);
-        fR = Accelerator(DfR,fR);
-        bL = Accelerator(DbL,bL);
-        bR = Accelerator(DbR,bR);
+            fL= (rotY+rotX+turn)/maximo;
+            fR=(rotY-rotX-turn)/maximo;
+            bL=(rotY-rotX+turn)/maximo;
+            bR=(rotY+rotX-turn)/maximo;
         /*
         fL= (rotY+rotX+turn)/maximo;
         fR=(rotY-rotX-turn)/maximo;
         bL=(rotY-rotX+turn)/maximo;
         bR=(rotY+rotX-turn)/maximo;
         /**/
-        //geração de uma aceleração ao controlar o maximo dos motores
-        //aplica as potências aos motores
+            //geração de uma aceleração ao controlar o maximo dos motores
+            //aplica as potências aos motores
 
-        frontRight.setPower(fR*0.5);
-        frontLeft.setPower(fL*0.5);
-        backRight.setPower(bR*0.5);
-        backLeft.setPower(bL*0.5);/**/}
+            frontRight.setPower(fR*0.5);
+            frontLeft.setPower(fL*0.5);
+            backRight.setPower(bR*0.5);
+            backLeft.setPower(bL*0.5);/**/}
         else {
             autodrive.setPoseEstimate(new Pose2d(0,0,0));
             Artpos = 0.71;
@@ -254,84 +279,43 @@ public class CenterstageMain extends LinearOpMode {
       /*Description:
       this funtion adds all debugging data needed to the telemetry board
       */
+        if (imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS)!=startingIMU){telemetry.addData("IMU Status","Functional"+imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES));} else {telemetry.addData("IMU Status","Not Functional");}
 
-        //imu
+        if (frontLeft.getCurrentPosition()!=startFLencoder){
+            telemetry.addData("FL Encoder Status","Functional");
+        } else {
+            telemetry.addData("FL Encoder Status","Not Functional");
+        }
 
-        telemetry.addData("Delta Angle", DeltaAngle);//quanto a base deslocou em radianos desde o ultimo reset
-        telemetry.addData("turn PID detected Error", pid_turn.error*180/Math.PI);
-        telemetry.addData("current angle",CurrentAngle*180/Math.PI);
-        telemetry.addData("currentfront",CurrentFront);
-        telemetry.addData("cumError",pid_turn.cummulativeError);
-        /* */
+        if (backLeft.getCurrentPosition()!=startBLencoder){
+            telemetry.addData("BL Encoder Status","Functional");
+        } else {
+            telemetry.addData("BL Encoder Status","Not Functional");
+        }
+        if (frontRight.getCurrentPosition()!=startFRencoder){
+            telemetry.addData("FR Encoder Status","Functional");
+        } else {
+            telemetry.addData("FR Encoder Status","Not Functional");
+        }
+        if (backRight.getCurrentPosition()!=startBRencoder){
+            telemetry.addData("FR Encoder Status","Functional");
+        } else {
+            telemetry.addData("FR Encoder Status","Not Functional");
+        }
+        telemetry.addData("Articulation Servo Status","is functional if pressing upped dpad and holding right stick up leaves it paralel to the floor");
+        telemetry.addData("Claw Servos Statur","if they fully open, they are functional, else they are attached incorrectly to tthe claw");
+        telemetry.addData("Bottom Limit Sensor Status (if it changes uppon pressing, it works)Current Status",bottomLimit.isPressed());
+        telemetry.addData("Airplane Servo Status","press the top left button or top right button on gamepad2, if it moves, it works");
 
-
-        //valores crus (direto do gamepad)
-
-      telemetry.addData("raw FB",-1*gamepad1.left_stick_y);
-      telemetry.addData("raw LR",gamepad1.left_stick_x);
-      telemetry.addData("raw TR",raw_turn);
-      telemetry.addData("1",fL);
-        telemetry.addData("2",fR);
-        telemetry.addData("3",bL);
-        telemetry.addData("4",bR);
-      //telemetry.addData("multiplier",maximo);//garante que a velocidade maxima seja 1/**/
-
-
-
-        //velocidades aplicadas nas rodas
-        /*
-        telemetry.addData("delay=",getRuntime()-prevtime);
-        prevtime=getRuntime();
-        telemetry.addData("fL",fL);
-        telemetry.addData("fR",fR);
-        telemetry.addData("bL",bL);
-        telemetry.addData("bR",bR);
-        telemetry.addData("armpos",backRight.getCurrentPosition());
-        telemetry.addData("goalbraco",goalbraco);
-        telemetry.addData("powerbraco",powerbraco);
-        //telemetry.addData("LARM power",LArm.getPower());
-        //telemetry.addData("RARM power",RArm.getPower());
-        /**/
-
-
-        //Encoders
-        
-        telemetry.addData("bL encoder",backLeft.getCurrentPosition());
-        telemetry.addData("bL encoder",backRight.getCurrentPosition());
-        telemetry.addData("bL encoder",frontLeft.getCurrentPosition());
-        telemetry.addData("bL encoder",frontRight.getCurrentPosition());
-        /**/
         telemetry.update(); // adiciona tudo da telemetria
     }
     private void braco() {
-        //alto = 540?
-        //baixo = 0
-        /*if (gamepad2.y||(yOn)) {
-            yOn=false;
-            yOn =  gamepad2.y;
-            if (yOn&&gamepad2.y){
-                mainArm.setPower(0);
 
-            } else {
-                backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            }
-        } else {
-            finalgoalbraco = gamepad2.right_trigger*540;
-            goalbraco+= PVARIATION*(finalgoalbraco-goalbraco);
-            //goalbraco = finalgoalbraco;
-            /*if (!((goalbraco>finalgoalbraco-1)&&(goalbraco<finalgoalbraco+1))){
-                if (goalbraco>finalgoalbraco){
-                    goalbraco-=1;
-                }else{
-                    goalbraco+=1;
-                }
-            }*//*
-            //powerbraco = pid_braco.CalculatePID(backRight.getCurrentPosition(),goalbraco,false);
-
-        }*/
         if (gamepad2.left_bumper){
             PlaneLauncher.setPosition(0);
+        }
+        if (gamepad2.right_bumper){
+            PlaneLauncher.setPosition(1);
         }
         if (Math.abs(gamepad2.right_trigger)>Math.abs(gamepad2.left_trigger)){
             mainArm.setPower(gamepad2.right_trigger*0.4);
@@ -345,22 +329,22 @@ public class CenterstageMain extends LinearOpMode {
         }
     }
     private void garra(){
-            if (gamepad2.x) {
-                openClaw();
-            } else if (gamepad2.y) {
-                closeClaw();
-            }
-            if (gamepad2.dpad_down) {
-                Artpos = 0.71;
-            } else if (gamepad2.dpad_up) {
-                Artpos = 0.45;
-            } else if (gamepad2.dpad_left) {
-                Artpos = 0.64;
-            } else if (gamepad2.dpad_right){
-                Artpos =0;
-                closeClaw();
-            }
-            Articulation.setPosition(Artpos + gamepad2.right_stick_y * 0.1);
+        if (gamepad2.x) {
+            openClaw();
+        } else if (gamepad2.y) {
+            closeClaw();
+        }
+        if (gamepad2.dpad_down) {
+            Artpos = 0.71;
+        } else if (gamepad2.dpad_up) {
+            Artpos = 0.45;
+        } else if (gamepad2.dpad_left) {
+            Artpos = 0.64;
+        } else if (gamepad2.dpad_right){
+            Artpos =0;
+            closeClaw();
+        }
+        Articulation.setPosition(Artpos + gamepad2.right_stick_y * 0.1);
     }
     private void closeClaw(){
         RClaw.setPosition(0.3);
@@ -370,20 +354,6 @@ public class CenterstageMain extends LinearOpMode {
         RClaw.setPosition(0.5);
         LClaw.setPosition(0.5);
     }
-    private double Accelerator(double desired,double current){
-        /*
-        double konstant=0.03;
-        if (Math.abs(desired)>Math.abs(current)&&!gamepad1.left_bumper){
-            if (Math.abs(current+konstant*desired)>1){
-                return Integer.signum((int)(current+konstant*desired));
-            } else {
-                return current + konstant*desired;
-            }
-        } else{
-            return desired;
-        }*/
-        return desired;
-    }
 
     public double ConvertAngle(double angle){
         double return_angle = angle;
@@ -392,4 +362,5 @@ public class CenterstageMain extends LinearOpMode {
         }
         return return_angle;
     }
+
 }
