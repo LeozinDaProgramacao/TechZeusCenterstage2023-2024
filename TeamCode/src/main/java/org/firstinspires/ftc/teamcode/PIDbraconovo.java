@@ -11,6 +11,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.CRServo;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
@@ -21,6 +23,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Config
 @TeleOp(name = "PIDbraconovo")
@@ -28,7 +31,7 @@ import com.qualcomm.robotcore.hardware.TouchSensor;
 public class PIDbraconovo extends LinearOpMode {
     FtcDashboard dashboard;
     public static double KP=0;
-    public static double PVARIATION=0.037;
+    public static double PVARIATION=0;
     public static double KI=0;
     public static double KD=0;
     public static double MAXI =0;
@@ -37,13 +40,12 @@ public class PIDbraconovo extends LinearOpMode {
 
     private DcMotor frontLeft;
 
-    private CRServo mainArm;
     private CRServo armEncoder;
     private TouchSensor bottomLimit;
 
     //private Servo servoArticulacao;
     //private Servo servoGarra;
-    double powerbraco;
+    double powerbraco=0;
     double finalgoalbraco = 0;
     double goalbraco;
     final double maximoo = 0.5;
@@ -64,7 +66,6 @@ public class PIDbraconovo extends LinearOpMode {
         frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        mainArm = hardwareMap.get(CRServo.class, "mainArm");
         bottomLimit= hardwareMap.get(TouchSensor.class,"bottomLimitSensor");
         //servoArticulacao = hardwareMap.get(Servo.class, "servoArticulacao");
         //servoGarra = hardwareMap.get(Servo.class, "servoGarra");
@@ -87,11 +88,13 @@ public class PIDbraconovo extends LinearOpMode {
         AngularVelocity angularVelocity;
 
         waitForStart();
+
         //falsifica um encoder pro braço
         double CurrentFront = 0;
-
+        ElapsedTime timeElapsed = new ElapsedTime();
         TelemetryPacket pack1 = new TelemetryPacket();
         while  (opModeIsActive()) {
+            telemetry.addData("nano",timeElapsed.nanoseconds());
             //pack1.put("armpos",armEncoder.getController().getServoPosition(5));
             pack1.put("goal",pid_braco.goal);
             pack1.put("final goal",finalgoalbraco);
@@ -108,8 +111,11 @@ public class PIDbraconovo extends LinearOpMode {
             telemetry.addData("desce",gamepad2.left_trigger);
             telemetry.addData("sobe",gamepad2.right_trigger);
             telemetry.addData("posicao",frontLeft.getCurrentPosition());
+            telemetry.addData("PODEEEERRR",powerbraco);
+            telemetry.addData("powah",frontLeft.getPower());
             //telemetry.addData("cu",armEncoder.getController().getServoPosition(5));
             telemetry.update();
+            timeElapsed.reset();
             //adicionarTelemetria();
         }
     }
@@ -179,20 +185,22 @@ public class PIDbraconovo extends LinearOpMode {
             finalgoalbraco = gamepad2.right_trigger*MAXHEIGHT;
             //goalbraco+= PVARIATION*(finalgoalbraco-goalbraco);
             //goalbraco = finalgoalbraco;
-            if (!((goalbraco>finalgoalbraco-1)&&(goalbraco<finalgoalbraco+1))){
+            if (!((goalbraco>finalgoalbraco-PVARIATION)&&(goalbraco<finalgoalbraco+PVARIATION))){
                 if (goalbraco>finalgoalbraco){
                     goalbraco-=PVARIATION;
                 }else{
                     goalbraco+=PVARIATION;
                 }
+            } else {
+                goalbraco = finalgoalbraco;
             }
             powerbraco = pid_braco.CalculatePID(frontLeft.getCurrentPosition(),goalbraco,false);
 
         }
         if (!bottomLimit.isPressed()){
-        mainArm.setPower(powerbraco);}
+        frontLeft.setPower(powerbraco);}
         else if (powerbraco>=0) {
-            mainArm.setPower(powerbraco);
+            frontLeft.setPower(powerbraco);
         }
 
 

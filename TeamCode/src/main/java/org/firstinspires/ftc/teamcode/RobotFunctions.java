@@ -2,48 +2,51 @@ package org.firstinspires.ftc.teamcode;
 
 
 
-import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.acmerobotics.roadrunner.drive.MecanumDrive;
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.AnalogInput;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.hardware.CRServo;
+
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
-import org.firstinspires.ftc.teamcode.util.Encoder;
 
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 
 import java.util.List;
+@TeleOp(name = "Robot Functions")
 
-public abstract class RobotFunctions extends LinearOpMode{
+public class RobotFunctions extends LinearOpMode{
 
-    private DcMotor frontRight;
-    private DcMotor backRight;
-    private DcMotor frontLeft;
-    private DcMotor backLeft;
-    private CRServo mainArm;
-    private CRServo armEncoder;
+
+    private static DcMotor frontRight;
+    private static DcMotor backRight;
+    private static DcMotor frontLeft;
+    private static DcMotor backLeft;
+    private Servo Arm2;
     private  Servo Articulation;
     private Servo LClaw;
     private Servo RClaw;
-    private Servo PlaneLauncher;
+    private static Servo PlaneLauncher;
     private TouchSensor bottomLimit;
     //private Servo servoArticulacao;
     //private Servo servoGarra;
     private IMU imu;
+    DigitalChannel greenLED;
+    DigitalChannel redLED;
+    DistanceSensor distanceSensor;
     YawPitchRollAngles orientation;
     SampleMecanumDrive Autodrive;
     double drive=0;
@@ -69,27 +72,104 @@ public abstract class RobotFunctions extends LinearOpMode{
     double goalbraco;
     //PID pid_turn = new PID(0.5,0.005,0.0,0.4);
     PID pid_turn = new PID(0.6,0.000,0.0,0.3);
-    //PID pid_braco = new PID(0.005,0.01,0.003);
+    public static int GPVARIATION=6;
+    public static int MAXHEIGHT=1700;
+
+    PID pid_braco = new PID(0.003,0,0,0);
     double prevtime=0;
     double Artpos =0;
     boolean autoGrab = false;
     boolean AutoGrabDone=true;
     boolean IMUWorking = true;
     boolean encodersWorking = true;
+    simpleSwitch leftClawSwitch = new simpleSwitch();
+    simpleSwitch rightClawSwitch = new simpleSwitch();
+
+    Control ctr = new Control();
+
+    @Override
+    public void runOpMode() throws InterruptedException {
+        ctr.hardwareMapAll();
+        waitForStart();
+        ctr.startup();
+        ElapsedTime timeElapsed = new ElapsedTime();
+        while  (opModeIsActive()) {
+            telemetry.addData("nano",timeElapsed.nanoseconds());
+            ctr.cycleLoop();
+            timeElapsed.reset();
+
+        }
+    }
+
     public enum DriveBaseExecMode {
         FULL_FUNCTION_MODE,
+        BACKDROP_FULL_FUNCTION_MODE,
         NO_IMU_MODE,
         NO_ENCODER_MODE,
         GRAPH_MODE,
         AUTO_ALIGN
     }
     DriveBaseExecMode currentBaseExecMode = DriveBaseExecMode.FULL_FUNCTION_MODE;
-    List<LynxModule> allHubs;
-    SampleMecanumDrive autodrive;
+    static List<LynxModule> allHubs;
+    public SampleMecanumDrive autodrive;
 
     public class Control{
-        DriveBase driving;
+        DriveBase driving = new DriveBase();
+
+        Arm arm = new Arm();
+
+        public void StatusLights(DriveBaseExecMode status){
+
+            //TODO make this better with switch cases
+            //blank if all is well
+            /*if (status = DriveBaseExecMode.FULL_FUNCTION_MODE){
+                redLED.setState(false);
+                greenLED.setState(false);
+            }
+            if (positionZeroed){
+                redLED.setState(false);
+                greenLED.setState(true);
+            }
+            if ((status != DriveBaseExecMode.FULL_FUNCTION_MODE)&&(status!=DriveBaseExecMode))
+            */
+
+
+
+            //green if dettect april tag
+            //red if limited function mode
+            //amber not used because too close to red
+
+        }
+        public void startup(){
+            redLED.setMode(DigitalChannel.Mode.OUTPUT);
+            greenLED.setMode(DigitalChannel.Mode.OUTPUT);
+        }
+        public void cycleLoop(){
+            if (gamepad1.a){
+                greenLED.setState(false);
+                redLED.setState(true);
+            }
+            if (gamepad1.y){
+                greenLED.setState(true);
+                redLED.setState(false);
+            }
+            if (gamepad1.b){
+                greenLED.setState(false);
+                redLED.setState(false);
+            }
+            if (gamepad1.x){
+                greenLED.setState(true);
+                redLED.setState(true);
+            }
+            bulkReadInputs();
+            arm.armheight();
+            arm.braco();
+            arm.ClawControl();
+            addTelemetry();
+        }
+
         public void hardwareMapAll(){
+
             autodrive = new SampleMecanumDrive(hardwareMap);
             //inicializa hardware
             imu = hardwareMap.get(IMU.class, "imu");
@@ -97,13 +177,18 @@ public abstract class RobotFunctions extends LinearOpMode{
             backRight = hardwareMap.get(DcMotor.class, "BRmotor");
             frontLeft = hardwareMap.get(DcMotor.class, "FLmotor");
             backLeft = hardwareMap.get(DcMotor.class, "BLmotor");
-            mainArm = hardwareMap.get(CRServo.class, "mainArm");
             bottomLimit= hardwareMap.get(TouchSensor.class,"bottomLimitSensor");
 
             Articulation = hardwareMap.get(Servo.class,"Articulation");
+            Arm2 = hardwareMap.get(Servo.class,"Arm2");
             LClaw = hardwareMap.get(Servo.class,"LClaw");
             RClaw = hardwareMap.get(Servo.class,"RClaw");
             PlaneLauncher = hardwareMap.get(Servo.class,"PlaneLauncher");
+
+            redLED = hardwareMap.get(DigitalChannel.class, "redL");
+            greenLED = hardwareMap.get(DigitalChannel.class, "greenL");
+
+            distanceSensor = hardwareMap.get(DistanceSensor.class,"distSensor");
 
 
 
@@ -120,7 +205,8 @@ public abstract class RobotFunctions extends LinearOpMode{
             backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            //TODO make this using encoder when can
+            frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
             backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -170,12 +256,17 @@ public abstract class RobotFunctions extends LinearOpMode{
             DeltaAngle =360- (orientation.getYaw(AngleUnit.RADIANS)*180/3.141);
         }
         private void addTelemetry(){
-            telemetry.addData("CurrentExecMode",currentBaseExecMode);
-            telemetry.update();
             /*Description:
             this funtion adds all debugging data needed to the telemetry board
             */
-
+            telemetry.addData("CurrentExecMode",currentBaseExecMode);
+            telemetry.addData("pb",powerbraco);
+            telemetry.addData("pos",frontLeft.getCurrentPosition());
+            telemetry.addData("distance",distanceSensor.getDistance(DistanceUnit.CM));
+            telemetry.addData("error",pid_braco.error);
+            telemetry.addData("gm2 lt",gamepad2.left_stick_x);
+            telemetry.addData("gm2 rt",gamepad2.right_stick_x);
+            telemetry.update();
             //imu
             /*
             telemetry.addData("Delta Angle", DeltaAngle);//quanto a base deslocou em radianos desde o ultimo reset
@@ -184,8 +275,6 @@ public abstract class RobotFunctions extends LinearOpMode{
             telemetry.addData("currentfront",CurrentFront);
             telemetry.addData("cumError",pid_turn.cummulativeError);
             /* */
-
-
             //valores crus (direto do gamepad)
             /*
             telemetry.addData("raw FB",-1*gamepad1.left_stick_y);
@@ -196,9 +285,6 @@ public abstract class RobotFunctions extends LinearOpMode{
             telemetry.addData("3",bL);
             telemetry.addData("4",bR);
             //telemetry.addData("multiplier",maximo);//garante que a velocidade maxima seja 1/**/
-
-
-
             //velocidades aplicadas nas rodas
             /*
             telemetry.addData("delay=",getRuntime()-prevtime);
@@ -213,14 +299,12 @@ public abstract class RobotFunctions extends LinearOpMode{
             //telemetry.addData("LARM power",LArm.getPower());
             //telemetry.addData("RARM power",RArm.getPower());
             /**/
-
-
             //Encoders
             /*
             telemetry.addData("bL encoder",backLeft.getCurrentPosition());
-            telemetry.addData("bL encoder",backRight.getCurrentPosition());
-            telemetry.addData("bL encoder",frontLeft.getCurrentPosition());
-            telemetry.addData("bL encoder",frontRight.getCurrentPosition());
+            telemetry.addData("bR encoder",backRight.getCurrentPosition());
+            telemetry.addData("fL encoder",frontLeft.getCurrentPosition());
+            telemetry.addData("fR encoder",frontRight.getCurrentPosition());
             /**/
             //telemetry.update(); // adiciona tudo da telemetria
         }
@@ -228,6 +312,9 @@ public abstract class RobotFunctions extends LinearOpMode{
 
             if (!(gamepad1.b||gamepad1.right_bumper) && IMUWorking &&encodersWorking){
                 currentBaseExecMode = DriveBaseExecMode.FULL_FUNCTION_MODE;
+            }
+            if ((goalbraco>1000)&&(distanceSensor.getDistance(DistanceUnit.CM)<30)){
+                currentBaseExecMode = DriveBaseExecMode.BACKDROP_FULL_FUNCTION_MODE;
             }
             if (gamepad1.right_bumper && IMUWorking && encodersWorking){
                 currentBaseExecMode = DriveBaseExecMode.AUTO_ALIGN;
@@ -242,6 +329,9 @@ public abstract class RobotFunctions extends LinearOpMode{
                 case FULL_FUNCTION_MODE:
                     driving.moveBaseIMU();
                     break;
+                case BACKDROP_FULL_FUNCTION_MODE:
+                    driving.moveBaseBackdropFull();
+                    break;
                 case NO_IMU_MODE:
                     driving.moveBaseNoIMU();
                     break;
@@ -251,6 +341,219 @@ public abstract class RobotFunctions extends LinearOpMode{
                 case GRAPH_MODE:
                     driving.graphMode();
                     break;
+            }
+        }
+        public class DriveBase {
+            void manageIMU() {
+
+                if (gamepad1.a) {
+                    imu.resetYaw();
+                    CurrentFront = orientation.getYaw(AngleUnit.RADIANS);
+                }
+
+                //ao girar manualmente, reseta a orientação tida como frente pelo robô (para uso no PID)
+                if (Math.abs(turn) >= 0.01) {
+                    CurrentFront = orientation.getYaw(AngleUnit.RADIANS);
+                    pid_turn.cummulativeError = 0;
+                }
+
+
+                //Parametros para o PID são calculados (não é tudo feito dentro do PID para permitir uso na telemetria)
+                CurrentAngle = orientation.getYaw(AngleUnit.RADIANS);
+                if (CurrentAngle < CurrentFront) {
+                    CurrentAngle = 2 * Math.PI + CurrentAngle - CurrentFront;
+                } else {
+                    CurrentAngle -= CurrentFront;
+                }
+
+                //se não houver uma curva manual, um PID é usado para manter a orientação do robô
+                if (Math.abs(turn) < 0.001) {
+                    turn = pid_turn.CalculatePID(ConvertAngle(CurrentAngle), 0, true) * -1;
+                    if (Math.abs(turn) < 0.1) {
+                        turn = 0;
+                    }
+                }
+            }
+            void moveBaseNoIMU(){
+                //define as velocidades de cada motor
+                double maximo = Math.max(drive+strafe + Math.abs(turn), 1);
+
+
+                fL = (drive + strafe + turn) / maximo;
+                fR = (drive - strafe - turn) / maximo;
+                bL = (drive - strafe + turn) / maximo;
+                bR = (drive + strafe - turn) / maximo;
+                //geração de uma aceleração ao controlar o maximo dos motores
+                //aplica as potências aos motores
+
+                frontRight.setPower(fR * 0.5);
+                frontLeft.setPower(fL * 0.5);
+                backRight.setPower(bR * 0.5);
+                backLeft.setPower(bL * 0.5);
+            }
+            void moveBaseIMU() {
+                //muda a direção de movimento com base na orientação ro robo
+                double rotX = strafe * Math.cos(orientation.getYaw(AngleUnit.RADIANS)) + drive * Math.sin(orientation.getYaw(AngleUnit.RADIANS));
+                double rotY = strafe * Math.sin(-orientation.getYaw(AngleUnit.RADIANS)) + drive * Math.cos(-orientation.getYaw(AngleUnit.RADIANS));
+
+                //define as velocidades de cada motor
+                double maximo = Math.max(Math.abs(rotX) + Math.abs(rotY) + Math.abs(turn), 1);
+
+
+                fL = (rotY + rotX + turn) / maximo;
+                fR = (rotY - rotX - turn) / maximo;
+                bL = (rotY - rotX + turn) / maximo;
+                bR = (rotY + rotX - turn) / maximo;
+
+                //geração de uma aceleração ao controlar o maximo dos motores
+                //aplica as potências aos motores
+
+                frontRight.setPower(fR * 0.5);
+                frontLeft.setPower(fL * 0.5);
+                backRight.setPower(bR * 0.5);
+                backLeft.setPower(bL * 0.5);/**/
+
+            }
+            public void moveBaseBackdropFull() {
+                //muda a direção de movimento com base na orientação ro robo
+                double rotX = strafe * Math.cos(orientation.getYaw(AngleUnit.RADIANS)) + drive * Math.sin(orientation.getYaw(AngleUnit.RADIANS));
+                double rotY = strafe * Math.sin(-orientation.getYaw(AngleUnit.RADIANS)) + drive * Math.cos(-orientation.getYaw(AngleUnit.RADIANS));
+
+                //define as velocidades de cada motor
+                double maximo = Math.max(Math.abs(rotX) + Math.abs(rotY) + Math.abs(turn), 1);
+
+
+                fL = (rotY + rotX + turn) / maximo;
+                fR = (rotY - rotX - turn) / maximo;
+                bL = (rotY - rotX + turn) / maximo;
+                bR = (rotY + rotX - turn) / maximo;
+
+                //geração de uma aceleração ao controlar o maximo dos motores
+                //aplica as potências aos motores
+
+                frontRight.setPower(fR * 0.3);
+                frontLeft.setPower(fL * 0.3);
+                backRight.setPower(bR * 0.3);
+                backLeft.setPower(bL * 0.3);/**/
+            }
+            void graphMode(){}
+            void autoalign(){
+                autodrive.setPoseEstimate(new Pose2d(0,0,0));
+                Artpos = 0.71;
+                Articulation.setPosition(0.71);
+                autodrive.followTrajectory(autodrive.trajectoryBuilder(new Pose2d(0,0,0))
+                        .back(2)
+                        .build());
+                AutoGrabDone=true;
+            }
+
+            private double Accelerator(double desired, double current) {
+        /*
+        double konstant=0.03;
+        if (Math.abs(desired)>Math.abs(current)&&!gamepad1.left_bumper){
+            if (Math.abs(current+konstant*desired)>1){
+                return Integer.signum((int)(current+konstant*desired));
+            } else {
+                return current + konstant*desired;
+            }
+        } else{
+            return desired;
+        }*/
+                return desired;
+            }
+
+            public double ConvertAngle(double angle) {
+                double return_angle = angle;
+                if (angle > Math.PI) {
+                    return_angle -= 2 * Math.PI;
+                }
+                return return_angle;
+            }
+
+
+        }
+        public class Arm{
+            private void armheight(){
+                if (gamepad2.dpad_down){
+                    finalgoalbraco = 0;
+                }
+                if (gamepad2.dpad_up){
+                    finalgoalbraco = 1700;
+                }
+                //Articulation.setPosition(gamepad2.right_stick_x);
+                //Arm2.setPosition(gamepad2.left_stick_x);
+                if (gamepad2.x){
+                    Arm2.setPosition(0.15);
+                    Articulation.setPosition(0.35);
+                    //0.72 extend
+                    //0.35 gradado
+                }
+                if (gamepad2.dpad_left){
+                    Arm2.setPosition(0.72);
+                    Articulation.setPosition(0.05);
+
+                }
+                if (gamepad2.dpad_right){
+                    Arm2.setPosition(0.6-gamepad2.right_trigger*0.4);
+                    Articulation.setPosition(0.37+gamepad2.right_trigger*0.35);
+                    //0.35
+                }
+            }
+            private void braco() {
+                //atras = 1700
+                //frente = 700
+                //baixado = 0
+                //kp = 0.01
+                //PVar = 6
+
+                    //goalbraco+= GPVARIATION*(finalgoalbraco-goalbraco);
+                    //goalbraco = finalgoalbraco;
+                    if (!((goalbraco>finalgoalbraco-GPVARIATION)&&(goalbraco<finalgoalbraco+GPVARIATION))){
+                        if (goalbraco>finalgoalbraco){
+                            goalbraco-=GPVARIATION;
+                        }else{
+                            goalbraco+=GPVARIATION;
+                        }
+                    } else {
+                        goalbraco = finalgoalbraco;
+                    }
+                    powerbraco = pid_braco.CalculatePID(frontLeft.getCurrentPosition(),goalbraco,false);
+
+
+                if (!bottomLimit.isPressed()){
+                    frontLeft.setPower(powerbraco);}
+                else if (powerbraco>=0) {
+                    frontLeft.setPower(powerbraco);
+                }
+
+            }
+            private void ClawControl(){
+
+
+
+                if (leftClawSwitch.click(gamepad2.left_bumper)) {
+                    openLeftClaw();
+                } else {
+                    closeLeftClaw();
+                }
+                if (rightClawSwitch.click(gamepad2.right_bumper)) {
+                    openRightClaw();
+                } else {
+                    closeRightClaw();
+                }
+
+            }
+            private void closeLeftClaw(){
+                LClaw.setPosition(0.3);
+            }
+            private void openLeftClaw(){
+                LClaw.setPosition(0.7);
+            }
+            private void closeRightClaw(){
+                RClaw.setPosition(0.7);
+            }
+            private void openRightClaw(){
+                RClaw.setPosition(0.3);
             }
         }
     }
@@ -303,26 +606,26 @@ public abstract class RobotFunctions extends LinearOpMode{
             backLeft.setPower(bL * 0.5);
         }
         void moveBaseIMU() {
-                //muda a direção de movimento com base na orientação ro robo
-                double rotX = strafe * Math.cos(orientation.getYaw(AngleUnit.RADIANS)) + drive * Math.sin(orientation.getYaw(AngleUnit.RADIANS));
-                double rotY = strafe * Math.sin(-orientation.getYaw(AngleUnit.RADIANS)) + drive * Math.cos(-orientation.getYaw(AngleUnit.RADIANS));
+            //muda a direção de movimento com base na orientação ro robo
+            double rotX = strafe * Math.cos(orientation.getYaw(AngleUnit.RADIANS)) + drive * Math.sin(orientation.getYaw(AngleUnit.RADIANS));
+            double rotY = strafe * Math.sin(-orientation.getYaw(AngleUnit.RADIANS)) + drive * Math.cos(-orientation.getYaw(AngleUnit.RADIANS));
 
-                //define as velocidades de cada motor
-                double maximo = Math.max(Math.abs(rotX) + Math.abs(rotY) + Math.abs(turn), 1);
+            //define as velocidades de cada motor
+            double maximo = Math.max(Math.abs(rotX) + Math.abs(rotY) + Math.abs(turn), 1);
 
 
-                fL = (rotY + rotX + turn) / maximo;
-                fR = (rotY - rotX - turn) / maximo;
-                bL = (rotY - rotX + turn) / maximo;
-                bR = (rotY + rotX - turn) / maximo;
+            fL = (rotY + rotX + turn) / maximo;
+            fR = (rotY - rotX - turn) / maximo;
+            bL = (rotY - rotX + turn) / maximo;
+            bR = (rotY + rotX - turn) / maximo;
 
-                //geração de uma aceleração ao controlar o maximo dos motores
-                //aplica as potências aos motores
+            //geração de uma aceleração ao controlar o maximo dos motores
+            //aplica as potências aos motores
 
-                frontRight.setPower(fR * 0.5);
-                frontLeft.setPower(fL * 0.5);
-                backRight.setPower(bR * 0.5);
-                backLeft.setPower(bL * 0.5);/**/
+            frontRight.setPower(fR * 0.5);
+            frontLeft.setPower(fL * 0.5);
+            backRight.setPower(bR * 0.5);
+            backLeft.setPower(bL * 0.5);/**/
 
         }
         void graphMode(){}
@@ -359,73 +662,16 @@ public abstract class RobotFunctions extends LinearOpMode{
             return return_angle;
         }
     }
-    public class Arm{
-        private void braco() {
-            //alto = 540?
-            //baixo = 0
-        /*if (gamepad2.y||(yOn)) {
-            yOn=false;
-            yOn =  gamepad2.y;
-            if (yOn&&gamepad2.y){
-                mainArm.setPower(0);
-
-            } else {
-                backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    public class simpleSwitch{
+        private boolean previouslyPressed=false;
+        private boolean currentState = false;
+        boolean click(boolean pressed) {
+            if (!previouslyPressed && pressed) {
+                currentState = !currentState;
             }
-        } else {
-            finalgoalbraco = gamepad2.right_trigger*540;
-            goalbraco+= PVARIATION*(finalgoalbraco-goalbraco);
-            //goalbraco = finalgoalbraco;
-            /*if (!((goalbraco>finalgoalbraco-1)&&(goalbraco<finalgoalbraco+1))){
-                if (goalbraco>finalgoalbraco){
-                    goalbraco-=1;
-                }else{
-                    goalbraco+=1;
-                }
-            }*//*
-            //powerbraco = pid_braco.CalculatePID(backRight.getCurrentPosition(),goalbraco,false);
-
-        }*/
-            if (gamepad2.left_bumper){
-                PlaneLauncher.setPosition(0);
-            }
-            if (Math.abs(gamepad2.right_trigger)>Math.abs(gamepad2.left_trigger)){
-                mainArm.setPower(gamepad2.right_trigger*0.4);
-            }
-            else {
-                if (!bottomLimit.isPressed()) {
-                    mainArm.setPower(-gamepad2.left_trigger*0.4);
-                } else{
-                    mainArm.setPower(0.07);
-                }
-            }
-        }
-        private void garra(){
-            if (gamepad2.x) {
-                openClaw();
-            } else if (gamepad2.y) {
-                closeClaw();
-            }
-            if (gamepad2.dpad_down) {
-                Artpos = 0.71;
-            } else if (gamepad2.dpad_up) {
-                Artpos = 0.45;
-            } else if (gamepad2.dpad_left) {
-                Artpos = 0.64;
-            } else if (gamepad2.dpad_right){
-                Artpos =0;
-                closeClaw();
-            }
-            Articulation.setPosition(Artpos + gamepad2.right_stick_y * 0.1);
-        }
-        private void closeClaw(){
-            RClaw.setPosition(0.3);
-            LClaw.setPosition(0.7);
-        }
-        private void openClaw(){
-            RClaw.setPosition(0.5);
-            LClaw.setPosition(0.5);
+            previouslyPressed = pressed;
+            return currentState;
         }
     }
+
 }
