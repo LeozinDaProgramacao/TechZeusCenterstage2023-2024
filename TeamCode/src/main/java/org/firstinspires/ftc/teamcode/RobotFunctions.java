@@ -162,6 +162,7 @@ public class RobotFunctions extends LinearOpMode{
                 redLED.setState(true);
             }
             bulkReadInputs();
+            driving.moveBaseNoIMU();
             arm.armheight();
             arm.braco();
             arm.ClawControl();

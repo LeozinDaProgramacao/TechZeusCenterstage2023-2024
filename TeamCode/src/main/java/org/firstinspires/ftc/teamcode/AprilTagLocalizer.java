@@ -27,8 +27,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package org.firstinspires.ftc.robotcontroller.external.samples;
-
+package org.firstinspires.ftc.teamcode;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -62,8 +61,8 @@ import java.util.List;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list.
  */
-@TeleOp(name = "Concept: AprilTag Easy", group = "Concept")
-public class ConceptAprilTagEasy extends LinearOpMode {
+@TeleOp(name = "AprilTagLocalizer", group = "Concept")
+public class AprilTagLocalizer extends LinearOpMode {
 
     private static final boolean USE_WEBCAM = true;  // true for webcam, false for phone camera
 
@@ -124,10 +123,10 @@ public class ConceptAprilTagEasy extends LinearOpMode {
         // Create the vision portal the easy way.
         if (USE_WEBCAM) {
             visionPortal = VisionPortal.easyCreateWithDefaults(
-                hardwareMap.get(WebcamName.class, "Webcam 1"), aprilTag);
+                    hardwareMap.get(WebcamName.class, "Webcam 1"), aprilTag);
         } else {
             visionPortal = VisionPortal.easyCreateWithDefaults(
-                BuiltinCameraDirection.BACK, aprilTag);
+                    BuiltinCameraDirection.BACK, aprilTag);
         }
 
     }   // end method initAprilTag()
@@ -143,8 +142,29 @@ public class ConceptAprilTagEasy extends LinearOpMode {
         // Step through the list of detections and display info for each one.
         for (AprilTagDetection detection : currentDetections) {
             if (detection.metadata != null) {
+                double xtag=0;
+                double ytag=0;
+                switch (detection.id){
+                    case 1:
+                        xtag = 59;
+                        ytag = 41.5;
+                        break;
+                    case 2:
+                        xtag = 59;
+                        ytag = 35.5;
+                        break;
+                    case 3:
+                        xtag = 59;
+                        ytag = 29.5;
+                        break;
+                }
+                double ytrans = Math.sin(Math.toRadians(-(detection.ftcPose.yaw-detection.ftcPose.bearing)))*detection.ftcPose.range;
+                double xtrans = Math.cos(Math.toRadians(-(detection.ftcPose.yaw-detection.ftcPose.bearing)))*detection.ftcPose.range;
+
                 telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
-                telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.metadata.fieldPosition.get(0), detection.metadata.fieldPosition.get(1), detection.metadata.fieldPosition.get(2)));
+                telemetry.addLine(String.format("Xtrans %6.1f Ytrans %6.1f",xtrans,ytrans));
+                telemetry.addLine(String.format("FIELD XY %6.1f %6.1f",xtag-xtrans,ytag-ytrans));
+                telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
                 telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
                 telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
             } else {
