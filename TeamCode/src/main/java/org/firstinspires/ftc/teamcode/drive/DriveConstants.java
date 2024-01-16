@@ -33,8 +33,9 @@ public class DriveConstants {
      * from DriveVelocityPIDTuner.
      */
     public static final boolean RUN_USING_ENCODER = false;
-    public static PIDFCoefficients MOTOR_VELO_PID = new PIDFCoefficients(30, 2, 10,
-            13.5//getMotorVelocityF(MAX_RPM / 60 * TICKS_PER_REV)
+    public static PIDFCoefficients MOTOR_VELO_PID = new PIDFCoefficients(
+            0,0,0,0
+            //30, 2, 10, 13.5//getMotorVelocityF(MAX_RPM / 60 * TICKS_PER_REV)
     );
 
     /*
@@ -47,7 +48,7 @@ public class DriveConstants {
      */
     public static double WHEEL_RADIUS = 3.77953/2; // in
     public static double GEAR_RATIO = 68/59.38; // output (wheel) speed / input (motor) speed
-    public static double TRACK_WIDTH = 12.33; // in
+    public static double TRACK_WIDTH = 30; // in
 
     /*
      * These are the feedforward parameters used to model the drive motor behavior. If you are using
@@ -55,9 +56,9 @@ public class DriveConstants {
      * motor encoders or have elected not to use them for velocity control, these values should be
      * empirically tuned.
      */
-    public static double kV = 1.0 / rpmToVelocity(MAX_RPM);
-    public static double kA = 0;
-    public static double kStatic = 0;
+    public static double kV = 0.0106;//1.0 / rpmToVelocity(MAX_RPM);
+    public static double kA = 0.0035;
+    public static double kStatic = 0.05;
 
     /*
      * These values are used to generate the trajectories for you robot. To ensure proper operation,
@@ -69,7 +70,7 @@ public class DriveConstants {
     public static double MAX_VEL = 30;
     public static double MAX_ACCEL = 20;
     public static double MAX_ANG_VEL = Math.toRadians(161.4002);
-    public static double MAX_ANG_ACCEL = Math.toRadians(60);
+    public static double MAX_ANG_ACCEL = 3;//Math.toRadians(60);
 
     /*
      * Adjust the orientations here to match your robot. See the FTC SDK documentation for details.

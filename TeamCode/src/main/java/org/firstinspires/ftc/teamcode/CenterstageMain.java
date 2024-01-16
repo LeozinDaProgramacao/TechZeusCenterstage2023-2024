@@ -34,24 +34,19 @@ public class CenterstageMain extends LinearOpMode {
     private DcMotor frontLeft;
     private DcMotor backLeft;
     private CRServo mainArm;
-    private CRServo armEncoder;
-    private  Servo Articulation;
+    private Encoder armEncoder;
+    private Servo Articulation;
     private Servo LClaw;
     private Servo RClaw;
-    private Servo PlaneLauncher;
-    private TouchSensor bottomLimit;
-
+    private Servo Wrist;
     //private Servo servoArticulacao;
     //private Servo servoGarra;
     private IMU imu;
     YawPitchRollAngles orientation;
-    SampleMecanumDrive Autodrive;
+    public static int GPVARIATION=6;
     double drive=0;
     double turn=0;
     double strafe=0;
-    double raw_drive=0;
-    double raw_turn=0;
-    double raw_strafe=0;
     double DeltaAngle;
     double CurrentFront;
     double CurrentAngle;
@@ -69,11 +64,9 @@ public class CenterstageMain extends LinearOpMode {
     double goalbraco;
     //PID pid_turn = new PID(0.5,0.005,0.0,0.4);
     PID pid_turn = new PID(0.6,0.000,0.0,0.3);
-    //PID pid_braco = new PID(0.005,0.01,0.003);
+    PID pid_braco = new PID(0.003,0,0,0);
     double prevtime=0;
     double Artpos =0;
-    boolean autoGrab = false;
-    boolean AutoGrabDone=true;
 
     /**
      * This function is executed when this Op Mode is selected.
@@ -88,13 +81,13 @@ public class CenterstageMain extends LinearOpMode {
         backRight = hardwareMap.get(DcMotor.class, "BRmotor");
         frontLeft = hardwareMap.get(DcMotor.class, "FLmotor");
         backLeft = hardwareMap.get(DcMotor.class, "BLmotor");
-        mainArm = hardwareMap.get(CRServo.class, "mainArm");
-        bottomLimit= hardwareMap.get(TouchSensor.class,"bottomLimitSensor");
+        mainArm = hardwareMap.get(CRServo.class, "BRACO_TEMP_MUDAR_DPS");
 
         Articulation = hardwareMap.get(Servo.class,"Articulation");
         LClaw = hardwareMap.get(Servo.class,"LClaw");
         RClaw = hardwareMap.get(Servo.class,"RClaw");
-        PlaneLauncher = hardwareMap.get(Servo.class,"PlaneLauncher");
+        Wrist = hardwareMap.get(Servo.class,"Wrist");
+        mainArm = hardwareMap.get(CRServo.class, "BRACO_TEMP_MUDAR_DPS");
 
 
 
@@ -105,7 +98,7 @@ public class CenterstageMain extends LinearOpMode {
         backLeft.setDirection(DcMotorSimple.Direction.FORWARD);
 
         //falsifica um encoder pro braço
-
+        /*
         frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -114,7 +107,7 @@ public class CenterstageMain extends LinearOpMode {
         frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
+        */
         /*
         frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -125,14 +118,17 @@ public class CenterstageMain extends LinearOpMode {
         backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         */
-        //servoArticulacao.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 
         //define variaveis essenciais e inicializa funções
 
         YawPitchRollAngles orientation = null;
         AngularVelocity angularVelocity;
-        PlaneLauncher.setPosition(0.5);
 
         waitForStart();
 
@@ -166,12 +162,6 @@ public class CenterstageMain extends LinearOpMode {
             turn = gamepad1.right_stick_x;
             strafe = gamepad1.left_stick_x;
         }
-
-
-        if (!autoGrab&&gamepad1.right_bumper){
-            AutoGrabDone=false;
-        }
-        autoGrab= gamepad1.right_bumper;
 
         orientation = imu.getRobotYawPitchRollAngles();
         DeltaAngle =360- (orientation.getYaw(AngleUnit.RADIANS)*180/3.141);
@@ -209,7 +199,6 @@ public class CenterstageMain extends LinearOpMode {
         }
     }
     private void moveBase(){
-        if (!autoGrab&&AutoGrabDone){
         //muda a direção de movimento com base na orientação ro robo
         double rotX = strafe*Math.cos(orientation.getYaw(AngleUnit.RADIANS))+drive*Math.sin(orientation.getYaw(AngleUnit.RADIANS));
         double rotY = strafe*Math.sin(-orientation.getYaw(AngleUnit.RADIANS))+drive*Math.cos(-orientation.getYaw(AngleUnit.RADIANS));
@@ -218,7 +207,7 @@ public class CenterstageMain extends LinearOpMode {
         double maximo = Math.max(Math.abs(rotX)+Math.abs(rotY)+Math.abs(turn),1);
 
 
-        DfL= (rotY+rotX+turn)/maximo;
+        /*DfL= (rotY+rotX+turn)/maximo;
         DfR=(rotY-rotX-turn)/maximo;
         DbL=(rotY-rotX+turn)/maximo;
         DbR=(rotY+rotX-turn)/maximo;
@@ -226,7 +215,9 @@ public class CenterstageMain extends LinearOpMode {
         fR = Accelerator(DfR,fR);
         bL = Accelerator(DbL,bL);
         bR = Accelerator(DbR,bR);
-        /*
+        /**/
+
+
         fL= (rotY+rotX+turn)/maximo;
         fR=(rotY-rotX-turn)/maximo;
         bL=(rotY-rotX+turn)/maximo;
@@ -238,16 +229,7 @@ public class CenterstageMain extends LinearOpMode {
         frontRight.setPower(fR*0.5);
         frontLeft.setPower(fL*0.5);
         backRight.setPower(bR*0.5);
-        backLeft.setPower(bL*0.5);/**/}
-        else {
-            autodrive.setPoseEstimate(new Pose2d(0,0,0));
-            Artpos = 0.71;
-            Articulation.setPosition(0.71);
-            autodrive.followTrajectory(autodrive.trajectoryBuilder(new Pose2d(0,0,0))
-                    .back(2)
-                    .build());
-            AutoGrabDone=true;
-        }
+        backLeft.setPower(bL*0.5);/**/
 
     }
     private void adicionarTelemetria(){
@@ -269,7 +251,7 @@ public class CenterstageMain extends LinearOpMode {
 
       telemetry.addData("raw FB",-1*gamepad1.left_stick_y);
       telemetry.addData("raw LR",gamepad1.left_stick_x);
-      telemetry.addData("raw TR",raw_turn);
+      telemetry.addData("raw TR",gamepad1.right_stick_x);
       telemetry.addData("1",fL);
         telemetry.addData("2",fR);
         telemetry.addData("3",bL);
@@ -295,7 +277,7 @@ public class CenterstageMain extends LinearOpMode {
 
 
         //Encoders
-        
+
         telemetry.addData("bL encoder",backLeft.getCurrentPosition());
         telemetry.addData("bL encoder",backRight.getCurrentPosition());
         telemetry.addData("bL encoder",frontLeft.getCurrentPosition());
@@ -304,46 +286,56 @@ public class CenterstageMain extends LinearOpMode {
         telemetry.update(); // adiciona tudo da telemetria
     }
     private void braco() {
-        //alto = 540?
-        //baixo = 0
-        /*if (gamepad2.y||(yOn)) {
-            yOn=false;
-            yOn =  gamepad2.y;
-            if (yOn&&gamepad2.y){
-                mainArm.setPower(0);
+        //atras = 1700
+        //frente = 700
+        //baixado = 0
+        //kp = 0.01
+        //PVar = 6
 
-            } else {
-                backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        if (gamepad2.dpad_down){
+            finalgoalbraco = 0;
+        }
+        if (gamepad2.dpad_up){
+            finalgoalbraco = 1700;
+        }
+        //Articulation.setPosition(gamepad2.right_stick_x);
+        //Arm2.setPosition(gamepad2.left_stick_x);
+        if (gamepad2.x){
+            Articulation.setPosition(0.15);
+            Wrist.setPosition(0.35);
+            //0.72 extend
+            //0.35 gradado
+        }
+        if (gamepad2.dpad_left){
+            Articulation.setPosition(0.72);
+            Wrist.setPosition(0.05);
+
+        }
+        if (gamepad2.dpad_right){
+            Articulation.setPosition(0.6-gamepad2.right_trigger*0.4);
+            Wrist.setPosition(0.37+gamepad2.right_trigger*0.35);
+            //0.35
+        }
+
+        //goalbraco+= GPVARIATION*(finalgoalbraco-goalbraco);
+        //goalbraco = finalgoalbraco;
+        if (!((goalbraco>finalgoalbraco-GPVARIATION)&&(goalbraco<finalgoalbraco+GPVARIATION))){
+            if (goalbraco>finalgoalbraco){
+                goalbraco-=GPVARIATION;
+            }else{
+                goalbraco+=GPVARIATION;
             }
         } else {
-            finalgoalbraco = gamepad2.right_trigger*540;
-            goalbraco+= PVARIATION*(finalgoalbraco-goalbraco);
-            //goalbraco = finalgoalbraco;
-            /*if (!((goalbraco>finalgoalbraco-1)&&(goalbraco<finalgoalbraco+1))){
-                if (goalbraco>finalgoalbraco){
-                    goalbraco-=1;
-                }else{
-                    goalbraco+=1;
-                }
-            }*//*
-            //powerbraco = pid_braco.CalculatePID(backRight.getCurrentPosition(),goalbraco,false);
+            goalbraco = finalgoalbraco;
+        }
+        powerbraco = pid_braco.CalculatePID(frontLeft.getCurrentPosition(),goalbraco,false);
 
-        }*/
-        if (gamepad2.left_bumper){
-            PlaneLauncher.setPosition(0);
+        mainArm.setPower(powerbraco);
+
+
         }
-        if (Math.abs(gamepad2.right_trigger)>Math.abs(gamepad2.left_trigger)){
-            mainArm.setPower(gamepad2.right_trigger*0.4);
-        }
-        else {
-            if (!bottomLimit.isPressed()) {
-                mainArm.setPower(-gamepad2.left_trigger*0.4);
-            } else{
-                mainArm.setPower(0.07);
-            }
-        }
-    }
+
     private void garra(){
             if (gamepad2.x) {
                 openClaw();

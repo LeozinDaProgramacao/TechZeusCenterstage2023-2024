@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -28,9 +29,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import java.util.List;
 @TeleOp(name = "Robot Functions")
 
-public class RobotFunctions extends LinearOpMode{
-
-
+public class RobotFunctions extends LinearOpMode {
     private static DcMotor frontRight;
     private static DcMotor backRight;
     private static DcMotor frontLeft;
@@ -163,7 +162,6 @@ public class RobotFunctions extends LinearOpMode{
             }
             bulkReadInputs();
             driving.moveBaseNoIMU();
-            arm.armheight();
             arm.braco();
             arm.ClawControl();
             addTelemetry();
@@ -474,7 +472,14 @@ public class RobotFunctions extends LinearOpMode{
 
         }
         public class Arm{
-            private void armheight(){
+            private void braco() {
+                //atras = 1700
+                //frente = 700
+                //baixado = 0
+                //kp = 0.01
+                //PVar = 6
+
+
                 if (gamepad2.dpad_down){
                     finalgoalbraco = 0;
                 }
@@ -499,13 +504,6 @@ public class RobotFunctions extends LinearOpMode{
                     Articulation.setPosition(0.37+gamepad2.right_trigger*0.35);
                     //0.35
                 }
-            }
-            private void braco() {
-                //atras = 1700
-                //frente = 700
-                //baixado = 0
-                //kp = 0.01
-                //PVar = 6
 
                     //goalbraco+= GPVARIATION*(finalgoalbraco-goalbraco);
                     //goalbraco = finalgoalbraco;
