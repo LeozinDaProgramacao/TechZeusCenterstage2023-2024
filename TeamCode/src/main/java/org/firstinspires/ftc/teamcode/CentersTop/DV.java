@@ -52,8 +52,8 @@ public class DV {
     static double bR =0;
     boolean yOn;
     static double powerbraco;
-    double finalgoalbraco = 0;
-    double goalbraco;
+    static double finalgoalbraco = 0;
+    static double goalbraco;
     //PID pid_turn = new PID(0.5,0.005,0.0,0.4);
     static PID pid_turn = new PID(0.6,0.000,0.0,0.3);
     public static int GPVARIATION=6;
@@ -66,18 +66,21 @@ public class DV {
     boolean AutoGrabDone=true;
     boolean IMUWorking = true;
     boolean encodersWorking = true;
-    simpleSwitch leftClawSwitch = new simpleSwitch();
-    simpleSwitch rightClawSwitch = new simpleSwitch();
+    static simpleSwitch leftClawSwitch = new simpleSwitch();
+    static simpleSwitch rightClawSwitch = new simpleSwitch();
     public static enum RunMode{
         FULL_FUNCTION,
         ENCODER_ERROR,
         INCOMPETENT_IMU
     }
-    public static enum BaseExecMode{
-        FART
+    public static enum ExecMode{
+        FULL_FUNCTION_MODE,
+        BACKDROP_MODE,
+        LIMITED_MODE,
+        HANG_MODE
     }
-    static BaseExecMode currentBaseExecMode = BaseExecMode.FART;
-    public class simpleSwitch{
+    static ExecMode currentExecMode = ExecMode.FULL_FUNCTION_MODE;
+    public static class simpleSwitch{
         public boolean previouslyPressed=false;
         public boolean currentState = false;
         boolean click(boolean pressed) {

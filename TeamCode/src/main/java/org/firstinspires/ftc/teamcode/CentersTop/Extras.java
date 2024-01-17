@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -17,7 +18,7 @@ public class Extras extends LinearOpMode
             /*Description:
             this funtion adds all debugging data needed to the telemetry board
             */
-        rtelemetry.addData("CurrentExecMode", DV.currentBaseExecMode);
+        rtelemetry.addData("CurrentExecMode", DV.currentExecMode);
         rtelemetry.addData("pb", DV.powerbraco);
         rtelemetry.addData("pos",DV.frontLeft.getCurrentPosition());
         rtelemetry.addData("distance",DV.distanceSensor.getDistance(DistanceUnit.CM));
@@ -66,7 +67,7 @@ public class Extras extends LinearOpMode
             /**/
         //telemetry.update(); // adiciona tudo da telemetria
     }
-    public void HardwareMapAll(){
+    public void HardwareMapAll(HardwareMap hardwareMap){
         DV.autodrive = new SampleMecanumDrive(hardwareMap);
         //inicializa hardware
         DV.imu = hardwareMap.get(IMU.class, "imu");

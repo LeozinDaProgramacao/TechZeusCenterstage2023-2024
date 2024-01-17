@@ -6,6 +6,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 public class DriveBase extends LinearOpMode {
     void manageIMU() {
+        DV.orientation = DV.imu.getRobotYawPitchRollAngles();
 
         if (gamepad1.a) {
             DV.imu.resetYaw();
@@ -98,6 +99,8 @@ public class DriveBase extends LinearOpMode {
         DV.backLeft.setPower(DV.bL * 0.3);/**/
     }
     void graphMode(){}
+
+
 
     private double Accelerator(double desired, double current) {
         /*
