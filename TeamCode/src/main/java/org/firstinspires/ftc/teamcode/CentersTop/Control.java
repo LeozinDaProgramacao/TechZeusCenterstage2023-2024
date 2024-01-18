@@ -1,10 +1,7 @@
 package org.firstinspires.ftc.teamcode.CentersTop;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-
-import org.firstinspires.ftc.teamcode.RobotFunctions;
 
 
 @TeleOp(name="Ballsack")
