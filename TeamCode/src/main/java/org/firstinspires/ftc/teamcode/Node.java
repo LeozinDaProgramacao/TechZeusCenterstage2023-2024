@@ -1,11 +1,17 @@
-package com.mycompany.node;
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+
+package org.firstinspires.ftc.teamcode;
+
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.acmerobotics.roadrunner.trajectory.Trajectory;
-import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
 
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDriveCancelable;
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
 
 import java.util.ArrayList;
@@ -13,33 +19,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.PriorityQueue;
 
-
 /**
  *
  * @author carlo
  */
-class Pair{
-    double XPos;
-    double YPos;
-    Pair(double nXPos,double nYPos){
-        XPos = nXPos;
-        YPos = nYPos;
-    }
-    double getX(){
-        return XPos;
-    }
-    double getY(){
-        return YPos;
-    }
-    void setX(double X){
-        XPos=X;
-    }
-    void setY(double Y){
-        YPos = Y;
-    }
-}
-
 public class Node implements Comparable<Node> {
+
     // Id for readability of result purposes
     private static int idCounter = 0;
     public int id;
@@ -48,7 +33,6 @@ public class Node implements Comparable<Node> {
     public Node parent = null;
 
     public List<Edge> neighbors;
-    public static List<Node> allNodes= new ArrayList<>();
 
     // Evaluation functions
     public double f = Double.MAX_VALUE;
@@ -58,76 +42,14 @@ public class Node implements Comparable<Node> {
     public double XPos;
     public double YPos;
 
-    public static Node getClosestNode(Node curP) {
-        double currdist = Double.MAX_VALUE;
-        Node closest = null;
-        for(Node n : allNodes){
-            double dif = Math.sqrt((n.XPos-curP.XPos)*(n.XPos-curP.XPos)+(n.YPos-curP.YPos)*(n.YPos-curP.YPos));
-            if (dif<currdist){
-                currdist = dif;
-                closest = n;
-            }
-        }
-        return closest;
-    }
-    public static Node makebluegraph(){
-        Node backdrop = new Node(48,36);
-        Node behindBackdrop = new Node(36,36);
-        Node center = new Node(30,0);
-        Node frontbridgeL = new Node(12,12);
-        Node frontbridgeR = new Node(12,-12);
-        Node backbridgeL = new Node(-36,12);
-        Node backbridgeR = new Node(-36,-12);
-        Node pixel_stack_temp_goal = new Node(-52,0);
 
-
-        backdrop.addBranch(behindBackdrop);
-
-        behindBackdrop.addBranch(center);
-        behindBackdrop.addBranch(frontbridgeL);
-
-        center.addBranch(frontbridgeL);
-        center.addBranch(frontbridgeR);
-
-        frontbridgeL.addBranch(frontbridgeR);
-        frontbridgeL.addBranch(backbridgeL);
-        frontbridgeL.addBranch(backbridgeR);
-
-        frontbridgeR.addBranch(backbridgeL);
-        frontbridgeR.addBranch(backbridgeR);
-
-        backbridgeL.addBranch(pixel_stack_temp_goal);
-        backbridgeR.addBranch(pixel_stack_temp_goal);
-        return pixel_stack_temp_goal;
-    }
-    /*public static void main(String[] args) {
-        Node head = new Node(0,0);
-        allNodes.add(head);
-        Node n1 = new Node(0,6);
-        allNodes.add(n1);
-        Node n2 = new Node(6,0);
-        allNodes.add(n2);
-        Node target = new Node(2,4);
-        allNodes.add(target);
-
-        head.addBranch(n1);
-        head.addBranch(n2);
-        //head.addBranch(target);
-        n2.addBranch(target);
-        n1.addBranch(target);
-
-        Node start = getClosestNode(new Node(3,4));
-        Node res = aStar(start, target);
-
-        printPath(res);
-    }*/
-
-    public Node(double XPos,double YPos){
+    Node(double XPos,double YPos){
         this.XPos = XPos;
         this.YPos = YPos;
         this.id = idCounter++;
         this.neighbors = new ArrayList<>();
     }
+
 
     @Override
     public int compareTo(Node n) {
@@ -147,16 +69,41 @@ public class Node implements Comparable<Node> {
     public void addBranch(Node node){
         Edge newEdge = new Edge(Math.sqrt((node.XPos-this.XPos)*(node.XPos-this.XPos)+(node.YPos-this.YPos)*(node.YPos-this.YPos)), node);
         neighbors.add(newEdge);
+        Edge newEdgeR = new Edge(Math.sqrt((node.XPos-this.XPos)*(node.XPos-this.XPos)+(node.YPos-this.YPos)*(node.YPos-this.YPos)), this);
+        node.neighbors.add(newEdgeR);
+    }
+    public static Node getClosestNode(Node curP,List<Node> nodeList) {
+        double currdist = Double.MAX_VALUE;
+        Node closest = null;
+        for(Node n : nodeList){
+            double dif = Math.sqrt((n.XPos-curP.XPos)*(n.XPos-curP.XPos)+(n.YPos-curP.YPos)*(n.YPos-curP.YPos));
+            if (dif<currdist){
+                currdist = dif;
+                closest = n;
+            }
+        }
+        return closest;
+    }
+    public static Node getTarget(Node position,List<Node> allNodesList){
+        System.out.println("printing the target position");
+        if (position.XPos>= -12){
+            System.out.println(allNodesList.get(allNodesList.size()-1).XPos+" "+ allNodesList.get(allNodesList.size()-1).YPos);
+            return allNodesList.get(allNodesList.size()-1);
+        } else{
+            System.out.println(allNodesList.get(allNodesList.size()-2).XPos+" "+ allNodesList.get(allNodesList.size()-2).YPos);
+            return allNodesList.get(allNodesList.size()-2);
+        }
     }
 
-    public double calculateHeuristic(Node target){
-        return Math.sqrt((target.XPos-this.XPos)*(target.XPos-this.XPos)+(target.YPos-this.YPos)*(target.YPos-this.YPos));
+    public static double calculateHeuristic(Node currentNode, Node target){
+        return Math.sqrt((target.XPos-currentNode.XPos)*(target.XPos-currentNode.XPos)+(target.YPos-currentNode.YPos)*(target.YPos-currentNode.YPos));
     }
+
     public static Node aStar(Node start, Node target){
         PriorityQueue<Node> closedList = new PriorityQueue<>();
         PriorityQueue<Node> openList = new PriorityQueue<>();
         start.g=0;
-        start.f = start.g + start.calculateHeuristic(target);
+        start.f = start.g + calculateHeuristic(start, target);
         openList.add(start);
 
         while(!openList.isEmpty()){
@@ -172,13 +119,13 @@ public class Node implements Comparable<Node> {
                 if(!openList.contains(m) && !closedList.contains(m)){
                     m.parent = n;
                     m.g = totalWeight;
-                    m.f = m.g + m.calculateHeuristic(target);
+                    m.f = m.g + calculateHeuristic(m,target);
                     openList.add(m);
                 } else {
                     if(totalWeight < m.g){
                         m.parent = n;
                         m.g = totalWeight;
-                        m.f = m.g + m.calculateHeuristic(target);
+                        m.f = m.g + calculateHeuristic(m,target);
 
                         if(closedList.contains(m)){
                             closedList.remove(m);
@@ -194,10 +141,16 @@ public class Node implements Comparable<Node> {
         return null;
     }
 
-    public static Trajectory //replace void with TrajectorySequence or sth like that
-    printPath(Node target, SampleMecanumDrive drive, Pose2d currentpose){
-        Node n = target;
+    public static TrajectorySequence //replace void with TrajectorySequence or sth like that
+    printPath(Node currentP, List<Node> allNodesList , SampleMecanumDriveCancelable autodrive){
+        Node start = getClosestNode(currentP, allNodesList);
+        System.out.println("printing first node visited (START)");
+        System.out.println(start.XPos+" "+ start.YPos);
 
+        Node target = getTarget(currentP,allNodesList);
+        Node n = aStar(start, target);
+        if(n==null)
+            return null;
         List<Pair> Coords = new ArrayList<Pair>();
         Pair Coord=null;
         List<Integer> ids = new ArrayList<>();
@@ -208,30 +161,38 @@ public class Node implements Comparable<Node> {
             ids.add(n.id);
             n = n.parent;
         }
-        ids.add(n.id);
+        //ids.add(n.id);
         Coord = new Pair(n.XPos,n.YPos);
-        Coords.add(Coord);
+        //Coords.add(Coord);
         Collections.reverse(Coords);
         Collections.reverse(ids);
         int index=0;
-        System.out.println(Coords);
-        TrajectoryBuilder path = drive.trajectoryBuilder(currentpose);
-        //TrajectorySequence path = new TrajectorySequenceBuilder(currentpose)
+        double heading = 69420;
+        System.out.println("lineToLinearHeading("+Coord.XPos+" "+ Coord.YPos+")");
+        TrajectorySequenceBuilder path= autodrive.trajectorySequenceBuilder(autodrive.getPoseEstimate());
+        path.lineToLinearHeading(new Pose2d(start.XPos,start.YPos,Math.toRadians(0)));
         for(int id : ids){
 
-            path.lineTo(new Vector2d(Coords.get(index).getX(),Coords.get(index).getY()));
+            if (start.XPos>target.XPos){
+                path.splineToConstantHeading( new Vector2d(Coords.get(index).getX(),Coords.get(index).getY()),Math.toRadians(180));
+                heading = 180;
+            } else{
+                path.splineToConstantHeading( new Vector2d(Coords.get(index).getX(),Coords.get(index).getY()),Math.toRadians(0));
+                heading = 0;
+            }
 
-
-            /*System.out.print(id + " (" +
+            System.out.println("splineToConstantHeading(new Pose2d(" +
                     Coords.get(index).getX()+
+
                     ","+
                     Coords.get(index).getY()+
-                    ")");*/
+                    " ),"+ heading+ ")   ");/**/
             index++;
         }
-        return path.build();
         //path.build();
         //System.out.println("");
-        //return path;
+        return path.build();
+
     }
+
 }

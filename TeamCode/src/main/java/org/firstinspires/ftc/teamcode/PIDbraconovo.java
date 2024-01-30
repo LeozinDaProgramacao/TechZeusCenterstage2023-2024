@@ -31,17 +31,16 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class PIDbraconovo extends LinearOpMode {
     FtcDashboard dashboard;
-    public static double KP=0;
-    public static double PVARIATION=0;
+    public static double KP=0.005;
+    public static double PVARIATION=0.0001;
+    public static double LVARIATION = 100;
     public static double KI=0;
     public static double KD=0;
     public static double MAXI =0;
-    public static int MAXHEIGHT=0;
+    public static int MAXHEIGHT=1569;
     boolean yOn = false;
 
-    private CRServo mainArm;
-
-    private Encoder armEncoder;
+    private DcMotor mainArm;
 
     //private Servo servoArticulacao;
     //private Servo servoGarra;
@@ -52,7 +51,7 @@ public class PIDbraconovo extends LinearOpMode {
     //PID pid_turn = new PID(0.5,0.005,0.0,0.4);
     //PID pid_turn = new PID(0.0,0.000,0.0,0.3);
     //PID pid_braco = new PID(0.005,0.01,0.003);
-    PID pid_braco = new PID(0.0,0.0,0,0.0);
+    PID pid_braco = new PID(0,0.0,0,0.0);
     double prevtime=0;
 
     /**
@@ -62,8 +61,7 @@ public class PIDbraconovo extends LinearOpMode {
     public void runOpMode() {
         dashboard =FtcDashboard.getInstance();
         //inicializa hardware
-        mainArm =hardwareMap.get(CRServo.class,"BRACO_TEMP_MUDAR_DPS");
-        armEncoder = new Encoder(hardwareMap.get(DcMotorEx.class,"BRmotor"));
+        mainArm =hardwareMap.get(DcMotor.class,"MainArm");
         //servoArticulacao = hardwareMap.get(Servo.class, "servoArticulacao");
         //servoGarra = hardwareMap.get(Servo.class, "servoGarra");
 
@@ -95,7 +93,7 @@ public class PIDbraconovo extends LinearOpMode {
             //pack1.put("armpos",armEncoder.getController().getServoPosition(5));
             pack1.put("goal",pid_braco.goal);
             pack1.put("final goal",finalgoalbraco);
-            pack1.put("posição braco",armEncoder.getCurrentPosition());
+            pack1.put("posição braco",mainArm.getCurrentPosition());
 
             dashboard.sendTelemetryPacket(pack1);
 
@@ -107,7 +105,7 @@ public class PIDbraconovo extends LinearOpMode {
             braco();
             telemetry.addData("desce",gamepad2.left_trigger);
             telemetry.addData("sobe",gamepad2.right_trigger);
-            telemetry.addData("posicao",armEncoder.getCurrentPosition());
+            telemetry.addData("posicao",mainArm.getCurrentPosition());
             telemetry.addData("PODEEEERRR",powerbraco);
             telemetry.addData("powah",mainArm.getPower());
             //telemetry.addData("cu",armEncoder.getController().getServoPosition(5));
@@ -179,8 +177,18 @@ public class PIDbraconovo extends LinearOpMode {
             }
         } else {
             finalgoalbraco = gamepad2.right_trigger * MAXHEIGHT;
-            //goalbraco+= PVARIATION*(finalgoalbraco-goalbraco);
+            goalbraco+= PVARIATION*(finalgoalbraco-goalbraco);
+            if (((goalbraco > finalgoalbraco - LVARIATION) && (goalbraco < finalgoalbraco + LVARIATION))) {
+                goalbraco = finalgoalbraco;
+            } else {
+                    goalbraco+= PVARIATION*(finalgoalbraco-goalbraco);
+            }
+
+
+
+
             //goalbraco = finalgoalbraco;
+                /*
             if (!((goalbraco > finalgoalbraco - PVARIATION) && (goalbraco < finalgoalbraco + PVARIATION))) {
                 if (goalbraco > finalgoalbraco) {
                     goalbraco -= PVARIATION;
@@ -190,11 +198,12 @@ public class PIDbraconovo extends LinearOpMode {
             } else {
                 goalbraco = finalgoalbraco;
             }
-            powerbraco = pid_braco.CalculatePID(armEncoder.getCurrentPosition(), goalbraco, false);
+            /**/
+            powerbraco = pid_braco.CalculatePID(mainArm.getCurrentPosition(), goalbraco, false);
             if (gamepad2.x) {
-                mainArm.setPower(powerbraco);
-            } else {
                 mainArm.setPower(0);
+            } else {
+                mainArm.setPower(powerbraco);
             }
 
         }

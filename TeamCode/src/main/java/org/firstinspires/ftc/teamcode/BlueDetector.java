@@ -39,14 +39,14 @@ public class BlueDetector extends OpenCvPipeline {
     public BlueDetector(Telemetry t){telemetry=t;}
 
     @Override
-    public  Mat processFrame(Mat input){
+    public Mat processFrame(Mat input){
         Mat mat = new Mat();
         Imgproc.cvtColor(input,mat,Imgproc.COLOR_RGB2HSV);
 
         Scalar lowHSV = new Scalar(A,B,C);
         Scalar highHSV = new Scalar(D,E,F);
         Core.inRange(mat,lowHSV,highHSV,mat);
-
+        //Core.copyTo(mat,input,mat);
         Mat mask = new Mat();
         mat.copyTo(mask);
         Mat left = mat.submat(LEFT);
@@ -90,10 +90,10 @@ public class BlueDetector extends OpenCvPipeline {
             location= BlueDetector.Location.RIGHT;
             telemetry.addData("side","right");
         }
-        //telemetry.update();
-        //input.release();
+        telemetry.update();
         mask.release();
         mat.release();
+        //input.release();
         return input;
     }
     public BlueDetector.Location getLocation(){
