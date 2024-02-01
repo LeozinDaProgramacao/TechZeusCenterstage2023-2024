@@ -65,6 +65,10 @@ public class Node implements Comparable<Node> {
         public double weight;
         public Node node;
     }
+    public void addOneDirectionalBranch(Node node){
+        Edge newEdge = new Edge(Math.sqrt((node.XPos-this.XPos)*(node.XPos-this.XPos)+(node.YPos-this.YPos)*(node.YPos-this.YPos)), node);
+        neighbors.add(newEdge);
+    }
 
     public void addBranch(Node node){
         Edge newEdge = new Edge(Math.sqrt((node.XPos-this.XPos)*(node.XPos-this.XPos)+(node.YPos-this.YPos)*(node.YPos-this.YPos)), node);

@@ -37,7 +37,7 @@ public class StandardTrackingWheelLocalizer extends ThreeTrackingWheelLocalizer 
 
     private Encoder leftEncoder, rightEncoder, frontEncoder;
     public static double X_MULTIPLIER =0.9983;
-    public static double Y_MULTIPLIER =1.08;
+    public static double Y_MULTIPLIER =1;
 
 
     private List<Integer> lastEncPositions, lastEncVels;

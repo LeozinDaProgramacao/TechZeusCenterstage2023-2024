@@ -39,28 +39,28 @@ import java.util.List;
 
 public class testelevantar extends LinearOpMode {
 
+    public static double PVARIATION = 0.001;
+    public static double LVARIATION =6;
+
     private DcMotor CoreDir;
     private DcMotor CoreEsq;
+    public static double KP1=0;
+    public static double KP2=0;
+    public static double KI1=0;
+    public static double KI2=0;
 
-    double powerbraco;
-    double finalgoalbraco = 0;
-    double goalbraco;
-    PID pid_core_esq = new PID(0.01,0,0,0);
-    PID pid_core_dir = new PID(0.01,0,0,0);
-    PID pid_turn = new PID(0,0,0,0);
-    //PID pid_turn = new PID(0.5,0.005,0.0,0.4);
-    //PID pid_turn = new PID(0.6,0.000,0.0,0.3);
-    PID pid_braco = new PID(0.01,0,0,0);
-    double prevtime=0;
-    double Artpos =0;
-    public static List<Node> allNodes= new ArrayList<>();
-    double goalX=0;
+    PID pid_core_esq = new PID(0.05,0,0,0);
+    PID pid_core_dir = new PID(0.05,0,0,0);
+
+    double goalhang=0;
 
     /**
      * This function is executed when this Op Mode is selected.
      */
 
     SampleMecanumDriveCancelable autodrive;
+    private int finalgoalhang=0;
+
     @Override
     public void runOpMode() {
 
@@ -69,8 +69,10 @@ public class testelevantar extends LinearOpMode {
         CoreDir = hardwareMap.get(DcMotor.class, "Barra2");
 
         CoreEsq.setDirection(DcMotorSimple.Direction.FORWARD);
-        CoreDir.setDirection(DcMotorSimple.Direction.FORWARD);
+        CoreDir.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        CoreDir.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        CoreEsq.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         CoreDir.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         CoreEsq.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -81,16 +83,30 @@ public class testelevantar extends LinearOpMode {
 
 
         while  (opModeIsActive()) {
-            if (gamepad2.right_bumper){
-                CoreDir.setPower(gamepad2.left_trigger);
-                CoreEsq.setPower(gamepad2.right_trigger);
-            } else if (gamepad2.left_bumper){
-                CoreDir.setPower(-gamepad2.left_trigger);
-                CoreEsq.setPower(-gamepad2.right_trigger);
-            } else {
-                CoreDir.setPower(0);
-                CoreEsq.setPower(0);
+
+
+            if (gamepad2.right_trigger>0.5&&gamepad2.left_trigger>0.5){
+                finalgoalhang = 250;
+            } if (gamepad2.x&&gamepad2.y){
+                finalgoalhang = 800;
+            } if (gamepad2.b){
+                finalgoalhang=0;
             }
+            //goalhang+= PVARIATION*(finalgoalhang-goalhang);
+            if (((goalhang > finalgoalhang - LVARIATION) && (goalhang < finalgoalhang + LVARIATION))) {
+                goalhang = finalgoalhang;
+            } else if (goalhang>finalgoalhang){
+                    goalhang-=LVARIATION;
+            } else if (goalhang<finalgoalhang){
+                goalhang+=LVARIATION;
+            }
+            double powEsq= pid_core_esq.CalculatePID(CoreEsq.getCurrentPosition(),goalhang,false);
+            double powDir =pid_core_dir.CalculatePID(CoreDir.getCurrentPosition(),goalhang,false);
+            CoreEsq.setPower(powEsq);
+            CoreDir.setPower(powDir);
+            telemetry.addData("left corehex",CoreEsq.getCurrentPosition());
+            telemetry.addData("right corehex",CoreDir.getCurrentPosition());
+            telemetry.update();
         }
     }
 }

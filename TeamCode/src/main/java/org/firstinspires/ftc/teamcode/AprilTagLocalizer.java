@@ -28,12 +28,16 @@
  */
 
 package org.firstinspires.ftc.teamcode;
+import android.annotation.SuppressLint;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDriveCancelable;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
@@ -70,6 +74,7 @@ public class AprilTagLocalizer extends LinearOpMode {
      * The variable to store our instance of the AprilTag processor.
      */
     private AprilTagProcessor aprilTag;
+    double CAM_DIST_TO_CENTER = 6.5;
 
     /**
      * The variable to store our instance of the vision portal.
@@ -86,7 +91,7 @@ public class AprilTagLocalizer extends LinearOpMode {
         telemetry.addData(">", "Touch Play to start OpMode");
         telemetry.update();
         waitForStart();
-
+        SampleMecanumDrive drive = new SampleMecanumDrive(hardwareMap);
         if (opModeIsActive()) {
             while (opModeIsActive()) {
 
@@ -108,7 +113,7 @@ public class AprilTagLocalizer extends LinearOpMode {
         }
 
         // Save more CPU resources when camera is no longer needed.
-        visionPortal.close();
+        visionPortal.stopStreaming();
 
     }   // end method runOpMode()
 
@@ -134,6 +139,7 @@ public class AprilTagLocalizer extends LinearOpMode {
     /**
      * Add telemetry about AprilTag detections.
      */
+    @SuppressLint("DefaultLocale")
     private void telemetryAprilTag() {
 
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
@@ -146,25 +152,30 @@ public class AprilTagLocalizer extends LinearOpMode {
                 double ytag=0;
                 switch (detection.id){
                     case 1:
-                        xtag = 59;
+                        xtag = 63;
                         ytag = 41.5;
                         break;
                     case 2:
-                        xtag = 59;
+                        xtag = 63;
                         ytag = 35.5;
                         break;
                     case 3:
-                        xtag = 59;
+                        xtag = 63;
                         ytag = 29.5;
                         break;
                 }
-                double ytrans = Math.sin(Math.toRadians(-(detection.ftcPose.yaw-detection.ftcPose.bearing)))*detection.ftcPose.range;
-                double xtrans = Math.cos(Math.toRadians(-(detection.ftcPose.yaw-detection.ftcPose.bearing)))*detection.ftcPose.range;
+                double actualHead = -(detection.ftcPose.yaw-detection.ftcPose.bearing);
+                double ytrans = Math.sin(Math.toRadians(actualHead))*detection.ftcPose.range;
+                double xtrans = Math.cos(Math.toRadians(actualHead))*detection.ftcPose.range;
 
                 telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
-                telemetry.addLine(String.format("Xtrans %6.1f Ytrans %6.1f",xtrans,ytrans));
-                telemetry.addLine(String.format("FIELD XY %6.1f %6.1f",xtag-xtrans,ytag-ytrans));
-                telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
+                //telemetry.addLine(String.format("Xtrans %6.1f Ytrans %6.1f",xtrans,ytrans));
+                telemetry.addLine(String.format("CAM FIELD XY %6.1f %6.1f",xtag-xtrans,ytag-ytrans, detection.ftcPose.bearing));
+                telemetry.addLine(String.format("BOT FIELD XY HEAD %6.1f %6.1f %6.1f",
+                        (xtag-xtrans)-(Math.cos(Math.toRadians(-detection.ftcPose.yaw))*CAM_DIST_TO_CENTER),
+                        (ytag-ytrans)-(Math.sin(Math.toRadians(-detection.ftcPose.yaw))*CAM_DIST_TO_CENTER),
+                        detection.ftcPose.yaw));
+                //telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
                 telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
                 telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
             } else {
@@ -174,9 +185,9 @@ public class AprilTagLocalizer extends LinearOpMode {
         }   // end for() loop
 
         // Add "key" information to telemetry
-        telemetry.addLine("\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
-        telemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
-        telemetry.addLine("RBE = Range, Bearing & Elevation");
+        //telemetry.addLine("\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
+        //telemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
+        //telemetry.addLine("RBE = Range, Bearing & Elevation");
 
     }   // end method telemetryAprilTag()
 

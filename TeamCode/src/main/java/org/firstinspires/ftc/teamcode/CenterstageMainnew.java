@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 
 
+import android.annotation.SuppressLint;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
@@ -16,6 +18,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.CRServo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AngularVelocity;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
@@ -24,6 +28,9 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDriveCancelable;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
 import org.firstinspires.ftc.teamcode.util.Encoder;
+import org.firstinspires.ftc.vision.VisionPortal;
+import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
+import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -52,13 +59,15 @@ public class CenterstageMainnew extends LinearOpMode {
     private Servo LClaw;
     private Servo RClaw;
     private Servo Wrist;
+    private Servo PlaneServo;
     //private Servo servoArticulacao;
     //private Servo servoGarra;
     private IMU imu;
     YawPitchRollAngles orientation;
     public static double PVARIATION=0.01;
     public static int LVARIATION = 100;
-    public static int MAXHEIGHT = 1569;
+    public static double HANGVARIATION =6;
+    public static int MAXHEIGHT = 1750;
     int startingArmPos =0;
     double drive=0;
     double turn=0;
@@ -80,10 +89,12 @@ public class CenterstageMainnew extends LinearOpMode {
     double powerbraco;
     double finalgoalbraco = 0;
     double goalbraco;
-    PID pid_turn = new PID(0.65,0,0,0);
-    //PID pid_turn = new PID(0.5,0.005,0.0,0.4);
+    //PID pid_turn = new PID(0.5,0,0,0);
+    PID pid_turn = new PID(0.3,0.0,0.0,0.0);
     //PID pid_turn = new PID(0.6,0.000,0.0,0.3);
     PID pid_braco = new PID(0.005,0,0,0);
+    PID coreHexEsq = new PID(0.05,0,0,0);
+    PID coreHexDir = new PID(0.05,0,0,0);
 
     simpleSwitch leftClawSwitch = new simpleSwitch();
     simpleSwitch rightClawSwitch = new simpleSwitch();
@@ -91,12 +102,105 @@ public class CenterstageMainnew extends LinearOpMode {
     double Artpos =0;
     public static List<Node> allNodes= new ArrayList<>();
     double goalX=0;
+    private AprilTagProcessor aprilTag;
+    double CAM_DIST_TO_CENTER = 6.5;
+    double actualHead;
+    double xtrans;
+    double ytrans;
+
+    /**
+     * The variable to store our instance of the vision portal.
+     */
+    private VisionPortal visionPortal;
 
     /**
      * This function is executed when this Op Mode is selected.
      */
 
     SampleMecanumDriveCancelable autodrive;
+    private double finalgoalhang=0;
+    private double goalhang=0;
+
+    /**
+     * Initialize the AprilTag processor.
+     */
+    private void initAprilTag() {
+
+        // Create the AprilTag processor the easy way.
+        aprilTag = AprilTagProcessor.easyCreateWithDefaults();
+
+        // Create the vision portal the easy way.
+
+            visionPortal = VisionPortal.easyCreateWithDefaults(
+                    hardwareMap.get(WebcamName.class, "Webcam 1"), aprilTag
+            );
+
+    }   // end method initAprilTag()
+
+    /**
+     * Add telemetry about AprilTag detections.
+     */
+    @SuppressLint("DefaultLocale")
+    private Pose2d LocateWithAprilTag() {
+
+        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+        telemetry.addData("# AprilTags Detected", currentDetections.size());
+
+        // Step through the list of detections and display info for each one.
+        if (currentDetections.size()>0) {
+            double avgX = 0;
+            double avgY = 0;
+            double avgHead = 0;
+            for (AprilTagDetection detection : currentDetections) {
+                if (detection.metadata != null) {
+                    double xtag = 0;
+                    double ytag = 0;
+                    switch (detection.id) {
+                        case 1:
+                            xtag = 63;
+                            ytag = 41.5;
+                            break;
+                        case 2:
+                            xtag = 63;
+                            ytag = 35.5;
+                            break;
+                        case 3:
+                            xtag = 63;
+                            ytag = 29.5;
+                            break;
+                    }
+                    actualHead = -(detection.ftcPose.yaw - detection.ftcPose.bearing);
+                    ytrans = Math.sin(Math.toRadians(actualHead)) * detection.ftcPose.range;
+                    xtrans = Math.cos(Math.toRadians(actualHead)) * detection.ftcPose.range;
+
+                    telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
+                    //telemetry.addLine(String.format("Xtrans %6.1f Ytrans %6.1f",xtrans,ytrans));
+                    telemetry.addLine(String.format("CAM FIELD XY %6.1f %6.1f", xtag - xtrans, ytag - ytrans, detection.ftcPose.bearing));
+                    telemetry.addLine(String.format("BOT FIELD XY HEAD %6.1f %6.1f %6.1f",
+                            (xtag - xtrans) - (Math.cos(Math.toRadians(-detection.ftcPose.yaw)) * CAM_DIST_TO_CENTER),
+                            (ytag - ytrans) - (Math.sin(Math.toRadians(-detection.ftcPose.yaw)) * CAM_DIST_TO_CENTER),
+                            detection.ftcPose.yaw));
+                    //telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
+                    telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
+                    telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
+                    avgX+= (xtag - xtrans) - (Math.cos(Math.toRadians(-detection.ftcPose.yaw)) * CAM_DIST_TO_CENTER);
+                    avgY += (ytag - ytrans) - (Math.sin(Math.toRadians(-detection.ftcPose.yaw)) * CAM_DIST_TO_CENTER);
+                    avgHead += detection.ftcPose.yaw+180;
+                } else {
+                    telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
+                    telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
+                }
+            }   // end for() loop
+
+            // Add "key" information to telemetry
+            //telemetry.addLine("\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
+            //telemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
+            //telemetry.addLine("RBE = Range, Bearing & Elevation");
+            return new Pose2d(avgX/currentDetections.size(), avgY/currentDetections.size(), -Math.toRadians(avgHead/currentDetections.size()));
+        } else {
+            return autodrive.getPoseEstimate();
+        }
+    }   // end method telemetryAprilTag()
     @Override
     public void runOpMode() {
 
@@ -107,12 +211,23 @@ public class CenterstageMainnew extends LinearOpMode {
         frontLeft = hardwareMap.get(DcMotor.class, "FLmotor");
         backLeft = hardwareMap.get(DcMotor.class, "BLmotor");
         mainArm = hardwareMap.get(DcMotor.class, "MainArm");
+        CoreEsq= hardwareMap.get(DcMotor.class, "Barra1");
+        CoreDir = hardwareMap.get(DcMotor.class, "Barra2");
 
 
         Articulation = hardwareMap.get(Servo.class,"Articulation");
         LClaw = hardwareMap.get(Servo.class,"LClaw");
         RClaw = hardwareMap.get(Servo.class,"RClaw");
         Wrist = hardwareMap.get(Servo.class,"Wrist");
+        PlaneServo = hardwareMap.get(Servo.class,"PlaneServo");
+
+        CoreEsq.setDirection(DcMotorSimple.Direction.FORWARD);
+        CoreDir.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        CoreDir.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        CoreEsq.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        CoreDir.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        CoreEsq.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 
 
@@ -157,7 +272,11 @@ public class CenterstageMainnew extends LinearOpMode {
         AngularVelocity angularVelocity;
         mainArm.setPower(-0.2);
         startingArmPos = mainArm.getCurrentPosition();
+        PlaneServo.setPosition(0);
+        initAprilTag();
         waitForStart();
+        mainArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        mainArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         mainArm.setPower(0);
 
         double CurrentFront = 0;
@@ -169,24 +288,7 @@ public class CenterstageMainnew extends LinearOpMode {
             inputs();
             moveBase();
             adicionarTelemetria();
-            if (gamepad2.right_trigger>0.5){
-                frontLeft.setPower(0.1);
-                frontRight.setPower(0.1);
-                backLeft.setPower(0.1);
-                backRight.setPower(0.1);
-            }
-            if (gamepad2.a){
-                frontLeft.setPower(0.1);
-            }
-            if (gamepad2.b){
-                frontRight.setPower(0.1);
-            }
-            if (gamepad2.y){
-                backLeft.setPower(0.1);
-            }
-            if (gamepad2.start){
-                backRight.setPower(0.1);
-            }
+
 
         }
     }
@@ -248,11 +350,16 @@ public class CenterstageMainnew extends LinearOpMode {
     private void moveBase(){
         autodrive.update();
         if (gamepad1.dpad_right){
-        graphMode=true;
+            graphMode=true;
+            visionPortal.resumeStreaming();
         }
+
         if (!graphMode||gamepad1.dpad_left) {
             if (gamepad1.dpad_left){
                 autodrive.breakFollowing();
+                visionPortal.stopStreaming();
+                turn = 0.002;
+                manageIMU();
             }
             graphMode=false;
             pathGenerated=false;
@@ -290,18 +397,26 @@ public class CenterstageMainnew extends LinearOpMode {
             frontLeft.setPower(fL * 0.75);
             backRight.setPower(bR * 0.75);
             backLeft.setPower(bL * 0.75);/**/
+            telemetry.addData("detects",aprilTag.getDetections().size());
         } else{
             if (!pathGenerated){
+                if (visionPortal.getCameraState().equals(VisionPortal.CameraState.STREAMING)) {
+
+                autodrive.setPoseEstimate(LocateWithAprilTag());
                 resetGraph();
                 TrajectorySequence AStarPath= Node.printPath(new Node(autodrive.getPoseEstimate().getX(),autodrive.getPoseEstimate().getY()),allNodes,autodrive);
                 goalX = Node.getTarget(new Node(autodrive.getPoseEstimate().getX(),autodrive.getPoseEstimate().getY()),allNodes).XPos;
                  //AStarPath = autodrive.trajectorySequenceBuilder(autodrive.getPoseEstimate()).lineTo(new Vector2d(20,20)).lineTo(new Vector2d(30,0)).build();
                 autodrive.followTrajectorySequenceAsync(AStarPath);
                 pathGenerated=true;
+                }
             }
             if (!autodrive.isBusy()){
                 graphMode=false;
                 pathGenerated=false;
+                visionPortal.stopStreaming();
+                turn = 0.002;
+                manageIMU();
             }
         }
 
@@ -316,8 +431,8 @@ public class CenterstageMainnew extends LinearOpMode {
         Node centerBack = new Node(30,0);
         Node BridgeBackBL = new Node(13,60);
         Node BridgeBackBR = new Node(13,36);
-        Node BridgeBackCL = new Node(13,12);
-        Node BridgeBackCR = new Node(13,-12);
+        Node BridgeBackCL = new Node(13,11);
+        Node BridgeBackCR = new Node(13,-11);
         Node BridgeBackRL = new Node(13,-36);
         Node BridgeBackRR = new Node(13,-60);
 
@@ -325,8 +440,8 @@ public class CenterstageMainnew extends LinearOpMode {
         Node centerFront = new Node(-50,0);
         Node BridgeFrontBL = new Node(-37,60);
         Node BridgeFrontBR = new Node(-37,36);
-        Node BridgeFrontCL = new Node(-37,12);
-        Node BridgeFrontCR = new Node(-37,-12);
+        Node BridgeFrontCL = new Node(-37,11);
+        Node BridgeFrontCR = new Node(-37,-11);
         Node BridgeFrontRL = new Node(-37,-36);
         Node BridgeFrontRR = new Node(-37,-60);
 
@@ -417,10 +532,12 @@ public class CenterstageMainnew extends LinearOpMode {
         BridgeBackBL.addBranch(BridgeFrontBL);
         BridgeBackBR.addBranch(BridgeFrontBR);
 
-        BridgeBackCL.addBranch(BridgeFrontCL);
-        BridgeBackCL.addBranch(BridgeFrontCR);
-        BridgeBackCR.addBranch(BridgeFrontCL);
-        BridgeBackCR.addBranch(BridgeFrontCR);
+
+        //MAKE ONE DIRECTIONAL CONNECTIONS BECAUSE THE FUCKING ROBOT CANT FIT UNDER A BRIDGE
+        BridgeFrontCL.addOneDirectionalBranch(BridgeBackCL);
+        BridgeFrontCL.addOneDirectionalBranch(BridgeBackCR);
+        BridgeFrontCR.addOneDirectionalBranch(BridgeBackCL);
+        BridgeFrontCR.addOneDirectionalBranch(BridgeBackCR);
 
         BridgeBackRL.addBranch(BridgeFrontRL);
         BridgeBackRR.addBranch(BridgeFrontRR);
@@ -496,12 +613,37 @@ public class CenterstageMainnew extends LinearOpMode {
         telemetry.addLine(String.valueOf(pathGenerated));
         telemetry.update(); // adiciona tudo da telemetria
     }
+
     private void braco() {
         //atras = 1700
         //frente = 700
         //baixado = 0
         //kp = 0.01
         //PVar = 6
+        if (gamepad1.left_trigger>0.5&&gamepad1.right_trigger>0.5){
+            PlaneServo.setPosition(1);
+        }
+        if (gamepad2.right_trigger>0.5&&gamepad2.left_trigger>0.5){
+            finalgoalhang = 250;
+        } if (gamepad2.x&&gamepad2.y){
+            finalgoalhang = 800;
+        } if (gamepad2.b){
+            finalgoalhang=0;
+        }
+        //goalhang+= PVARIATION*(finalgoalhang-goalhang);
+        if (((goalhang > finalgoalhang - LVARIATION) && (goalhang < finalgoalhang + LVARIATION))) {
+            goalhang = finalgoalhang;
+        } else if (goalhang>finalgoalhang){
+            goalhang-=LVARIATION;
+        } else if (goalhang<finalgoalhang){
+            goalhang+=LVARIATION;
+        }
+        double powEsq= coreHexEsq.CalculatePID(CoreEsq.getCurrentPosition(),goalhang,false);
+        double powDir =coreHexDir.CalculatePID(CoreDir.getCurrentPosition(),goalhang,false);
+        CoreEsq.setPower(powEsq);
+        CoreDir.setPower(powDir);
+        telemetry.addData("left corehex",CoreEsq.getCurrentPosition());
+        telemetry.addData("right corehex",CoreDir.getCurrentPosition());
 
 
         if (gamepad2.dpad_down){
@@ -513,15 +655,14 @@ public class CenterstageMainnew extends LinearOpMode {
         //Articulation.setPosition(gamepad2.right_stick_x);
         //Arm2.setPosition(gamepad2.left_stick_x);
         if (gamepad2.x){
-            Articulation.setPosition(0.15-0.15);
+            Articulation.setPosition(0.1);
             Wrist.setPosition(0.35);
             //0.72 extend
             //0.35 gradado
         }
         if (gamepad2.dpad_left){
-            Articulation.setPosition(0.5);
-            Wrist.setPosition(0.05);
-
+            Articulation.setPosition(0.252);
+            Wrist.setPosition(0.251);
         }
         if (gamepad2.dpad_right){
             Articulation.setPosition(0.53-gamepad2.right_trigger*0.4);
@@ -529,27 +670,13 @@ public class CenterstageMainnew extends LinearOpMode {
             //0.35
         }
 
-        //goalbraco+= GPVARIATION*(finalgoalbraco-goalbraco);
+
         goalbraco+= PVARIATION*(finalgoalbraco-goalbraco);
         if (((goalbraco > finalgoalbraco - LVARIATION) && (goalbraco < finalgoalbraco + LVARIATION))) {
             goalbraco = finalgoalbraco;
         } else {
             goalbraco+= PVARIATION*(finalgoalbraco-goalbraco);
         }
-
-
-        //goalbraco = finalgoalbraco;
-        /*
-        if (!((goalbraco > finalgoalbraco - GPVARIATION) && (goalbraco < finalgoalbraco + GPVARIATION))) {
-            if (goalbraco > finalgoalbraco) {
-                goalbraco -= GPVARIATION;
-            } else {
-                goalbraco += GPVARIATION;
-            }
-        } else {
-            goalbraco = finalgoalbraco;
-        }
-        */
         powerbraco = pid_braco.CalculatePID(mainArm.getCurrentPosition(), goalbraco, false);
         if (gamepad2.y) {
             mainArm.setPower(-0.1);
@@ -558,6 +685,7 @@ public class CenterstageMainnew extends LinearOpMode {
         } else {
             mainArm.setPower(powerbraco);
         }
+
 
         if (leftClawSwitch.click(gamepad2.left_bumper)) {
             openLeftClaw();
