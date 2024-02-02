@@ -24,8 +24,8 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
-@Autonomous(name="AutoBlueFrontNew", group="BlueAuto")
-public class AutoBlueFrontNew extends LinearOpMode {
+@Autonomous(name="AutoRedFrontNew", group="RedAuto")
+public class AutoRedFrontNew extends LinearOpMode {
 
 
 
@@ -49,7 +49,7 @@ public class AutoBlueFrontNew extends LinearOpMode {
     private DcMotor mainArm;
     PID pid_braco = new PID(0.008,0,0,0);
 
-    BlueDetector.Location registred;
+    RedDetector.Location registred;
 
     SampleMecanumDrive drive;
 
@@ -62,13 +62,13 @@ public class AutoBlueFrontNew extends LinearOpMode {
         mainArm = hardwareMap.get(DcMotor.class, "MainArm");
 
 
-        Pose2d startPose = new Pose2d(12, 63, Math.toRadians(90));
+        Pose2d startPose = new Pose2d(12, -63, Math.toRadians(90));
 
         drive = new SampleMecanumDrive(hardwareMap);
         drive.setPoseEstimate(startPose);
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-        BlueDetector detector = new BlueDetector(telemetry);
+        RedDetector detector = new RedDetector(telemetry);
         webcam.setPipeline(detector);
         webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
@@ -91,9 +91,9 @@ public class AutoBlueFrontNew extends LinearOpMode {
                     //Wrist.setPosition(0.5);
                     Wrist.setPosition(0.45);
                 })
-                .lineToLinearHeading(new Pose2d(36,32,Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(36,-32,Math.toRadians(180)))
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
-                openLeftClaw();
+                    openLeftClaw();
                 })
                 .waitSeconds(0.1)
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
@@ -102,7 +102,7 @@ public class AutoBlueFrontNew extends LinearOpMode {
                     Wrist.setPosition(0.3);
                 })
                 .setReversed(true)
-                .splineToConstantHeading(new Vector2d(49,39),0)
+                .splineToConstantHeading(new Vector2d(49,-39),0)
                 .waitSeconds(0.1)
                 .back(6)
                 .setReversed(false)
@@ -113,14 +113,14 @@ public class AutoBlueFrontNew extends LinearOpMode {
                 .UNSTABLE_addDisplacementMarkerOffset(0,()->{
                     finalgoalbraco=0;
                 })
-                .splineToConstantHeading(new Vector2d(13,60),Math.toRadians(180))
-                .splineToConstantHeading(new Vector2d(-30,60),Math.toRadians(180))
+                .splineToConstantHeading(new Vector2d(13,-60),Math.toRadians(180))
+                .splineToConstantHeading(new Vector2d(-30,-60),Math.toRadians(180))
                 .UNSTABLE_addDisplacementMarkerOffset(0,()->{
                     Articulation.setPosition(0.35);
                     //Wrist.setPosition(0.5);
                     Wrist.setPosition(0.48);
                 })
-                .splineToLinearHeading(new Pose2d(-54,36.5,Math.toRadians(180)),Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-54,-36.5,Math.toRadians(180)),Math.toRadians(180))
 
 
                 .waitSeconds(0.2)
@@ -140,14 +140,14 @@ public class AutoBlueFrontNew extends LinearOpMode {
                 })
                 .back(1)
                 .setReversed(true)
-                .splineToLinearHeading(new Pose2d(-30,60,Math.toRadians(180)),Math.toRadians(0))
-                .splineToConstantHeading(new Vector2d(13,60),Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(-30,-60,Math.toRadians(180)),Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(13,-60),Math.toRadians(0))
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
                     finalgoalbraco = MAXHEIGHT;
                     Articulation.setPosition(0.252);
                     Wrist.setPosition(0.251);
                 })
-                .splineToConstantHeading(new Vector2d(47,39.5),0)
+                .splineToConstantHeading(new Vector2d(47,-39.5),0)
                 .waitSeconds(0.3)
                 .back(8)
                 .setReversed(false)
@@ -158,8 +158,8 @@ public class AutoBlueFrontNew extends LinearOpMode {
                     finalgoalbraco=0;
                 })
                 .forward(5)
-                .splineToConstantHeading(new Vector2d(40,60),Math.toRadians(0))
-                .splineToConstantHeading(new Vector2d(60,60),Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(40,-60),Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(60,-60),Math.toRadians(0))
                 .build();
 
 

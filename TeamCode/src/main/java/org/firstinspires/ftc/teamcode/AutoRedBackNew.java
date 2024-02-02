@@ -24,14 +24,8 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
-@Autonomous(name="AutoBlueBackNew", group="BlueAuto")
-public class AutoBlueBackNew extends LinearOpMode {
-
-
-
-
-
-
+@Autonomous(name="AutoBlueBackNew", group="RedAuto")
+public class AutoRedBackNew extends LinearOpMode {
     double armpos;
     double powerbraco;
     double finalgoalbraco=0;
@@ -48,7 +42,7 @@ public class AutoBlueBackNew extends LinearOpMode {
     private DcMotor mainArm;
     PID pid_braco = new PID(0.008,0,0,0);
 
-    BlueDetector.Location registred;
+    RedDetector.Location registred;
 
     SampleMecanumDrive drive;
 
@@ -61,13 +55,13 @@ public class AutoBlueBackNew extends LinearOpMode {
         mainArm = hardwareMap.get(DcMotor.class, "MainArm");
 
 
-        Pose2d startPose = new Pose2d(-36, 63, Math.toRadians(90));
+        Pose2d startPose = new Pose2d(-36, -63, Math.toRadians(-90));
 
         drive = new SampleMecanumDrive(hardwareMap);
         drive.setPoseEstimate(startPose);
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         webcam = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
-        BlueDetector detector = new BlueDetector(telemetry);
+        RedDetector detector = new RedDetector(telemetry);
         webcam.setPipeline(detector);
         webcam.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
             @Override
@@ -90,13 +84,13 @@ public class AutoBlueBackNew extends LinearOpMode {
                     //Wrist.setPosition(0.5);
                     Wrist.setPosition(0.48);
                 })
-                .lineToLinearHeading(new Pose2d(-40,31,0))
+                .lineToLinearHeading(new Pose2d(-40,-31,0))
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
                     openLeftClaw();
                 })
                 .setReversed(true)
                 .back(3)
-                .splineToLinearHeading(new Pose2d(-53,14,Math.toRadians(180)),Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-53,-14,Math.toRadians(180)),Math.toRadians(180))
                 .forward(5.5)
 
                 //moves to get the  extra pixel
@@ -106,7 +100,7 @@ public class AutoBlueBackNew extends LinearOpMode {
                 .back(3)
                 //.lineToLinearHeading(new Pose2d(-54.5,25.5-12,Math.toRadians(180)))
                 //.waitSeconds(1)
-                .splineToLinearHeading(new Pose2d(20,8,Math.toRadians(180)),Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(20,-8,Math.toRadians(180)),Math.toRadians(0))
                 .UNSTABLE_addDisplacementMarkerOffset(-10,()->
                 {
                     finalgoalbraco = MAXHEIGHT;
@@ -116,7 +110,7 @@ public class AutoBlueBackNew extends LinearOpMode {
                 //.splineToConstantHeading(new Vector2d(45,36),0)
 
                 //moves to backdrop to deposit pixel
-                .splineToConstantHeading(new Vector2d(49,37),0)
+                .splineToConstantHeading(new Vector2d(49,-37),0)
                 .waitSeconds(0.5)
                 .back(6)
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
@@ -128,8 +122,8 @@ public class AutoBlueBackNew extends LinearOpMode {
                     finalgoalbraco=0;
                 })
                 .setReversed(false)
-                .splineToConstantHeading(new Vector2d(40,24),Math.toRadians(-90))
-                .splineToConstantHeading(new Vector2d(58,10),Math.toRadians(20))
+                .splineToConstantHeading(new Vector2d(40,-24),Math.toRadians(90))
+                .splineToConstantHeading(new Vector2d(58,-10),Math.toRadians(-20))
                 .build();
 
 
@@ -140,15 +134,15 @@ public class AutoBlueBackNew extends LinearOpMode {
                     //Wrist.setPosition(0.5);
                     Wrist.setPosition(0.48);
                 })
-                .lineToLinearHeading(new Pose2d(-39,8,Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(-39,-8,Math.toRadians(-90)))
 
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
                     openLeftClaw();
                 })
                 .waitSeconds(0.2)
-                .turn(Math.toRadians(90))
+                .turn(Math.toRadians(-90))
                 //moves to get the  extra pixel
-                .splineToLinearHeading(new Pose2d(-53,14,Math.toRadians(180)),Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-53,-14,Math.toRadians(180)),Math.toRadians(180))
                 .forward(5.5)
                 .UNSTABLE_addDisplacementMarkerOffset(0,()-> {
                     closeLeftClaw();
@@ -156,7 +150,7 @@ public class AutoBlueBackNew extends LinearOpMode {
                 .setReversed(true)
                 //.lineToLinearHeading(new Pose2d(-54.5,25.5-12,Math.toRadians(180)))
                 //.waitSeconds(1)
-                .splineToLinearHeading(new Pose2d(20,8,Math.toRadians(180)),Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(20,-8,Math.toRadians(180)),Math.toRadians(0))
                 .UNSTABLE_addDisplacementMarkerOffset(-10,()->
                 {
                     finalgoalbraco = MAXHEIGHT;
@@ -164,7 +158,7 @@ public class AutoBlueBackNew extends LinearOpMode {
                     Wrist.setPosition(0.251);
                 })
                 //.splineToConstantHeading(new Vector2d(45,36),0)
-                .splineToConstantHeading(new Vector2d(49,33),0)
+                .splineToConstantHeading(new Vector2d(49,-33),0)
                 .waitSeconds(0.5)
                 .back(6)
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
@@ -177,8 +171,8 @@ public class AutoBlueBackNew extends LinearOpMode {
                 })
                 .setReversed(false)
                 .setReversed(false)
-                .splineToConstantHeading(new Vector2d(40,24),Math.toRadians(-90))
-                .splineToConstantHeading(new Vector2d(58,10),Math.toRadians(20))
+                .splineToConstantHeading(new Vector2d(40,-24),Math.toRadians(90))
+                .splineToConstantHeading(new Vector2d(58,-10),Math.toRadians(-20))
                 .build();
 
         TrajectorySequence rightSequence= drive.trajectorySequenceBuilder(startPose)
@@ -187,14 +181,14 @@ public class AutoBlueBackNew extends LinearOpMode {
                     //Wrist.setPosition(0.5);
                     Wrist.setPosition(0.48);
                 })
-                .lineToLinearHeading(new Pose2d(-45.5,10,Math.toRadians(90)))
+                .lineToLinearHeading(new Pose2d(-45.5,-10,Math.toRadians(-90)))
                 .waitSeconds(0.1)
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
                     openLeftClaw();
                 })
-                .turn(Math.toRadians(90))
+                .turn(Math.toRadians(-90))
                 //moves to get the  extra pixel
-                .splineToLinearHeading(new Pose2d(-53,14,Math.toRadians(180)),Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-53,-14,Math.toRadians(180)),Math.toRadians(180))
                 .forward(5.5)
                 .UNSTABLE_addDisplacementMarkerOffset(0,()-> {
                     closeLeftClaw();
@@ -202,7 +196,7 @@ public class AutoBlueBackNew extends LinearOpMode {
                 .setReversed(true)
                 //.lineToLinearHeading(new Pose2d(-54.5,25.5-12,Math.toRadians(180)))
                 //.waitSeconds(1)
-                .splineToLinearHeading(new Pose2d(20,8,Math.toRadians(180)),Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(20,-8,Math.toRadians(180)),Math.toRadians(0))
                 .UNSTABLE_addDisplacementMarkerOffset(-10,()->
                 {
                     finalgoalbraco = MAXHEIGHT;
@@ -210,7 +204,7 @@ public class AutoBlueBackNew extends LinearOpMode {
                     Wrist.setPosition(0.251);
                 })
                 //.splineToConstantHeading(new Vector2d(45,36),0)
-                .splineToConstantHeading(new Vector2d(49,29.5),0)
+                .splineToConstantHeading(new Vector2d(49,-29.5),0)
                 .waitSeconds(0.5)
                 .back(6)
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
@@ -222,8 +216,8 @@ public class AutoBlueBackNew extends LinearOpMode {
                     finalgoalbraco=0;
                 })
                 .setReversed(false)
-                .splineToConstantHeading(new Vector2d(40,24),Math.toRadians(-90))
-                .splineToConstantHeading(new Vector2d(58,10),Math.toRadians(20))
+                .splineToConstantHeading(new Vector2d(40,-24),Math.toRadians(-90))
+                .splineToConstantHeading(new Vector2d(58,-10),Math.toRadians(20))
                 .build();
 
 

@@ -41,8 +41,8 @@ public class DoutorOpmode extends LinearOpMode {
     private DcMotor backRight;
     private DcMotor frontLeft;
     private DcMotor backLeft;
-    private CRServo mainArm;
-    private CRServo armEncoder;
+    private DcMotor mainArm;
+
     private  Servo Articulation;
     private Servo LClaw;
     private Servo RClaw;
@@ -102,7 +102,7 @@ public class DoutorOpmode extends LinearOpMode {
         backRight = hardwareMap.get(DcMotor.class, "BRmotor");
         frontLeft = hardwareMap.get(DcMotor.class, "FLmotor");
         backLeft = hardwareMap.get(DcMotor.class, "BLmotor");
-        mainArm = hardwareMap.get(CRServo.class, "mainArm");
+        mainArm = hardwareMap.get(DcMotor.class, "MainArm");
         bottomLimit= hardwareMap.get(TouchSensor.class,"bottomLimitSensor");
 
         Articulation = hardwareMap.get(Servo.class,"Articulation");
