@@ -24,7 +24,7 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
-@Autonomous(name="AutoBlueBackNew", group="RedAuto")
+@Autonomous(name="AutoRedBackNew", group="RedAuto")
 public class AutoRedBackNew extends LinearOpMode {
     double armpos;
     double powerbraco;
@@ -86,7 +86,7 @@ public class AutoRedBackNew extends LinearOpMode {
                 })
                 .lineToLinearHeading(new Pose2d(-40,-31,0))
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
-                    openLeftClaw();
+                    openRightClaw();
                 })
                 .setReversed(true)
                 .back(3)
@@ -95,7 +95,7 @@ public class AutoRedBackNew extends LinearOpMode {
 
                 //moves to get the  extra pixel
                 .UNSTABLE_addDisplacementMarkerOffset(0,()-> {
-                    closeLeftClaw();
+                    closeRightClaw();
                 })
                 .back(3)
                 //.lineToLinearHeading(new Pose2d(-54.5,25.5-12,Math.toRadians(180)))
@@ -137,7 +137,7 @@ public class AutoRedBackNew extends LinearOpMode {
                 .lineToLinearHeading(new Pose2d(-39,-8,Math.toRadians(-90)))
 
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
-                    openLeftClaw();
+                    openRightClaw();
                 })
                 .waitSeconds(0.2)
                 .turn(Math.toRadians(-90))
@@ -145,7 +145,7 @@ public class AutoRedBackNew extends LinearOpMode {
                 .splineToLinearHeading(new Pose2d(-53,-14,Math.toRadians(180)),Math.toRadians(180))
                 .forward(5.5)
                 .UNSTABLE_addDisplacementMarkerOffset(0,()-> {
-                    closeLeftClaw();
+                    closeRightClaw();
                 })
                 .setReversed(true)
                 //.lineToLinearHeading(new Pose2d(-54.5,25.5-12,Math.toRadians(180)))
@@ -184,14 +184,14 @@ public class AutoRedBackNew extends LinearOpMode {
                 .lineToLinearHeading(new Pose2d(-45.5,-10,Math.toRadians(-90)))
                 .waitSeconds(0.1)
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
-                    openLeftClaw();
+                    openRightClaw();
                 })
                 .turn(Math.toRadians(-90))
                 //moves to get the  extra pixel
                 .splineToLinearHeading(new Pose2d(-53,-14,Math.toRadians(180)),Math.toRadians(180))
                 .forward(5.5)
                 .UNSTABLE_addDisplacementMarkerOffset(0,()-> {
-                    closeLeftClaw();
+                    closeRightClaw();
                 })
                 .setReversed(true)
                 //.lineToLinearHeading(new Pose2d(-54.5,25.5-12,Math.toRadians(180)))

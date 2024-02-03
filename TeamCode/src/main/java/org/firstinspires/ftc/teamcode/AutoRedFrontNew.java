@@ -62,7 +62,7 @@ public class AutoRedFrontNew extends LinearOpMode {
         mainArm = hardwareMap.get(DcMotor.class, "MainArm");
 
 
-        Pose2d startPose = new Pose2d(12, -63, Math.toRadians(90));
+        Pose2d startPose = new Pose2d(12, -63, Math.toRadians(-90));
 
         drive = new SampleMecanumDrive(hardwareMap);
         drive.setPoseEstimate(startPose);
@@ -93,7 +93,7 @@ public class AutoRedFrontNew extends LinearOpMode {
                 })
                 .lineToLinearHeading(new Pose2d(36,-32,Math.toRadians(180)))
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
-                    openLeftClaw();
+                    openRightClaw();
                 })
                 .waitSeconds(0.1)
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
@@ -107,7 +107,7 @@ public class AutoRedFrontNew extends LinearOpMode {
                 .back(6)
                 .setReversed(false)
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
-                    openRightClaw();
+                    openLeftClaw();
                 })
                 .waitSeconds(0.1)
                 .UNSTABLE_addDisplacementMarkerOffset(0,()->{
@@ -132,7 +132,7 @@ public class AutoRedFrontNew extends LinearOpMode {
                 //moves to get the  extra pixel
 
                 .UNSTABLE_addTemporalMarkerOffset(0,()-> {
-                    closeLeftClaw();
+                    closeRightClaw();
                 })
                 .waitSeconds(0.2)
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
@@ -152,7 +152,7 @@ public class AutoRedFrontNew extends LinearOpMode {
                 .back(8)
                 .setReversed(false)
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
-                    openLeftClaw();
+                    openRightClaw();
                 }).waitSeconds(0.3)
                 .UNSTABLE_addDisplacementMarkerOffset(0,()->{
                     finalgoalbraco=0;
@@ -172,7 +172,7 @@ public class AutoRedFrontNew extends LinearOpMode {
                 })
                 .lineToLinearHeading(new Pose2d(12,38.5,Math.toRadians(-90+0.01)))
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
-                    openLeftClaw();
+                    openRightClaw();
                 })
                 .waitSeconds(0.2)
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
@@ -188,7 +188,7 @@ public class AutoRedFrontNew extends LinearOpMode {
                 .back(6)
                 .setReversed(false)
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
-                    openRightClaw();
+                    openLeftClaw();
                 })
 
 
@@ -219,7 +219,7 @@ public class AutoRedFrontNew extends LinearOpMode {
                 //moves to get the  extra pixel
 
                 .UNSTABLE_addTemporalMarkerOffset(0,()-> {
-                    closeLeftClaw();
+                    closeRightClaw();
                 })
                 .waitSeconds(0.15)
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
@@ -239,7 +239,7 @@ public class AutoRedFrontNew extends LinearOpMode {
                 .back(8)
                 .setReversed(false)
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
-                    openLeftClaw();
+                    openRightClaw();
                 }).waitSeconds(0.3)
                 .UNSTABLE_addDisplacementMarkerOffset(0,()->{
                     finalgoalbraco=0;
@@ -257,7 +257,7 @@ public class AutoRedFrontNew extends LinearOpMode {
                 })
                 .splineToLinearHeading(new Pose2d(14,31,Math.toRadians(180)),Math.toRadians(180))
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
-                    openLeftClaw();
+                    openRightClaw();
                 })
                 .waitSeconds(0.2)
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
@@ -271,7 +271,7 @@ public class AutoRedFrontNew extends LinearOpMode {
                 .back(6)
                 .setReversed(false)
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
-                    openRightClaw();
+                    openLeftClaw();
                 })
 
 
@@ -305,7 +305,7 @@ public class AutoRedFrontNew extends LinearOpMode {
                 //moves to get the  extra pixel
 
                 .UNSTABLE_addTemporalMarkerOffset(0,()-> {
-                    closeLeftClaw();
+                    closeRightClaw();
                 })
                 .waitSeconds(0.15)
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
@@ -325,7 +325,7 @@ public class AutoRedFrontNew extends LinearOpMode {
                 .back(8)
                 .setReversed(false)
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
-                    openLeftClaw();
+                    openRightClaw();
                 }).waitSeconds(0.2)
                 .UNSTABLE_addDisplacementMarkerOffset(0,()->{
                     finalgoalbraco=0;

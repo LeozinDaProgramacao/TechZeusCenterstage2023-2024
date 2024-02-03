@@ -49,7 +49,8 @@ public class CenterstageMainRed extends LinearOpMode {
     //private Servo servoGarra;
     private IMU imu;
     YawPitchRollAngles orientation;
-    public static double PVARIATION=0.01;
+    double FeedFHang = 0;
+    public static double PVARIATION=0.017;
     public static int LVARIATION = 100;
     public static double HANGVARIATION =6;
     public static int MAXHEIGHT = 1750;
@@ -88,16 +89,7 @@ public class CenterstageMainRed extends LinearOpMode {
     double actualHead;
     double xtrans;
     double ytrans;
-
-    /**
-     * The variable to store our instance of the vision portal.
-     */
     private VisionPortal visionPortal;
-
-    /**
-     * This function is executed when this Op Mode is selected.
-     */
-
     SampleMecanumDriveCancelable autodrive;
     private double finalgoalhang=0;
     private double goalhang=0;
@@ -149,6 +141,18 @@ public class CenterstageMainRed extends LinearOpMode {
                             xtag = 63;
                             ytag = 29.5;
                             break;
+                        case 4:
+                            xtag = 63;
+                            ytag= -29.5;
+                            break;
+                        case 5:
+                            xtag = 63;
+                            ytag =-35.5;
+                            break;
+                        case 6:
+                            xtag = 63;
+                            ytag = -41.5;
+                            break;
                     }
                     actualHead = -(detection.ftcPose.yaw - detection.ftcPose.bearing);
                     ytrans = Math.sin(Math.toRadians(actualHead)) * detection.ftcPose.range;
@@ -182,6 +186,10 @@ public class CenterstageMainRed extends LinearOpMode {
             return autodrive.getPoseEstimate();
         }
     }   // end method telemetryAprilTag()
+
+    /**
+     * This function is executed when the opmode is executed
+     */
     @Override
     public void runOpMode() {
 
@@ -218,7 +226,6 @@ public class CenterstageMainRed extends LinearOpMode {
         frontLeft.setDirection(DcMotorSimple.Direction.FORWARD);
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        //falsifica um encoder pro braço
         /*
         frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -247,15 +254,16 @@ public class CenterstageMainRed extends LinearOpMode {
         backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 
-        //define variaveis essenciais e inicializa funções
+        //inicializa o robô para o teleop
 
-        YawPitchRollAngles orientation = null;
-        AngularVelocity angularVelocity;
+
         mainArm.setPower(-0.2);
         startingArmPos = mainArm.getCurrentPosition();
         PlaneServo.setPosition(0);
         initAprilTag();
+
         waitForStart();
+
         mainArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         mainArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         mainArm.setPower(0);
@@ -263,14 +271,29 @@ public class CenterstageMainRed extends LinearOpMode {
         double CurrentFront = 0;
         autodrive = new SampleMecanumDriveCancelable(hardwareMap);
         autodrive.setPoseEstimate(new Pose2d(24,0,0));
+
+        //grafo é gerado para uso no teleop
         generateGraph();
+
         while  (opModeIsActive()) {
             braco();
             inputs();
             moveBase();
             adicionarTelemetria();
+            manageWebcam();
 
+        }
+    }
 
+    /**
+     * Manages webcam for the dettection of april tags and conservation of memmory, pressing X engages webcam and pressing B turns it off
+     * Gerencia a câmera para o teleop, apertar X liga a câmera e B desliga
+     */
+    private void manageWebcam() {
+        if (gamepad1.x){
+            visionPortal.resumeStreaming();
+        } else if (gamepad1.b){
+            visionPortal.stopStreaming();
         }
     }
     private void inputs(){
@@ -296,6 +319,11 @@ public class CenterstageMainRed extends LinearOpMode {
         orientation = imu.getRobotYawPitchRollAngles();
         DeltaAngle =360- (orientation.getYaw(AngleUnit.RADIANS)*180/3.141);
     }
+
+    /**
+     * Gerencia o IMU e o PID da base, evitando curvas não intencionais e proporcionando a orientação
+     * nescessaria para o controle orientado ao controlador
+     */
     private void manageIMU(){
 
         if(gamepad1.a){
@@ -328,19 +356,22 @@ public class CenterstageMainRed extends LinearOpMode {
             }
         }
     }
+
+    /**
+     * Movimenta a base, nesta função há dois modos de ação, o primeiro é o controle manual
+     * o segundo é o modo de movimentação por grafos, que pode ser habilidado ao pressionar o
+     * dpad esquerdo, fazendo o robô gerar uma nova rota e começar a segui-la
+     */
     private void moveBase(){
         autodrive.update();
         if (gamepad1.dpad_right){
             graphMode=true;
-            visionPortal.resumeStreaming();
         }
 
         if (!graphMode||gamepad1.dpad_left) {
             if (gamepad1.dpad_left){
                 autodrive.breakFollowing();
-                visionPortal.stopStreaming();
                 turn = 0.002;
-                manageIMU();
             }
             graphMode=false;
             pathGenerated=false;
@@ -381,31 +412,36 @@ public class CenterstageMainRed extends LinearOpMode {
             telemetry.addData("detects",aprilTag.getDetections().size());
         } else{
             if (!pathGenerated){
-                if (visionPortal.getCameraState().equals(VisionPortal.CameraState.STREAMING)) {
 
-                    autodrive.setPoseEstimate(LocateWithAprilTag());
-                    resetGraph();
-                    TrajectorySequence AStarPath= Node.printPath(new Node(autodrive.getPoseEstimate().getX(),autodrive.getPoseEstimate().getY()),allNodes,autodrive);
-                    goalX = Node.getTarget(new Node(autodrive.getPoseEstimate().getX(),autodrive.getPoseEstimate().getY()),allNodes).XPos;
-                    //AStarPath = autodrive.trajectorySequenceBuilder(autodrive.getPoseEstimate()).lineTo(new Vector2d(20,20)).lineTo(new Vector2d(30,0)).build();
-                    autodrive.followTrajectorySequenceAsync(AStarPath);
-                    pathGenerated=true;
-                }
+                autodrive.setPoseEstimate(LocateWithAprilTag());
+                resetGraph();
+                TrajectorySequence AStarPath= Node.printPath(new Node(autodrive.getPoseEstimate().getX(),autodrive.getPoseEstimate().getY()),allNodes,autodrive);
+                goalX = Node.getTarget(new Node(autodrive.getPoseEstimate().getX(),autodrive.getPoseEstimate().getY()),allNodes).XPos;
+                //AStarPath = autodrive.trajectorySequenceBuilder(autodrive.getPoseEstimate()).lineTo(new Vector2d(20,20)).lineTo(new Vector2d(30,0)).build();
+                autodrive.followTrajectorySequenceAsync(AStarPath);
+                pathGenerated=true;
             }
             if (!autodrive.isBusy()){
                 graphMode=false;
                 pathGenerated=false;
-                visionPortal.stopStreaming();
                 turn = 0.002;
                 manageIMU();
             }
         }
 
     }
+
+    /**
+     * Esta função reseta as funcionalidades nescessarias para o uso do movimento automatizado usando grafos
+     */
     public static void resetGraph(){
         allNodes.clear();
         generateGraph();
     }
+
+    /**
+     * Gera o grafo do sistema de movimento automático, com os vértices e arestas tudinho :>
+     */
     public static void generateGraph() {
 
         //backstage nodes
@@ -531,10 +567,13 @@ public class CenterstageMainRed extends LinearOpMode {
         centerFront.addBranch(BridgeFrontRL);
         centerFront.addBranch(BridgeFrontRR);
     }
+    /**
+     *Description:
+     *this funtion adds all debugging data needed to the telemetry board
+     * adiciona toda a telemetria
+     */
     private void adicionarTelemetria(){
-      /*Description:
-      this funtion adds all debugging data needed to the telemetry board
-      */
+
 
         //imu
         /*
@@ -596,6 +635,12 @@ public class CenterstageMainRed extends LinearOpMode {
         telemetry.update(); // adiciona tudo da telemetria
     }
 
+    /**
+     * Esta função basicamente controla as responsabilidades do segundo controlador:
+     * Controle do setpoint (alvo) do PID do Braço
+     * Controle das posições da garra e da articulação
+     * Uso do PID/FeedForward usado para pendurar nas travessas da arena
+     */
     private void braco() {
         //atras = 1700
         //frente = 700
@@ -607,10 +652,13 @@ public class CenterstageMainRed extends LinearOpMode {
         }
         if (gamepad2.right_trigger>0.5&&gamepad2.left_trigger>0.5){
             finalgoalhang = 250;
+            FeedFHang = -0.05;
         } if (gamepad2.x&&gamepad2.y){
             finalgoalhang = 800;
+            FeedFHang =0;
         } if (gamepad2.b){
             finalgoalhang=0;
+            FeedFHang = 0;
         }
         //goalhang+= PVARIATION*(finalgoalhang-goalhang);
         if (((goalhang > finalgoalhang - HANGVARIATION) && (goalhang < finalgoalhang + HANGVARIATION))) {
@@ -622,8 +670,8 @@ public class CenterstageMainRed extends LinearOpMode {
         }
         double powEsq= coreHexEsq.CalculatePID(CoreEsq.getCurrentPosition(),goalhang,false);
         double powDir =coreHexDir.CalculatePID(CoreDir.getCurrentPosition(),goalhang,false);
-        CoreEsq.setPower(powEsq);
-        CoreDir.setPower(powDir);
+        CoreEsq.setPower(powEsq+FeedFHang);
+        CoreDir.setPower(powDir+FeedFHang);
         telemetry.addData("left corehex",CoreEsq.getCurrentPosition());
         telemetry.addData("right corehex",CoreDir.getCurrentPosition());
 
@@ -694,20 +742,6 @@ public class CenterstageMainRed extends LinearOpMode {
         RClaw.setPosition(0.45);
     }
 
-    private double Accelerator(double desired,double current){
-        /*
-        double konstant=0.03;
-        if (Math.abs(desired)>Math.abs(current)&&!gamepad1.left_bumper){
-            if (Math.abs(current+konstant*desired)>1){
-                return Integer.signum((int)(current+konstant*desired));
-            } else {
-                return current + konstant*desired;
-            }
-        } else{
-            return desired;
-        }*/
-        return desired;
-    }
     public double ConvertAngle(double angle){
         double return_angle = angle;
         if(angle>Math.PI){
@@ -715,7 +749,12 @@ public class CenterstageMainRed extends LinearOpMode {
         }
         return return_angle;
     }
-    public class simpleSwitch{
+
+    /**
+     * Essa classe permite usar os inputs booleanos de botôes dos controles para controlar objetos
+     * que agem como interruptores, assim permitindo ligar e desligar funções com o mesmo botão
+     */
+    public static class simpleSwitch{
         private boolean previouslyPressed=false;
         private boolean currentState = false;
         boolean click(boolean pressed) {
