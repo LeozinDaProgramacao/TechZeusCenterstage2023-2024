@@ -13,12 +13,12 @@ import org.openftc.easyopencv.OpenCvPipeline;
 
 @Config
 public class RedDetector extends OpenCvPipeline {
-    public static int A=120;
-    public static int B=50;
-    public static int C=80;
-    public static int D=180;
+    public static int A=0;
+    public static int B=95;
+    public static int C=60;
+    public static int D=60;
     public static int E=255;
-    public static int F=250;
+    public static int F=255;
 
     Telemetry telemetry;
     Scalar green = new Scalar(0,255,0);
@@ -56,7 +56,7 @@ public class RedDetector extends OpenCvPipeline {
 
         double leftValue = Core.sumElems(left).val[0]/LEFT.area()/255;
         double middleValue = Core.sumElems(middle).val[0]/MIDDLE.area()/255;
-        double rightValue = Core.sumElems(right).val[0]/RIGHT.area()/255;
+        double rightValue = (Core.sumElems(right).val[0]-5000)/RIGHT.area()/255;
 
         telemetry.addData("lftraw",(int) Core.sumElems(left).val[0]);
         telemetry.addData("midraw",(int) Core.sumElems(middle).val[0]);

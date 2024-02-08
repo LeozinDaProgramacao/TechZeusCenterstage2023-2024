@@ -53,7 +53,7 @@ public class CenterstageMainRed extends LinearOpMode {
     public static double PVARIATION=0.017;
     public static int LVARIATION = 100;
     public static double HANGVARIATION =6;
-    public static int MAXHEIGHT = 1750;
+    public static int MAXHEIGHT = 1825;
     int startingArmPos =0;
     double drive=0;
     double turn=0;
@@ -258,7 +258,6 @@ public class CenterstageMainRed extends LinearOpMode {
 
 
         mainArm.setPower(-0.2);
-        startingArmPos = mainArm.getCurrentPosition();
         PlaneServo.setPosition(0);
         initAprilTag();
 
@@ -691,8 +690,8 @@ public class CenterstageMainRed extends LinearOpMode {
             //0.35 gradado
         }
         if (gamepad2.dpad_left){
-            Articulation.setPosition(0.252);
-            Wrist.setPosition(0.251);
+            Articulation.setPosition(0.4);
+            Wrist.setPosition(0.1);
         }
         if (gamepad2.dpad_right){
             Articulation.setPosition(0.53-gamepad2.right_trigger*0.4);

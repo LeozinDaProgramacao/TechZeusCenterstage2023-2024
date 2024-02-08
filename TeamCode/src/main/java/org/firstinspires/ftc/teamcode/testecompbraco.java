@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode;
 
 import android.annotation.SuppressLint;
 
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -26,10 +27,10 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import java.util.ArrayList;
 import java.util.List;
 
+@Config
+@TeleOp(name = "testecompbraco")
 
-@TeleOp(name = "CenterstageMainBlue")
-
-public class CenterstageMainBlue extends LinearOpMode {
+public class testecompbraco extends LinearOpMode {
     TrajectorySequence AStarPath;
 
     private DcMotor frontRight;
@@ -53,7 +54,9 @@ public class CenterstageMainBlue extends LinearOpMode {
     public static double PVARIATION=0.017;
     public static int LVARIATION = 100;
     public static double HANGVARIATION =6;
-    public static int MAXHEIGHT = 1825;
+    public static double MAXHEIGHT = 1825;
+    public static double ARTPOS =0.4;
+    public static double WRISTPOS =0.1;
     int startingArmPos =0;
     double drive=0;
     double turn=0;
@@ -273,14 +276,11 @@ public class CenterstageMainBlue extends LinearOpMode {
         autodrive.setPoseEstimate(new Pose2d(24,0,0));
 
         //grafo é gerado para uso no teleop
-        generateGraph();
 
         while  (opModeIsActive()) {
             braco();
             inputs();
-            moveBase();
             adicionarTelemetria();
-            manageWebcam();
 
         }
     }
@@ -289,13 +289,7 @@ public class CenterstageMainBlue extends LinearOpMode {
      * Manages webcam for the dettection of april tags and conservation of memmory, pressing X engages webcam and pressing B turns it off
      * Gerencia a câmera para o teleop, apertar X liga a câmera e B desliga
      */
-    private void manageWebcam() {
-        if (gamepad1.x){
-            visionPortal.resumeStreaming();
-        } else if (gamepad1.b){
-            visionPortal.stopStreaming();
-        }
-    }
+
     private void inputs(){
         //get gamepad axis
         /*
@@ -324,255 +318,7 @@ public class CenterstageMainBlue extends LinearOpMode {
      * Gerencia o IMU e o PID da base, evitando curvas não intencionais e proporcionando a orientação
      * nescessaria para o controle orientado ao controlador
      */
-    private void manageIMU(){
 
-        if(gamepad1.a){
-            imu.resetYaw();
-            CurrentFront = orientation.getYaw(AngleUnit.RADIANS);
-        }
-
-        //ao girar manualmente, reseta a orientação tida como frente pelo robô (para uso no PID)
-        if (Math.abs(turn)>=0.001){
-            CurrentFront = orientation.getYaw(AngleUnit.RADIANS);
-            pid_turn.cummulativeError=0;
-
-        }
-
-
-
-        //Parametros para o PID são calculados (não é tudo feito dentro do PID para permitir uso na telemetria)
-        CurrentAngle = orientation.getYaw(AngleUnit.RADIANS);
-        if (CurrentAngle <CurrentFront){
-            CurrentAngle = 2*Math.PI+CurrentAngle-CurrentFront;
-        } else{
-            CurrentAngle-=CurrentFront;
-        }
-
-        //se não houver uma curva manual, um PID é usado para manter a orientação do robô
-        if (Math.abs(turn)<0.001){
-            turn = pid_turn.CalculatePID(ConvertAngle(CurrentAngle),0,true)*-1;
-            if (Math.abs(turn)<0.1){
-                turn =0;
-            }
-        }
-    }
-
-    /**
-     * Movimenta a base, nesta função há dois modos de ação, o primeiro é o controle manual
-     * o segundo é o modo de movimentação por grafos, que pode ser habilidado ao pressionar o
-     * dpad esquerdo, fazendo o robô gerar uma nova rota e começar a segui-la
-     */
-    private void moveBase(){
-        autodrive.update();
-        if (gamepad1.dpad_right){
-            graphMode=true;
-        }
-
-        if (!graphMode||gamepad1.dpad_left) {
-            if (gamepad1.dpad_left){
-                autodrive.breakFollowing();
-                turn = 0.002;
-            }
-            graphMode=false;
-            pathGenerated=false;
-
-            manageIMU();
-
-            //muda a direção de movimento com base na orientação ro robo
-            double rotX = strafe * Math.cos(orientation.getYaw(AngleUnit.RADIANS)) + drive * Math.sin(orientation.getYaw(AngleUnit.RADIANS));
-            double rotY = strafe * Math.sin(-orientation.getYaw(AngleUnit.RADIANS)) + drive * Math.cos(-orientation.getYaw(AngleUnit.RADIANS));
-
-            //define as velocidades de cada motor
-            double maximo = Math.max(Math.abs(rotX) + Math.abs(rotY) + Math.abs(turn), 1);
-
-
-        /*DfL= (rotY+rotX+turn)/maximo;
-        DfR=(rotY-rotX-turn)/maximo;
-        DbL=(rotY-rotX+turn)/maximo;
-        DbR=(rotY+rotX-turn)/maximo;
-        fL = Accelerator(DfL,fL);
-        fR = Accelerator(DfR,fR);
-        bL = Accelerator(DbL,bL);
-        bR = Accelerator(DbR,bR);
-        /**/
-
-
-            fL = (rotY + rotX + turn) / maximo;
-            fR = (rotY - rotX - turn) / maximo;
-            bL = (rotY - rotX + turn) / maximo;
-            bR = (rotY + rotX - turn) / maximo;
-            /**/
-            //geração de uma aceleração ao controlar o maximo dos motores
-            //aplica as potências aos motores
-
-            frontRight.setPower(fR * 0.75);
-            frontLeft.setPower(fL * 0.75);
-            backRight.setPower(bR * 0.75);
-            backLeft.setPower(bL * 0.75);/**/
-            telemetry.addData("detects",aprilTag.getDetections().size());
-        } else{
-            if (!pathGenerated){
-
-                autodrive.setPoseEstimate(LocateWithAprilTag());
-                resetGraph();
-                TrajectorySequence AStarPath= Node.printPath(new Node(autodrive.getPoseEstimate().getX(),autodrive.getPoseEstimate().getY()),allNodes,autodrive);
-                goalX = Node.getTarget(new Node(autodrive.getPoseEstimate().getX(),autodrive.getPoseEstimate().getY()),allNodes).XPos;
-                //AStarPath = autodrive.trajectorySequenceBuilder(autodrive.getPoseEstimate()).lineTo(new Vector2d(20,20)).lineTo(new Vector2d(30,0)).build();
-                autodrive.followTrajectorySequenceAsync(AStarPath);
-                pathGenerated=true;
-            }
-            if (!autodrive.isBusy()){
-                graphMode=false;
-                pathGenerated=false;
-                turn = 0.002;
-                manageIMU();
-            }
-        }
-
-    }
-
-    /**
-     * Esta função reseta as funcionalidades nescessarias para o uso do movimento automatizado usando grafos
-     */
-    public static void resetGraph(){
-        allNodes.clear();
-        generateGraph();
-    }
-
-    /**
-     * Gera o grafo do sistema de movimento automático, com os vértices e arestas tudinho :>
-     */
-    public static void generateGraph() {
-
-        //backstage nodes
-        Node centerBack = new Node(30,0);
-        Node BridgeBackBL = new Node(13,60);
-        Node BridgeBackBR = new Node(13,36);
-        Node BridgeBackCL = new Node(13,11);
-        Node BridgeBackCR = new Node(13,-11);
-        Node BridgeBackRL = new Node(13,-36);
-        Node BridgeBackRR = new Node(13,-60);
-
-        //front side nodes
-        Node centerFront = new Node(-50,0);
-        Node BridgeFrontBL = new Node(-37,60);
-        Node BridgeFrontBR = new Node(-37,36);
-        Node BridgeFrontCL = new Node(-37,11);
-        Node BridgeFrontCR = new Node(-37,-11);
-        Node BridgeFrontRL = new Node(-37,-36);
-        Node BridgeFrontRR = new Node(-37,-60);
-
-
-        //addition of all common nodes to the allNodes list
-        allNodes.add(centerBack);
-
-        allNodes.add(BridgeBackBL);
-        allNodes.add(BridgeBackBR);
-        allNodes.add(BridgeBackCL);
-        allNodes.add(BridgeBackCR);
-        allNodes.add(BridgeBackRL);
-        allNodes.add(BridgeBackRR);
-
-        allNodes.add(centerFront);
-
-        allNodes.add(BridgeFrontBL);
-        allNodes.add(BridgeFrontBR);
-        allNodes.add(BridgeFrontCL);
-        allNodes.add(BridgeFrontCR);
-        allNodes.add(BridgeFrontRL);
-        allNodes.add(BridgeFrontRR);
-
-
-
-        //ADD EXCLUSIVE BLUE SIDE CONNECTIONS AND NODES
-
-        Node BackdropB = new Node(48,36);
-        Node behindBBack = new Node(36,36);
-        Node collectBlue = new Node(-60,-64);
-        Node BehindBCollect = new Node(-50,-64);
-        allNodes.add(behindBBack);
-        allNodes.add(BehindBCollect);
-        allNodes.add(BackdropB);
-        allNodes.add(collectBlue);
-
-        BackdropB.addBranch(behindBBack);
-
-        behindBBack.addBranch(centerBack);
-        behindBBack.addBranch(BridgeBackBL);
-        behindBBack.addBranch(BridgeBackBR);
-        behindBBack.addBranch(BridgeBackCL);
-
-        collectBlue.addBranch(BehindBCollect);
-
-        BehindBCollect.addBranch(centerFront);
-        BehindBCollect.addBranch(BridgeFrontCR);
-        BehindBCollect.addBranch(BridgeFrontRL);
-        BehindBCollect.addBranch(BridgeFrontRR);
-
-
-
-        //ADD EXCLUSIVE RED SIDE CONNECTIONS AND NODES
-        /*
-        Node BackdropR = new Node(48,-36);
-        Node behindRBack = new Node(36,-36);
-        Node collectRed = new Node(-60,64);
-        Node BehindRCollect = new Node(-50,64);
-
-
-        allNodes.add(behindRBack);
-        allNodes.add(BehindRCollect);
-        allNodes.add(BackdropR);
-        allNodes.add(collectRed);
-
-        BackdropR.addBranch(behindRBack);
-
-        behindRBack.addBranch(centerBack);
-        behindRBack.addBranch(BridgeBackCR);
-        behindRBack.addBranch(BridgeBackRL);
-        behindRBack.addBranch(BridgeBackRR);
-
-        collectRed.addBranch(BehindRCollect);
-
-        BehindRCollect.addBranch(centerFront);
-        BehindRCollect.addBranch(BridgeFrontCL);
-        BehindRCollect.addBranch(BridgeFrontBL);
-        BehindRCollect.addBranch(BridgeFrontBR);
-        */
-
-
-        //MAKE THE COMMON CONNECTIONS (EDGES BETWEEN VERTEXES)
-        centerBack.addBranch(BridgeBackBL);
-        centerBack.addBranch(BridgeBackBR);
-        centerBack.addBranch(BridgeBackCL);
-        centerBack.addBranch(BridgeBackCR);
-        centerBack.addBranch(BridgeBackRL);
-        centerBack.addBranch(BridgeBackRR);
-
-        BridgeBackBL.addBranch(BridgeFrontBL);
-        BridgeBackBR.addBranch(BridgeFrontBR);
-
-
-        //MAKE ONE DIRECTIONAL CONNECTIONS BECAUSE THE FUCKING ROBOT CANT FIT UNDER A BRIDGE
-        BridgeFrontCL.addOneDirectionalBranch(BridgeBackCL);
-        BridgeFrontCL.addOneDirectionalBranch(BridgeBackCR);
-        BridgeFrontCR.addOneDirectionalBranch(BridgeBackCL);
-        BridgeFrontCR.addOneDirectionalBranch(BridgeBackCR);
-
-        BridgeBackRL.addBranch(BridgeFrontRL);
-        BridgeBackRR.addBranch(BridgeFrontRR);
-
-        centerFront.addBranch(BridgeFrontBL);
-        centerFront.addBranch(BridgeFrontBR);
-        centerFront.addBranch(BridgeFrontCL);
-        centerFront.addBranch(BridgeFrontCR);
-        centerFront.addBranch(BridgeFrontRL);
-        centerFront.addBranch(BridgeFrontRR);
-    }
-    /**
-     *Description:
-     *this funtion adds all debugging data needed to the telemetry board
-     * adiciona toda a telemetria
-     */
     private void adicionarTelemetria(){
 
 
@@ -692,8 +438,8 @@ public class CenterstageMainBlue extends LinearOpMode {
             //0.35 gradado
         }
         if (gamepad2.dpad_left){
-            Articulation.setPosition(0.4);
-            Wrist.setPosition(0.1);
+            Articulation.setPosition(ARTPOS);
+            Wrist.setPosition(WRISTPOS);
         }
         if (gamepad2.dpad_right){
             Articulation.setPosition(0.53-gamepad2.right_trigger*0.4);

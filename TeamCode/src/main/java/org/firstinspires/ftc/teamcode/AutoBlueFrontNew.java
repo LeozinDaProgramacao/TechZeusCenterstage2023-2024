@@ -91,7 +91,7 @@ public class AutoBlueFrontNew extends LinearOpMode {
                     //Wrist.setPosition(0.5);
                     Wrist.setPosition(0.45);
                 })
-                .lineToLinearHeading(new Pose2d(36,32,Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(38,32,Math.toRadians(180)))
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
                 openLeftClaw();
                 })
@@ -102,7 +102,7 @@ public class AutoBlueFrontNew extends LinearOpMode {
                     Wrist.setPosition(0.3);
                 })
                 .setReversed(true)
-                .splineToConstantHeading(new Vector2d(49,39),0)
+                .splineToConstantHeading(new Vector2d(49,40.5),0)
                 .waitSeconds(0.1)
                 .back(6)
                 .setReversed(false)

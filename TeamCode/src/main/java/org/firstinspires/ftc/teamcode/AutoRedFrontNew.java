@@ -120,7 +120,7 @@ public class AutoRedFrontNew extends LinearOpMode {
                     //Wrist.setPosition(0.5);
                     Wrist.setPosition(0.48);
                 })
-                .splineToLinearHeading(new Pose2d(-54,-36.5,Math.toRadians(180)),Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-54,-38,Math.toRadians(180)),Math.toRadians(180))
 
 
                 .waitSeconds(0.2)
@@ -170,7 +170,7 @@ public class AutoRedFrontNew extends LinearOpMode {
                     //Wrist.setPosition(0.5);
                     Wrist.setPosition(0.45);
                 })
-                .lineToLinearHeading(new Pose2d(12,38.5,Math.toRadians(-90+0.01)))
+                .lineToLinearHeading(new Pose2d(12,-38.5,Math.toRadians(90-0.01)))
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
                     openRightClaw();
                 })
@@ -183,7 +183,7 @@ public class AutoRedFrontNew extends LinearOpMode {
                 .setReversed(true)
 
                 //move to place on backdrop
-                .splineToLinearHeading(new Pose2d(49,33.5,Math.toRadians(180)),0)
+                .splineToLinearHeading(new Pose2d(49,-33.5,Math.toRadians(180)),0)
                 .waitSeconds(0.2)
                 .back(6)
                 .setReversed(false)
@@ -200,14 +200,14 @@ public class AutoRedFrontNew extends LinearOpMode {
                 .UNSTABLE_addDisplacementMarkerOffset(0,()->{
                     finalgoalbraco=0;
                 })
-                .splineToConstantHeading(new Vector2d(13,60),Math.toRadians(180))
-                .splineToConstantHeading(new Vector2d(-30,60),Math.toRadians(180))
+                .splineToConstantHeading(new Vector2d(13,-60),Math.toRadians(180))
+                .splineToConstantHeading(new Vector2d(-30,-60),Math.toRadians(180))
                 .UNSTABLE_addDisplacementMarkerOffset(0,()->{
                     Articulation.setPosition(0.35);
                     //Wrist.setPosition(0.5);
                     Wrist.setPosition(0.48);
                 })
-                .splineToLinearHeading(new Pose2d(-54,36.5,Math.toRadians(180)),Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-54,-38,Math.toRadians(180)),Math.toRadians(180))
 
 
                 .waitSeconds(0.2)
@@ -227,14 +227,14 @@ public class AutoRedFrontNew extends LinearOpMode {
                 })
                 .back(1)
                 .setReversed(true)
-                .splineToLinearHeading(new Pose2d(-30,60,Math.toRadians(180)),Math.toRadians(0))
-                .splineToConstantHeading(new Vector2d(13,60),Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(-30,-60,Math.toRadians(180)),Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(13,-60),Math.toRadians(0))
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
                     finalgoalbraco = MAXHEIGHT;
                     Articulation.setPosition(0.252);
                     Wrist.setPosition(0.251);
                 })
-                .splineToConstantHeading(new Vector2d(47,39),0)
+                .splineToConstantHeading(new Vector2d(47,-39),0)
                 .waitSeconds(0.5)
                 .back(8)
                 .setReversed(false)
@@ -245,8 +245,8 @@ public class AutoRedFrontNew extends LinearOpMode {
                     finalgoalbraco=0;
                 })
                 .forward(10)
-                .splineToConstantHeading(new Vector2d(40,60),Math.toRadians(0))
-                .splineToConstantHeading(new Vector2d(60,60),Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(40,-60),Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(60,-60),Math.toRadians(0))
                 .build();
 
         TrajectorySequence rightSequence= drive.trajectorySequenceBuilder(startPose)
@@ -255,7 +255,7 @@ public class AutoRedFrontNew extends LinearOpMode {
                     //Wrist.setPosition(0.5);
                     Wrist.setPosition(0.45);
                 })
-                .splineToLinearHeading(new Pose2d(14,31,Math.toRadians(180)),Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(14,-31,Math.toRadians(180)),Math.toRadians(180))
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
                     openRightClaw();
                 })
@@ -266,7 +266,7 @@ public class AutoRedFrontNew extends LinearOpMode {
                     Wrist.setPosition(0.3);
                 })
                 .setReversed(true)
-                .splineToLinearHeading(new Pose2d(49,29.5,Math.toRadians(180)),0)
+                .splineToLinearHeading(new Pose2d(49,-29.5,Math.toRadians(180)),0)
                 .waitSeconds(0.2)
                 .back(6)
                 .setReversed(false)
@@ -286,14 +286,14 @@ public class AutoRedFrontNew extends LinearOpMode {
                 .UNSTABLE_addDisplacementMarkerOffset(0,()->{
                     finalgoalbraco=0;
                 })
-                .splineToConstantHeading(new Vector2d(13,60),Math.toRadians(180))
-                .splineToConstantHeading(new Vector2d(-30,60),Math.toRadians(180))
+                .splineToConstantHeading(new Vector2d(13,-60),Math.toRadians(180))
+                .splineToConstantHeading(new Vector2d(-30,-60),Math.toRadians(180))
                 .UNSTABLE_addDisplacementMarkerOffset(0,()->{
                     Articulation.setPosition(0.35);
                     //Wrist.setPosition(0.5);
                     Wrist.setPosition(0.48);
                 })
-                .splineToLinearHeading(new Pose2d(-54,36.5,Math.toRadians(180)),Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-54,-38,Math.toRadians(180)),Math.toRadians(180))
 
 
                 .waitSeconds(0.2)
@@ -313,14 +313,14 @@ public class AutoRedFrontNew extends LinearOpMode {
                 })
                 .setReversed(true)
                 .back(1)
-                .splineToLinearHeading(new Pose2d(-30,60,Math.toRadians(180)),Math.toRadians(0))
-                .splineToConstantHeading(new Vector2d(13,60),Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(-30,-60,Math.toRadians(180)),Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(13,-60),Math.toRadians(0))
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
                     finalgoalbraco = MAXHEIGHT;
                     Articulation.setPosition(0.252);
                     Wrist.setPosition(0.251);
                 })
-                .splineToConstantHeading(new Vector2d(47,39),0)
+                .splineToConstantHeading(new Vector2d(47,-39),0)
                 .waitSeconds(0.3)
                 .back(8)
                 .setReversed(false)
@@ -331,14 +331,14 @@ public class AutoRedFrontNew extends LinearOpMode {
                     finalgoalbraco=0;
                 })
                 .forward(10)
-                .splineToConstantHeading(new Vector2d(40,60),Math.toRadians(0))
-                .splineToConstantHeading(new Vector2d(60,60),Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(40,-60),Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(60,-60),Math.toRadians(0))
                 .build();
         /**/
 
 
-        closeLeftClaw();
         closeRightClaw();
+        closeLeftClaw();
 
         mainArm.setPower(-0.2);
         waitForStart();
@@ -356,7 +356,7 @@ public class AutoRedFrontNew extends LinearOpMode {
         switch (registred) {
             case LEFT:
                 //posição esquerda
-                drive.followTrajectorySequenceAsync(leftSequencee);
+                drive.followTrajectorySequenceAsync(rightSequence);
                 break;
             case MIDDLE:
                 //posição central
@@ -364,12 +364,12 @@ public class AutoRedFrontNew extends LinearOpMode {
                 break;
             case RIGHT:
                 //posição direita
-                drive.followTrajectorySequenceAsync(rightSequence);
+                drive.followTrajectorySequenceAsync(leftSequencee);
                 break;
         }
 
         closeLeftClaw();
-        closeRightClaw();
+        closeLeftClaw();
         while (opModeIsActive()){
             drive.update();
             braco();
