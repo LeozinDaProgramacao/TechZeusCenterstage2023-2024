@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.CentersTop;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
@@ -15,6 +16,7 @@ import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 /**
  * DriveVariables, everything variables used in the TeleOp mode is here (or supposed to be here)
  */
+@Disabled
 public class DV {
     public static DcMotor frontRight;
     public static DcMotor backRight;

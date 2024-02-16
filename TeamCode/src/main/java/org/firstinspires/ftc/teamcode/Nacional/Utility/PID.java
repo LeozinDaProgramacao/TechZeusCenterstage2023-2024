@@ -1,11 +1,8 @@
+package org.firstinspires.ftc.teamcode.Nacional.Utility;
 
-package org.firstinspires.ftc.teamcode.CentersTop;
 
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
-
-@Disabled
-class PID {
-    double kP;
+public class PID {
+    public double kP;
     double kI;
     double kD;
     double MaxI;
@@ -20,25 +17,31 @@ class PID {
     double position=0;
     double max_acceleration = 1;
     double max_speed = 1;
-    double cummulativeError=0;
+    public double cummulativeError=0;
     double error=0;
     double previous_speed=0;
     double lastError =0;
-  
+
     public double P(double multiplier){
-      return multiplier*(error);
+        return multiplier*(error);
     }
-    
+
+
+
     public double I(double multiplier){
         if (!(multiplier * Math.abs(cummulativeError + error) > MaxI)) {
             cummulativeError += error;
         }
         return multiplier*cummulativeError;
     }
+
+
     public double D(double multiplier){
-      return multiplier*(error-lastError);
+        return multiplier*(error-lastError);
     }
-    
+
+
+
     public double CalculatePID(double current_position,double current_goal,boolean base){
         goal = current_goal;
         position = current_position;
@@ -55,7 +58,7 @@ class PID {
                 }
             }
         }else{
-        error = goal-position;
+            error = goal-position;
         }
 
         speed = P(kP)+I(kI)+D(kD);
@@ -70,10 +73,9 @@ class PID {
         if (Math.abs(speed)>max_speed){
             speed = max_speed*Math.abs(speed)/speed;
         }
-      
+
         lastError = error;
-      
+
         return speed;
     }
 }
-

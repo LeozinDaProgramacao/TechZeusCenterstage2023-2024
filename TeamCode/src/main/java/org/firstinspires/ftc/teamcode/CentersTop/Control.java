@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.CentersTop;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 
 @TeleOp(name="Ballsack")
+@Disabled
 public class Control extends LinearOpMode {
     Extras ex = new Extras();
     DriveBase drive = new DriveBase();

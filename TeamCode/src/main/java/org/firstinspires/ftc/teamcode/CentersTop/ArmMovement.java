@@ -1,7 +1,8 @@
 package org.firstinspires.ftc.teamcode.CentersTop;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-
+@Disabled
 public class ArmMovement extends LinearOpMode {
     public void braco() {
         //atras = 1700
