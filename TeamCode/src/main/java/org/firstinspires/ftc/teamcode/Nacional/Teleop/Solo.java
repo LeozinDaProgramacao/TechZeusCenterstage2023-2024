@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Nacional.Teleop;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -14,7 +15,6 @@ import org.firstinspires.ftc.teamcode.Nacional.Utility.counterSwitch;
 import org.firstinspires.ftc.teamcode.Nacional.Utility.simpleSwitch;
 
 @Config
-
 @TeleOp (name="Solo :>")
 public class Solo extends LinearOpMode {
     simpleSwitch LClawSwitch = new simpleSwitch();
@@ -56,13 +56,13 @@ public class Solo extends LinearOpMode {
     public void defineArmHeight() {
 
         if (gamepad2.dpad_up) {
-            ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_BACK);
+            ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_BACK_AUTO);
         }
         if (gamepad2.dpad_left) {
             ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_FRONT);
         }
         if (gamepad2.dpad_down) {
-            ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL1UP);
+            ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL4UP);
         }
         if (gamepad2.dpad_right) {
             ArmMovement.setArmState(ArmMovement.ARM_STATE.STORED);
@@ -72,7 +72,7 @@ public class Solo extends LinearOpMode {
         }
         if ((gamepad2.a||gamepad2.b||gamepad2.right_trigger>0.5)){
             stateMachine.click(gamepad2.a,gamepad2.b);
-            switch (ArmMovement.Artheight){
+            switch (ArmMovement.Artheight){//
                 case 0:
                     ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL2UP);
                     break;

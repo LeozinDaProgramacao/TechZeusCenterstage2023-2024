@@ -17,7 +17,7 @@ public class BlueDetector extends OpenCvPipeline {
     public static int B=90;
     public static int C=90;
     public static int D=220;
-    public static int E=255;
+    public static int E=240;
     public static int F=220;
 
     Telemetry telemetry;

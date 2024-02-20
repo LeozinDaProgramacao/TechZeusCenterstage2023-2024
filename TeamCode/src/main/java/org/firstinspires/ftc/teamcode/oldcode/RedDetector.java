@@ -16,7 +16,7 @@ public class RedDetector extends OpenCvPipeline {
     public static int A=0;
     public static int B=95;
     public static int C=60;
-    public static int D=60;
+    public static int D=15;
     public static int E=255;
     public static int F=255;
 

@@ -9,7 +9,12 @@ import com.acmerobotics.dashboard.config.Config;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.teamcode.Nacional.Graphs.Graph;
+import org.firstinspires.ftc.teamcode.Nacional.Graphs.ManualObstacleDetector;
+import org.firstinspires.ftc.teamcode.Nacional.Graphs.Vertex;
 import org.firstinspires.ftc.teamcode.Nacional.Utility.PID;
+import org.firstinspires.ftc.teamcode.R;
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.oldcode.Node;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 @Config
@@ -23,9 +28,40 @@ public class DriveBase {
     static double CurrentFront;
     public static PID turnPID = new PID(0,0,0,0);
     private static double currentStateMultiplier;
+    static Vertex startPosition;
+
+
+
+    public static void startGraphMode(boolean BLUESIDE){
+        Graph graph = new Graph(BLUESIDE);
+        graph.resetGraph();
+
+        startPosition = new Vertex(RobotHardware.autodrive.getPoseEstimate().getX(),RobotHardware.autodrive.getPoseEstimate().getY(),"startPosition");
+
+
+
+        Vertex target = Graph.getTarget(startPosition);
+
+        TrajectorySequence sequence = Graph.printPath(startPosition,target);
+        RobotHardware.autodrive.followTrajectorySequenceAsync(sequence);
+        RobotHardware.autodrive.update();
+
+    }
+    public static boolean loopMoveGraph(boolean up, boolean down, boolean left, boolean right,double heading){
+
+        TrajectorySequence newsequence = Graph.recalculateRoute(ManualObstacleDetector.CheckDetections(up,down,left,right,heading),
+                new Vertex(RobotHardware.autodrive.getPoseEstimate().getX(),RobotHardware.autodrive.getPoseEstimate().getY(),"Position"),
+                startPosition);
+        if (newsequence == null) {
+            RobotHardware.autodrive.update();
+        } else {
+            RobotHardware.autodrive.followTrajectorySequenceAsync(newsequence);
+            RobotHardware.autodrive.update();
+        }
+        return RobotHardware.autodrive.isBusy();
+    }
 
     public static void moveWithIMU(double drive,double strafe,double turn,boolean resetIMUorNO,boolean SLOW_MODE){
-
         RobotHardware.autodrive.update();
         Gturn = turn;
         manageIMU(resetIMUorNO);

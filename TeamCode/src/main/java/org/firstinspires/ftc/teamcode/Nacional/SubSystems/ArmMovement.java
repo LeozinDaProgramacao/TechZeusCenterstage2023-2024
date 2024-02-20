@@ -10,6 +10,7 @@ public class ArmMovement {
     public static enum ARM_STATE {
         DEPOSIT_FRONT,
         DEPOSIT_BACK,
+        DEPOSIT_BACK_AUTO,
         HANGING,
         STORED,
         PIXEL5UP,
@@ -29,26 +30,28 @@ public class ArmMovement {
     public static double ARTICULATION_MIDDLE=0.53;
     public static double ARTICULATION_POS_DEPOSIT_FRONT=-0.07;
     public static double ARTICULATION_POS_DEPOSIT_BACK=-0.05;
+    public static double ARTICULATION_POS_DEPOSIT_BACK_AUTO = -0.05;
     public static double ARTICULATION_POS_COLLECT_GROUND=-0.03;
     public static double ARTICULATION_STORE_CLAW=-0.3;
     public static double ARTICULATION_HANG=-0.03;
     public static double ARTICULATION_POS_2NDPIXEL_UP=-0.06;
     public static double ARTICULATION_POS_3NDPIXEL_UP=-0.08;
-    public static double ARTICULATION_POS_4NDPIXEL_UP=-0.1;
+    public static double ARTICULATION_POS_4NDPIXEL_UP=-0.09;
     public static double ARTICULATION_POS_5NDPIXEL_UP=-0.11;
     public static double ARTICULATION_DEPOSIT_NO_ARM = 0;
 
 
-    public static double WRIST_POS_DEPOSIT_FRONT=-0.1;
+    public static double WRIST_POS_DEPOSIT_FRONT=-0.09;
     public static double WRIST_POS_DEPOSIT_BACK=-0.3;
+    public static double WRIST_POS_DEPOSIT_BACK_AUTO=-0.3;
     public static double WRIST_POS_COLLECT_GROUND=-0.05;
     public static double WRIST_STORE_CLAW=-0.3;
     public static double WRIST_MIDDLE=0.4;
     public static double WRIST_HANG;
     public static double WRIST_POS_2NDPIXEL_UP=-0.05;
     public static double WRIST_POS_3NDPIXEL_UP=-0.05;
-    public static double WRIST_POS_4NDPIXEL_UP=-0.03;
-    public static double WRIST_POS_5NDPIXEL_UP=-0.02;
+    public static double WRIST_POS_4NDPIXEL_UP=-0.04;
+    public static double WRIST_POS_5NDPIXEL_UP=-0.03;
     public static double WRIST_DEPOSIT_NO_ARM =0;
 
     public static double OPEN_CLAW_POS=0.6;
@@ -58,8 +61,9 @@ public class ArmMovement {
     public static double ARM_DEAD_ZONE;
     public static double ARM_DOWN=0;
     public static double ARM_DEPOSIT_FRONT=500;
-    public static double ARM_DEPOSIT_BACK=1500;
-    public static double PVARIATION=0.017;
+    public static double ARM_DEPOSIT_BACK=1600;
+    public static double ARM_DEPOSIT_BACK_AUTO = 1600;
+    public static double PVARIATION=0.02;
     public static int LVARIATION = 100;
     public static double finalArmGoal=0;
 
@@ -81,6 +85,11 @@ public class ArmMovement {
                 finalArmGoal = ARM_DEPOSIT_BACK+ARM_DEAD_ZONE;
                 RobotHardware.setArtPosition(ARTICULATION_MIDDLE+ARTICULATION_POS_DEPOSIT_BACK);
                 RobotHardware.setWristPos(WRIST_MIDDLE+WRIST_POS_DEPOSIT_BACK);
+                break;
+            case DEPOSIT_BACK_AUTO:
+                finalArmGoal = ARM_DEPOSIT_BACK_AUTO;
+                RobotHardware.setArtPosition(ARTICULATION_MIDDLE+ARTICULATION_POS_DEPOSIT_BACK_AUTO);
+                RobotHardware.setWristPos(ARTICULATION_MIDDLE+WRIST_POS_DEPOSIT_BACK_AUTO);
                 break;
             case STORED:
                 finalArmGoal=ARM_DOWN;
@@ -163,10 +172,10 @@ public class ArmMovement {
     public static void ControlRightClaw(CLAW_STATE claw_state){
         switch (claw_state){
             case OPEN:
-                RobotHardware.RClaw.setPosition(OPEN_CLAW_POS);
+                RobotHardware.RClaw.setPosition(1-OPEN_CLAW_POS);
                 break;
             case CLOSED:
-                RobotHardware.RClaw.setPosition(CLOSE_CLAW_POS);
+                RobotHardware.RClaw.setPosition(1-CLOSE_CLAW_POS);
                 break;
         }
     }

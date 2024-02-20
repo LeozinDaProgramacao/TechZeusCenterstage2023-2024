@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.drive.PoseStorage;
+import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDriveCancelable;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
@@ -37,7 +38,8 @@ public class RobotHardware {
     YawPitchRollAngles orientation;
 
     static HardwareMap hardwareMap;
-    static SampleMecanumDriveCancelable autodrive;
+    public static SampleMecanumDrive AutonomousDrive;
+    public static SampleMecanumDriveCancelable autodrive;
     public static void setHardwareMap(HardwareMap map){
         hardwareMap = map;
     }
@@ -128,6 +130,8 @@ public class RobotHardware {
         double CurrentFront = 0;
         autodrive = new SampleMecanumDriveCancelable(hardwareMap);
         autodrive.setPoseEstimate(PoseStorage.currentPose);
+        AutonomousDrive = new SampleMecanumDrive(hardwareMap);
+        AutonomousDrive.setPoseEstimate(PoseStorage.currentPose);
     }
     public static void setArtPosition(double ArtPos){
         ArticulationL.setPosition(ArtPos);
