@@ -12,6 +12,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.teamcode.Nacional.Auuutonomo.Blue.BlueFront.BlueFrontLeft;
 import org.firstinspires.ftc.teamcode.Nacional.Auuutonomo.Blue.BlueFront.BlueFrontMid;
+import org.firstinspires.ftc.teamcode.Nacional.Auuutonomo.Blue.BlueFront.BlueFrontRight;
+
 import org.firstinspires.ftc.teamcode.Nacional.SubSystems.ArmMovement;
 import org.firstinspires.ftc.teamcode.Nacional.SubSystems.RobotHardware;
 import org.firstinspires.ftc.teamcode.drive.PoseStorage;
@@ -22,9 +24,7 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvWebcam;
-import org.firstinspires.ftc.teamcode.Nacional.Auuutonomo.Blue.BlueBack.BlueBackLeft;
-import org.firstinspires.ftc.teamcode.Nacional.Auuutonomo.Blue.BlueBack.BlueBackMid;
-import org.firstinspires.ftc.teamcode.Nacional.Auuutonomo.Blue.BlueBack.BlueBackRight;
+
 @Autonomous(name="BlueFrontYayy!", group="BlueAuto")
 public class AutoBlueFrontOpmode extends LinearOpMode {
 
@@ -39,7 +39,7 @@ public class AutoBlueFrontOpmode extends LinearOpMode {
         PoseStorage.currentPose = startPose;
         RobotHardware.setHardwareMap(hardwareMap);
         RobotHardware.initAll();
-        RobotHardware.startup();
+
 
         RobotHardware.AutonomousDrive.setPoseEstimate(startPose);
 
@@ -64,6 +64,7 @@ public class AutoBlueFrontOpmode extends LinearOpMode {
         ArmMovement.ControlRightClaw(ArmMovement.CLAW_STATE.CLOSED);
 
         waitForStart();
+        RobotHardware.startup();
 
         //a câmera detecta em qual posição está o objeto de jogo
         registred = detector.getLocation();
@@ -83,7 +84,7 @@ public class AutoBlueFrontOpmode extends LinearOpMode {
                 break;
             case RIGHT:
                 //posição direita
-                RobotHardware.AutonomousDrive.followTrajectorySequenceAsync(BlueBackRight.getRightSequence(RobotHardware.AutonomousDrive,startPose));
+                RobotHardware.AutonomousDrive.followTrajectorySequenceAsync(BlueFrontRight.getRightSequence(RobotHardware.AutonomousDrive,startPose));
                 break;
         }
 

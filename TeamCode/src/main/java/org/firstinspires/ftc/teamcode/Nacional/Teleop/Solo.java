@@ -19,11 +19,10 @@ import org.firstinspires.ftc.teamcode.Nacional.Utility.simpleSwitch;
 public class Solo extends LinearOpMode {
     simpleSwitch LClawSwitch = new simpleSwitch();
     simpleSwitch RClawSwitch = new simpleSwitch();
-    counterSwitch stateMachine = new counterSwitch();
+    counterSwitch stateMachine = new counterSwitch(4);
 
     @Override
     public void runOpMode() throws InterruptedException {
-        stateMachine.counterSwitch(4);
         RobotHardware.setHardwareMap(hardwareMap);
         RobotHardware.initAll();
         AirplaneLauncher.resetAirplaneServo();

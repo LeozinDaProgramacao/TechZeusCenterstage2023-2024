@@ -5,7 +5,7 @@ import org.firstinspires.ftc.teamcode.Nacional.SubSystems.ArmMovement;
 public class counterSwitch{
     public int maxV=4;
     public int currV=0;
-    public void counterSwitch(int newMaxV){
+    public counterSwitch(int newMaxV){
         this.maxV = newMaxV;
     }
     private boolean previouslyPressedIncrease=false;
@@ -14,16 +14,17 @@ public class counterSwitch{
     private boolean previouslyPressedDecrease=false;
     private boolean currentStateDecrease = false;
     public void click(boolean pressedincrease, boolean presseddecrease) {
-        if (!this.previouslyPressedIncrease && pressedincrease/*&&currV!=maxV*/) {
+        if (!this.previouslyPressedIncrease && pressedincrease&&currV!=maxV) {
             this.currentStateIncrease = !this.currentStateIncrease;
             ArmMovement.Artheight++;
         }
-        this.previouslyPressedIncrease = pressedincrease;
 
-        if (!this.previouslyPressedDecrease && presseddecrease/*&&currV!=0*/) {
+
+        if (!this.previouslyPressedDecrease && presseddecrease&&currV!=0) {
             this.currentStateDecrease = !this.currentStateDecrease;
-            ArmMovement.Artheight--;
+            ArmMovement.Artheight = ArmMovement.Artheight-1;
         }
+        this.previouslyPressedIncrease = pressedincrease;
         this.previouslyPressedDecrease = presseddecrease;
     }
 }

@@ -12,6 +12,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.Nacional.Graphs.Graph;
 import org.firstinspires.ftc.teamcode.Nacional.Graphs.ManualObstacleDetector;
 import org.firstinspires.ftc.teamcode.Nacional.Graphs.Vertex;
+import org.firstinspires.ftc.teamcode.Nacional.Teleop.Duo;
 import org.firstinspires.ftc.teamcode.Nacional.Utility.PID;
 import org.firstinspires.ftc.teamcode.R;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
@@ -47,22 +48,27 @@ public class DriveBase {
         RobotHardware.autodrive.update();
 
     }
-    public static boolean loopMoveGraph(boolean up, boolean down, boolean left, boolean right,double heading){
-
+    public static boolean loopMoveGraph(boolean up, boolean down, boolean left, boolean right,double heading,boolean exit){
+        if (exit){
+            Duo.currentMode = Duo.BASE_MODE.NORMAL;
+            RobotHardware.autodrive.breakFollowing();
+            return false;
+        }
         TrajectorySequence newsequence = Graph.recalculateRoute(ManualObstacleDetector.CheckDetections(up,down,left,right,heading),
                 new Vertex(RobotHardware.autodrive.getPoseEstimate().getX(),RobotHardware.autodrive.getPoseEstimate().getY(),"Position"),
                 startPosition);
         if (newsequence == null) {
-            RobotHardware.autodrive.update();
+            //RobotHardware.autodrive.update();
         } else {
+            RobotHardware.autodrive.breakFollowing();
             RobotHardware.autodrive.followTrajectorySequenceAsync(newsequence);
-            RobotHardware.autodrive.update();
+            //RobotHardware.autodrive.update();
         }
         return RobotHardware.autodrive.isBusy();
     }
 
     public static void moveWithIMU(double drive,double strafe,double turn,boolean resetIMUorNO,boolean SLOW_MODE){
-        RobotHardware.autodrive.update();
+        //RobotHardware.autodrive.update();
         Gturn = turn;
         manageIMU(resetIMUorNO);
 

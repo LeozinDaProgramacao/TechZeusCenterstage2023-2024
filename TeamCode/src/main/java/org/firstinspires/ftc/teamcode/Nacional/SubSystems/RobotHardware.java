@@ -65,6 +65,8 @@ public class RobotHardware {
 
         distance = hardwareMap.get(DistanceSensor.class,"DistanceSensorBack");
 
+
+
         CoreEsq.setDirection(DcMotorSimple.Direction.FORWARD);
         CoreDir.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -109,6 +111,9 @@ public class RobotHardware {
         frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        mainArm.setPower(-0.2);
+        AutonomousDrive = new SampleMecanumDrive(hardwareMap);
+        AutonomousDrive.setPoseEstimate(PoseStorage.currentPose);
     }
     public static void startup(){
         //inicializa o robô para o teleop
@@ -119,7 +124,6 @@ public class RobotHardware {
         CoreEsq.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         HangRobot.hideHooks();
-        mainArm.setPower(-0.2);
 
         PlaneServo.setPosition(0);
 
@@ -130,8 +134,11 @@ public class RobotHardware {
         double CurrentFront = 0;
         autodrive = new SampleMecanumDriveCancelable(hardwareMap);
         autodrive.setPoseEstimate(PoseStorage.currentPose);
-        AutonomousDrive = new SampleMecanumDrive(hardwareMap);
-        AutonomousDrive.setPoseEstimate(PoseStorage.currentPose);
+
+        ArmMovement.currentArmGoal=0;
+        ArmMovement.finalArmGoal=0;
+        HangRobot.currentDesiredHeight=0;
+        HangRobot.goalhang=0;
     }
     public static void setArtPosition(double ArtPos){
         ArticulationL.setPosition(ArtPos);

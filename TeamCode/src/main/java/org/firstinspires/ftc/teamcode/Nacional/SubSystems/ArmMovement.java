@@ -1,8 +1,19 @@
 package org.firstinspires.ftc.teamcode.Nacional.SubSystems;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.acmerobotics.dashboard.config.Config;
 
 import org.firstinspires.ftc.teamcode.Nacional.Utility.PID;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
 
 
 @Config
@@ -21,6 +32,12 @@ public class ArmMovement {
         DEPOSIT_NO_ARM
     }
     public static ARM_STATE currentArmState;
+    public static Set<ARM_STATE> COLLECT_ARM_STATES = EnumSet.of( ARM_STATE.PIXEL5UP,
+            ARM_STATE.PIXEL4UP,
+            ARM_STATE.PIXEL3UP,
+            ARM_STATE.PIXEL2UP,
+            ARM_STATE.PIXEL1UP,
+            ARM_STATE.DEPOSIT_NO_ARM );
     public enum CLAW_STATE{
         OPEN,
         CLOSED
@@ -58,11 +75,11 @@ public class ArmMovement {
     public static double CLOSE_CLAW_POS=0.4;
 
 
-    public static double ARM_DEAD_ZONE;
+    public static double ARM_DEAD_ZONE=400;
     public static double ARM_DOWN=0;
     public static double ARM_DEPOSIT_FRONT=500;
-    public static double ARM_DEPOSIT_BACK=1600;
-    public static double ARM_DEPOSIT_BACK_AUTO = 1600;
+    public static double ARM_DEPOSIT_BACK=1550;
+    public static double ARM_DEPOSIT_BACK_AUTO = 1550;
     public static double PVARIATION=0.02;
     public static int LVARIATION = 100;
     public static double finalArmGoal=0;
@@ -87,7 +104,7 @@ public class ArmMovement {
                 RobotHardware.setWristPos(WRIST_MIDDLE+WRIST_POS_DEPOSIT_BACK);
                 break;
             case DEPOSIT_BACK_AUTO:
-                finalArmGoal = ARM_DEPOSIT_BACK_AUTO;
+                finalArmGoal = ARM_DEPOSIT_BACK_AUTO+ARM_DEAD_ZONE;
                 RobotHardware.setArtPosition(ARTICULATION_MIDDLE+ARTICULATION_POS_DEPOSIT_BACK_AUTO);
                 RobotHardware.setWristPos(ARTICULATION_MIDDLE+WRIST_POS_DEPOSIT_BACK_AUTO);
                 break;
@@ -127,8 +144,8 @@ public class ArmMovement {
                 break;
             case DEPOSIT_NO_ARM:
                 finalArmGoal=ARM_DOWN;
-                RobotHardware.setArtPosition(0);
-                RobotHardware.setWristPos(0);
+                //RobotHardware.setArtPosition(0);
+                //RobotHardware.setWristPos(0);
                 break;
 
         }

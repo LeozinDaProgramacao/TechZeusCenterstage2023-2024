@@ -7,10 +7,16 @@ public class ArtStateMachine {
     public void setHeightGround(){
         this.height=0;
     }
+
+
+
     public void increaseOrLower(boolean increase,boolean lower){
+
         if (increase&&increaseSwitch.click(increase)&&height!=4){
             this.height++;
-        } else if (lower&& decreaseSwitch.click(lower)&&height!=0){
+        }
+
+        else if (lower&& decreaseSwitch.click(lower)&&height!=0){
             this.height--;
         }
 

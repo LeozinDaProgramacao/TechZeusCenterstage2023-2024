@@ -12,7 +12,7 @@ public class HangRobot {
     public static double currentDesiredHeight =0;
     static PID lftHexPIDf = new PID(0.03,0.0,0,0);
     static PID rgtHexPIDf = new PID(0.03,0,0,0);
-    private static double goalhang;
+    public static double goalhang;
 
     //TODO make it so that when robot is attempting to hang the drivebase slows down to make it easier for hooks to not fold themselves the wrong way
     public static void extendHooksToGrab(){
