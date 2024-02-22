@@ -58,7 +58,7 @@ public class Solo extends LinearOpMode {
             ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_BACK_AUTO);
         }
         if (gamepad2.dpad_left) {
-            ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_FRONT);
+            ArmMovement.setArmState(ArmMovement.ARM_STATE.DEBUG);
         }
         if (gamepad2.dpad_down) {
             ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL4UP);

@@ -16,6 +16,7 @@ public class ManualObstacleDetector {
     static List<Obstacle> detectionList = new ArrayList<Obstacle>();
     public static List<Obstacle> CheckDetections(boolean up,boolean down, boolean left, boolean right,double heading){
         boolean alignedAtFirst = (heading<Math.toRadians(45)||heading>Math.toRadians(135));
+        detectionList.clear();
         //recieves inputs from all sensors and sees which has been activated bellow the treshold for longest
         // this is then returned as a Obstacle enumeration (up, down, left or roght)
 

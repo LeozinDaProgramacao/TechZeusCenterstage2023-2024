@@ -5,6 +5,7 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.teamcode.Nacional.SubSystems.AirplaneLauncher;
 import org.firstinspires.ftc.teamcode.Nacional.SubSystems.ArmMovement;
 import org.firstinspires.ftc.teamcode.Nacional.SubSystems.DriveBase;
@@ -50,11 +51,11 @@ public class Duo extends LinearOpMode {
         Pose2d estimate = WebcamAprilTags.LocateWithAprilTag(telemetry,RobotHardware.autodrive);
 
 
-        if (RobotHardware.autodrive.getPoseEstimate()==estimate) {
+        if (RobotHardware.autodrive.getPoseEstimate()==estimate||currentMode==BASE_MODE.GRAPH) {
             RobotHardware.autodrive.update();
         } else{
             if (Math.abs(gamepad1.right_stick_y)+Math.abs(gamepad1.left_stick_x)+Math.abs(gamepad1.right_stick_x)<0.1) {
-                RobotHardware.autodrive.setPoseEstimate(WebcamAprilTags.LocateWithAprilTag(telemetry, RobotHardware.autodrive));
+                RobotHardware.autodrive.setPoseEstimate(estimate);
             } else{
                 RobotHardware.autodrive.update();
             }
@@ -63,10 +64,11 @@ public class Duo extends LinearOpMode {
         //RobotHardware.mainArm.setPower(gamepad2.left_trigger);
         if (currentMode == BASE_MODE.NORMAL) {
             if (gamepad1.x) {
+
                 currentMode = BASE_MODE.GRAPH;
                 DriveBase.startGraphMode(true);
             }
-            DriveBase.moveWithIMU(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x, gamepad1.a, gamepad1.b);
+            DriveBase.moveWithIMU(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x, gamepad1.a, gamepad1.right_bumper);
 
         } else if (currentMode == BASE_MODE.GRAPH) {
             if (!DriveBase.loopMoveGraph(
@@ -81,6 +83,13 @@ public class Duo extends LinearOpMode {
         }
         AirplaneLauncher.launchAirplane(gamepad1.left_trigger, gamepad1.right_trigger);
         HangRobot.HangLoop(gamepad2.x && gamepad2.y, gamepad2.right_trigger > 0.7 && gamepad2.left_trigger > 0.7);
+
+        telemetry.addData("CURF",DriveBase.CurrentFront);
+        telemetry.addData("CURD",DriveBase.CurrentDistTo0);
+        telemetry.addData("miu",RobotHardware.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
+        telemetry.update();
+
+
 
     }
 

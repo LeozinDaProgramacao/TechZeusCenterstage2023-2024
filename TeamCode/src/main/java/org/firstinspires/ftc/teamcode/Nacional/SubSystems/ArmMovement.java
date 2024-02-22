@@ -29,7 +29,8 @@ public class ArmMovement {
         PIXEL3UP,
         PIXEL2UP,
         PIXEL1UP,
-        DEPOSIT_NO_ARM
+        DEPOSIT_NO_ARM,
+        DEBUG
     }
     public static ARM_STATE currentArmState;
     public static Set<ARM_STATE> COLLECT_ARM_STATES = EnumSet.of( ARM_STATE.PIXEL5UP,
@@ -43,17 +44,17 @@ public class ArmMovement {
         CLOSED
     }
     public static int Artheight =0;
-    public static double LEFT_ARTICULATION_DIFFERENCE=-0.05;
-    public static double ARTICULATION_MIDDLE=0.53;
+    public static double LEFT_ARTICULATION_DIFFERENCE=0.01;
+    public static double ARTICULATION_MIDDLE=0.57;
     public static double ARTICULATION_POS_DEPOSIT_FRONT=-0.07;
     public static double ARTICULATION_POS_DEPOSIT_BACK=-0.05;
     public static double ARTICULATION_POS_DEPOSIT_BACK_AUTO = -0.05;
     public static double ARTICULATION_POS_COLLECT_GROUND=-0.03;
-    public static double ARTICULATION_STORE_CLAW=-0.3;
+    public static double ARTICULATION_STORE_CLAW=-0.4;
     public static double ARTICULATION_HANG=-0.03;
     public static double ARTICULATION_POS_2NDPIXEL_UP=-0.06;
     public static double ARTICULATION_POS_3NDPIXEL_UP=-0.08;
-    public static double ARTICULATION_POS_4NDPIXEL_UP=-0.09;
+    public static double ARTICULATION_POS_4NDPIXEL_UP=-0.11;
     public static double ARTICULATION_POS_5NDPIXEL_UP=-0.11;
     public static double ARTICULATION_DEPOSIT_NO_ARM = 0;
 
@@ -62,12 +63,12 @@ public class ArmMovement {
     public static double WRIST_POS_DEPOSIT_BACK=-0.3;
     public static double WRIST_POS_DEPOSIT_BACK_AUTO=-0.3;
     public static double WRIST_POS_COLLECT_GROUND=-0.05;
-    public static double WRIST_STORE_CLAW=-0.3;
-    public static double WRIST_MIDDLE=0.4;
+    public static double WRIST_STORE_CLAW=-0.25;
+    public static double WRIST_MIDDLE=0.52;
     public static double WRIST_HANG;
     public static double WRIST_POS_2NDPIXEL_UP=-0.05;
     public static double WRIST_POS_3NDPIXEL_UP=-0.05;
-    public static double WRIST_POS_4NDPIXEL_UP=-0.04;
+    public static double WRIST_POS_4NDPIXEL_UP=-0.03;
     public static double WRIST_POS_5NDPIXEL_UP=-0.03;
     public static double WRIST_DEPOSIT_NO_ARM =0;
 
@@ -147,6 +148,10 @@ public class ArmMovement {
                 //RobotHardware.setArtPosition(0);
                 //RobotHardware.setWristPos(0);
                 break;
+            case DEBUG:
+                finalArmGoal = ARM_DEPOSIT_FRONT+ARM_DEAD_ZONE;
+                RobotHardware.setArtPosition(ARTICULATION_MIDDLE);
+                RobotHardware.setWristPos(WRIST_MIDDLE);
 
         }
 

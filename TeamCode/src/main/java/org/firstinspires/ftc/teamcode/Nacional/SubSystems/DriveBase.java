@@ -20,21 +20,24 @@ import org.firstinspires.ftc.teamcode.oldcode.Node;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 @Config
 public class DriveBase {
-    public static double BASE_DRIVING_SPEED = 0.5;
+    public static double BASE_DRIVING_SPEED = 0.7;
     public static double BACKDROP_MULTIPLIER =0.3;
-    public static double HANG_SPEED_MULTIPLIER=0.25;
+    public static double HANG_SPEED_MULTIPLIER=0.3;
     public static double Gturn=0;
     static YawPitchRollAngles orientation;
     static double CurrentAngle;
-    static double CurrentFront;
+    public static double CurrentFront;
     public static PID turnPID = new PID(0,0,0,0);
     private static double currentStateMultiplier;
+    public static double CurrentDistTo0;
     static Vertex startPosition;
 
 
 
     public static void startGraphMode(boolean BLUESIDE){
+        RobotHardware.moveArm(0);
         Graph graph = new Graph(BLUESIDE);
+
         graph.resetGraph();
 
         startPosition = new Vertex(RobotHardware.autodrive.getPoseEstimate().getX(),RobotHardware.autodrive.getPoseEstimate().getY(),"startPosition");
@@ -73,8 +76,8 @@ public class DriveBase {
         manageIMU(resetIMUorNO);
 
         //muda a direção de movimento com base na orientação ro robo
-        double rotX = strafe * Math.cos(orientation.getYaw(AngleUnit.RADIANS)) + drive * Math.sin(orientation.getYaw(AngleUnit.RADIANS));
-        double rotY = strafe * Math.sin(-orientation.getYaw(AngleUnit.RADIANS)) + drive * Math.cos(-orientation.getYaw(AngleUnit.RADIANS));
+        double rotX = strafe * Math.cos(CurrentFront) + drive * Math.sin(CurrentFront);
+        double rotY = strafe * Math.sin(-CurrentFront) + drive * Math.cos(-CurrentFront);
 
         //define as velocidades de cada motor
         double maximo = Math.max(Math.abs(rotX) + Math.abs(rotY) + Math.abs(turn), 1);
@@ -106,14 +109,14 @@ public class DriveBase {
         orientation = RobotHardware.imu.getRobotYawPitchRollAngles();
         //DeltaAngle =360- (orientation.getYaw(AngleUnit.RADIANS)*180/3.141);
         if(resetIMUorNO){
-            RobotHardware.imu.resetYaw();
-            CurrentFront = orientation.getYaw(AngleUnit.RADIANS);
+            //RobotHardware.imu.resetYaw();
+            CurrentDistTo0 =orientation.getYaw(AngleUnit.RADIANS);
+            CurrentFront = orientation.getYaw(AngleUnit.RADIANS) - CurrentDistTo0;
         }
 
         //ao girar manualmente, reseta a orientação tida como frente pelo robô (para uso no PID)
         if (Math.abs(Gturn)>=0.001){
-            CurrentFront = orientation.getYaw(AngleUnit.RADIANS);
-            turnPID.cummulativeError=0;
+            CurrentFront = orientation.getYaw(AngleUnit.RADIANS)- CurrentDistTo0;
 
         }
 
