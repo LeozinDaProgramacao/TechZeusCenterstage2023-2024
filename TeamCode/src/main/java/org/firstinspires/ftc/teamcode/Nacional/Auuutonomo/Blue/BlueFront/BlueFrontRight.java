@@ -22,7 +22,7 @@ public class BlueFrontRight {
                     ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_BACK);
                 })
                 .setReversed(true)
-                .splineToLinearHeading(new Pose2d(49,29,Math.toRadians(180)),0)
+                .splineToLinearHeading(new Pose2d(49,28,Math.toRadians(180)),0)
                 .waitSeconds(0.15)
                 .back(6)
                 .setReversed(false)
@@ -44,7 +44,7 @@ public class BlueFrontRight {
                 })
                 .splineToConstantHeading(new Vector2d(13,60),Math.toRadians(180))
                 .splineToConstantHeading(new Vector2d(-30,60),Math.toRadians(180))
-                .splineToLinearHeading(new Pose2d(-54,36.7,Math.toRadians(180)),Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-53,36.7,Math.toRadians(180)),Math.toRadians(180))
 
                 .waitSeconds(0.1)
                 .forward(1.2)

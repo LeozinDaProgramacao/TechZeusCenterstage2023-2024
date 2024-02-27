@@ -54,15 +54,15 @@ public class WebcamAprilTags {
                     switch (detection.id) {
                         case 1:
                             xtag = 63;
-                            ytag = 41.5;
+                            ytag = -41.5;
                             break;
                         case 2:
                             xtag = 63;
-                            ytag = 35.5;
+                            ytag = -35.5;
                             break;
                         case 3:
                             xtag = 63;
-                            ytag = 29.5;
+                            ytag = -29.5;
                             break;
                         case 4:
                             xtag = 63;

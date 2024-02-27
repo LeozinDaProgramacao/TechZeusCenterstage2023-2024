@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.Nacional.Auuutonomo.Blue.BlueFront;
+package org.firstinspires.ftc.teamcode.Nacional.Auuutonomo.Red.RedFront;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
@@ -7,42 +7,42 @@ import org.firstinspires.ftc.teamcode.Nacional.SubSystems.ArmMovement;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 
-public class BlueFrontLeft {
-    public static TrajectorySequence getLeftSequence(SampleMecanumDrive drive, Pose2d startPose){
-        TrajectorySequence leftSequencee= drive.trajectorySequenceBuilder(startPose)
-                .UNSTABLE_addTemporalMarkerOffset(0.3,()->{
+public class RedFrontRight {
+    public static TrajectorySequence getRightSequence(SampleMecanumDrive drive, Pose2d startPose){
+        TrajectorySequence rightSequence= drive.trajectorySequenceBuilder(startPose)
+                .UNSTABLE_addTemporalMarkerOffset(0,()->{
                     ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL4UP);
                 })
-                .lineToLinearHeading(new Pose2d(38,32,Math.toRadians(180)))
+                .lineToLinearHeading(new Pose2d(40,-32,Math.toRadians(180)))
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
-                    ArmMovement.ControlLeftClaw(ArmMovement.CLAW_STATE.OPEN);
+                    ArmMovement.ControlRightClaw(ArmMovement.CLAW_STATE.OPEN);
                 })
                 .waitSeconds(0.1)
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
                     ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_BACK);
                 })
                 .setReversed(true)
-                .splineToConstantHeading(new Vector2d(49,41),0)
+                .splineToConstantHeading(new Vector2d(49,-39),0)
                 .waitSeconds(0.1)
                 .back(6)
                 .setReversed(false)
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
-                    ArmMovement.ControlRightClaw(ArmMovement.CLAW_STATE.OPEN);
+                    ArmMovement.ControlLeftClaw(ArmMovement.CLAW_STATE.OPEN);
                 })
                 .waitSeconds(0.1)
                 .UNSTABLE_addDisplacementMarkerOffset(0,()->{
                     ArmMovement.setArmState(ArmMovement.ARM_STATE.STORED);
                 })
-                .splineToConstantHeading(new Vector2d(13,60),Math.toRadians(180))
-                .splineToConstantHeading(new Vector2d(-30,60),Math.toRadians(180))
+                .splineToConstantHeading(new Vector2d(13,-60),Math.toRadians(180))
+                .splineToConstantHeading(new Vector2d(-30,-60),Math.toRadians(180))
                 .UNSTABLE_addDisplacementMarkerOffset(0,()->{
                     ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL4UP);
                 })
-                .splineToLinearHeading(new Pose2d(-53,36,Math.toRadians(180)),Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-52,-34.5,Math.toRadians(180)),Math.toRadians(180))
 
 
-                .waitSeconds(0.1)
-                .forward(1.2)
+                .waitSeconds(0.2)
+                .forward(1.5)
                 //.setReversed(true)
                 //.back(3)
                 //.splineToLinearHeading(new Pose2d(-56,12,Math.toRadians(180)),Math.toRadians(180))
@@ -50,33 +50,34 @@ public class BlueFrontLeft {
                 //moves to get the  extra pixel
 
                 .UNSTABLE_addTemporalMarkerOffset(0,()-> {
-                    ArmMovement.ControlLeftClaw(ArmMovement.CLAW_STATE.CLOSED);
+                    ArmMovement.ControlRightClaw(ArmMovement.CLAW_STATE.CLOSED);
                 })
-                .waitSeconds(0.1)
+                .waitSeconds(0.2)
+                .setReversed(true)
                 .back(4)
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
                     ArmMovement.setArmState(ArmMovement.ARM_STATE.STORED);
                 })
-                .back(1)
-                .setReversed(true)
-                .splineToLinearHeading(new Pose2d(-30,60,Math.toRadians(180)),Math.toRadians(0))
-                .splineToConstantHeading(new Vector2d(13,60),Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(-30,-60,Math.toRadians(180)),Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(13,-60),Math.toRadians(0))
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
+
                     ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_BACK);
                 })
-                .splineToConstantHeading(new Vector2d(47,32.5),0)
-                .back(4)
+                .splineToConstantHeading(new Vector2d(47,-33),0)
+                .waitSeconds(0.3)
+                .back(8)
                 .setReversed(false)
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
-                    ArmMovement.ControlLeftClaw(ArmMovement.CLAW_STATE.OPEN);
-                }).waitSeconds(0.1)
-                .forward(5)
+                    ArmMovement.ControlRightClaw(ArmMovement.CLAW_STATE.OPEN);
+                }).waitSeconds(0.3)
                 .UNSTABLE_addDisplacementMarkerOffset(0,()->{
                     ArmMovement.setArmState(ArmMovement.ARM_STATE.STORED);
                 })
-                .splineToConstantHeading(new Vector2d(40,60),Math.toRadians(0))
-                .splineToConstantHeading(new Vector2d(60,60),Math.toRadians(0))
+                .forward(5)
+                .splineToConstantHeading(new Vector2d(40,-60),Math.toRadians(0))
+                .splineToConstantHeading(new Vector2d(60,-60),Math.toRadians(0))
                 .build();
-        return leftSequencee;
+	return rightSequence;
     }
 }

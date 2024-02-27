@@ -15,10 +15,11 @@ import org.firstinspires.ftc.teamcode.Nacional.SubSystems.WebcamAprilTags;
 import org.firstinspires.ftc.teamcode.Nacional.Utility.ArtStateMachine;
 import org.firstinspires.ftc.teamcode.Nacional.Utility.counterSwitch;
 import org.firstinspires.ftc.teamcode.Nacional.Utility.simpleSwitch;
+
 @Config
 
-@TeleOp (name="Duo >:D")
-public class Duo extends LinearOpMode {
+@TeleOp (name="Duo Red >:D🦞🥵")
+public class DuoRed extends LinearOpMode {
     simpleSwitch LClawSwitch = new simpleSwitch();
     simpleSwitch RClawSwitch = new simpleSwitch();
     counterSwitch stateMachine = new counterSwitch(4);
@@ -33,7 +34,7 @@ public class Duo extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         RobotHardware.setHardwareMap(hardwareMap);
-        RobotHardware.initAll();
+        RobotHardware.initAll(-1);
         AirplaneLauncher.resetAirplaneServo();
         waitForStart();
         RobotHardware.startup();
@@ -47,11 +48,11 @@ public class Duo extends LinearOpMode {
     public void loopRobot() {
         defineArmHeight();
         ArmMovement.ControlClawTeleop(LClawSwitch.click(gamepad2.left_bumper), RClawSwitch.click(gamepad2.right_bumper));
-        ArmMovement.armPIDLoop(gamepad2.back);
+        ArmMovement.armPIDLoop(gamepad2.y);
         Pose2d estimate = WebcamAprilTags.LocateWithAprilTag(telemetry,RobotHardware.autodrive);
 
 
-        if (RobotHardware.autodrive.getPoseEstimate()==estimate||currentMode==BASE_MODE.GRAPH) {
+        if (RobotHardware.autodrive.getPoseEstimate()==estimate||currentMode== BASE_MODE.GRAPH) {
             RobotHardware.autodrive.update();
         } else{
             if (Math.abs(gamepad1.right_stick_y)+Math.abs(gamepad1.left_stick_x)+Math.abs(gamepad1.right_stick_x)<0.1) {
@@ -66,7 +67,7 @@ public class Duo extends LinearOpMode {
             if (gamepad1.x) {
 
                 currentMode = BASE_MODE.GRAPH;
-                DriveBase.startGraphMode(true);
+                DriveBase.startGraphMode(-1);
             }
             DriveBase.moveWithIMU(-gamepad1.left_stick_y, gamepad1.left_stick_x, gamepad1.right_stick_x, gamepad1.a, gamepad1.right_bumper);
 
@@ -84,8 +85,11 @@ public class Duo extends LinearOpMode {
         AirplaneLauncher.launchAirplane(gamepad1.left_trigger, gamepad1.right_trigger);
         HangRobot.HangLoop(gamepad2.x && gamepad2.y, gamepad2.right_trigger > 0.7 && gamepad2.left_trigger > 0.7);
 
+        telemetry.addData("ARM GOAL", ArmMovement.currentArmGoal);
+        telemetry.addData("ARM POSITION", RobotHardware.mainArm.getCurrentPosition());
         telemetry.addData("CURF",DriveBase.CurrentFront);
         telemetry.addData("CURD",DriveBase.CurrentDistTo0);
+        telemetry.addData("AP",ArmMovement.armPower);
         telemetry.addData("miu",RobotHardware.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
         telemetry.update();
 

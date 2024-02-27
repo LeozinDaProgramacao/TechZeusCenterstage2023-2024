@@ -24,7 +24,7 @@ public class Solo extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         RobotHardware.setHardwareMap(hardwareMap);
-        RobotHardware.initAll();
+        RobotHardware.initAll(1);
         AirplaneLauncher.resetAirplaneServo();
 
         waitForStart();
@@ -55,7 +55,7 @@ public class Solo extends LinearOpMode {
     public void defineArmHeight() {
 
         if (gamepad2.dpad_up) {
-            ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_BACK_AUTO);
+            ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL5UP);
         }
         if (gamepad2.dpad_left) {
             ArmMovement.setArmState(ArmMovement.ARM_STATE.DEBUG);

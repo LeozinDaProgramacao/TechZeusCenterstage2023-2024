@@ -55,7 +55,7 @@ public class ArmMovement {
     public static double ARTICULATION_POS_2NDPIXEL_UP=-0.06;
     public static double ARTICULATION_POS_3NDPIXEL_UP=-0.08;
     public static double ARTICULATION_POS_4NDPIXEL_UP=-0.11;
-    public static double ARTICULATION_POS_5NDPIXEL_UP=-0.11;
+    public static double ARTICULATION_POS_5NDPIXEL_UP=-0.15;
     public static double ARTICULATION_DEPOSIT_NO_ARM = 0;
 
 
@@ -64,19 +64,19 @@ public class ArmMovement {
     public static double WRIST_POS_DEPOSIT_BACK_AUTO=-0.3;
     public static double WRIST_POS_COLLECT_GROUND=-0.05;
     public static double WRIST_STORE_CLAW=-0.25;
-    public static double WRIST_MIDDLE=0.52;
+    public static double WRIST_MIDDLE=0.47;
     public static double WRIST_HANG;
     public static double WRIST_POS_2NDPIXEL_UP=-0.05;
     public static double WRIST_POS_3NDPIXEL_UP=-0.05;
     public static double WRIST_POS_4NDPIXEL_UP=-0.03;
-    public static double WRIST_POS_5NDPIXEL_UP=-0.03;
+    public static double WRIST_POS_5NDPIXEL_UP=0.02;
     public static double WRIST_DEPOSIT_NO_ARM =0;
 
     public static double OPEN_CLAW_POS=0.6;
     public static double CLOSE_CLAW_POS=0.4;
 
 
-    public static double ARM_DEAD_ZONE=400;
+    public static double ARM_DEAD_ZONE=370;
     public static double ARM_DOWN=0;
     public static double ARM_DEPOSIT_FRONT=500;
     public static double ARM_DEPOSIT_BACK=1550;

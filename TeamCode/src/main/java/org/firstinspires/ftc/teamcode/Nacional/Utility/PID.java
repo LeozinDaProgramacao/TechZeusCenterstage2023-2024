@@ -45,21 +45,7 @@ public class PID {
     public double CalculatePID(double current_position,double current_goal,boolean base){
         goal = current_goal;
         position = current_position;
-        if (base){
-            if (((goal<=Math.PI) && (position <=Math.PI))||((goal>Math.PI)&&(position>Math.PI))){
-                error = goal-position;
-            } else{
-                if (goal-position>Math.PI){
-                    //soma menor que PI
-                    error = goal-position;
-                } else{
-                    //objetivo na direita e posição na esquerda
-                    error = position+2*Math.PI-goal;
-                }
-            }
-        }else{
-            error = goal-position;
-        }
+        error = goal-position;
 
         speed = P(kP)+I(kI)+D(kD);
 

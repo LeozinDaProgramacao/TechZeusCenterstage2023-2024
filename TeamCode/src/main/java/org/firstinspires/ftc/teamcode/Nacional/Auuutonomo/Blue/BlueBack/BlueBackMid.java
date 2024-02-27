@@ -23,7 +23,7 @@ public class BlueBackMid {
                 .turn(Math.toRadians(90))
                 //moves to get the  extra pixel
                 .splineToLinearHeading(new Pose2d(-51,15,Math.toRadians(180)),Math.toRadians(180))
-                .forward(5)
+                .forward(4.5)
                 .UNSTABLE_addDisplacementMarkerOffset(0,()-> {
                     ArmMovement.ControlLeftClaw(ArmMovement.CLAW_STATE.CLOSED);
                 })
@@ -33,10 +33,10 @@ public class BlueBackMid {
                 .splineToLinearHeading(new Pose2d(20,8,Math.toRadians(180)),Math.toRadians(0))
                 .UNSTABLE_addDisplacementMarkerOffset(-10,()->
                 {
-                    ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_BACK_AUTO);
+                    ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_BACK);
                 })
                 //.splineToConstantHeading(new Vector2d(45,36),0)
-                .splineToConstantHeading(new Vector2d(49,33),0)
+                .splineToConstantHeading(new Vector2d(49,31),0)
                 .waitSeconds(0.5)
                 .back(4)
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{

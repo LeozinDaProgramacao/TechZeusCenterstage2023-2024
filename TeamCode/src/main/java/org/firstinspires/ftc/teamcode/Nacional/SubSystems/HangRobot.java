@@ -5,9 +5,9 @@ import com.acmerobotics.dashboard.config.Config;
 import org.firstinspires.ftc.teamcode.Nacional.Utility.PID;
 @Config
 public class HangRobot {
-    private static final double HANGVARIATION = 6;
+    private static final double HANGVARIATION = 15;
     public static double HOOK_HEIGHT_GRAB=800;
-    public static double HOOK_HEIGHT_HANG=250;
+    public static double HOOK_HEIGHT_HANG=150;
     public static double HOOK_HEIGHT_STORE=0;
     public static double currentDesiredHeight =0;
     static PID lftHexPIDf = new PID(0.03,0.0,0,0);

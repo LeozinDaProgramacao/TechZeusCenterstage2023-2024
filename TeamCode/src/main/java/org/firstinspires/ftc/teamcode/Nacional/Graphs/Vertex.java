@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.Nacional.Graphs;
 
 
+import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
@@ -16,6 +18,7 @@ public class Vertex implements Comparable<Vertex>{
     public double XPos;
     public String id;
     public double YPos;
+    public TrajectorySequence PersonalSequence;
     public List<String> neighbors;
     public Vertex parent;
 
@@ -38,4 +41,3 @@ public class Vertex implements Comparable<Vertex>{
         neighbors.remove(id);
     }
 }
-

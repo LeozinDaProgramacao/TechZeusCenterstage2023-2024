@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Nacional.Graphs;
 
+import android.text.GetChars;
+
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 
@@ -13,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.Vector;
 
 /**
  *
@@ -42,13 +45,15 @@ public class Graph {
 
     public static double currdist = Double.MAX_VALUE;
     public static Vertex closest = null;
-    public static boolean Blue;
+    public static int Blue;
 
-    public Graph(boolean BlueSide){
-        this.Blue = BlueSide;
+    public Graph(int BlueSide){
+        Blue = BlueSide;
     }
 
     public static Map<String,Vertex> allVertexs = new HashMap<String,Vertex>();
+
+    public static Map<String,TrajectorySequence> allSequences = new HashMap<String,TrajectorySequence>();
 
     public void resetGraph(){
         allVertexs.clear();
@@ -66,6 +71,9 @@ public class Graph {
         allVertexs.put(v2.id,v2);
 
     }
+    public void addToList(Vertex v){
+        allVertexs.put(v.id, v);
+    }
     public void singleEdge(Vertex src,Vertex dst){
         src.addEdge(dst.id,dst);
         allVertexs.put(src.id,src);
@@ -74,7 +82,7 @@ public class Graph {
         currdist = Double.MAX_VALUE;
         closest = new Vertex(9999,9999,"9999");
         allVertexs.forEach((k,v)->{
-            double dif = Math.sqrt((v.XPos-curP.XPos)*(v.XPos-curP.XPos)+(v.YPos-curP.YPos)*(v.YPos-curP.YPos));
+            double dif = (v.XPos-curP.XPos)*(v.XPos-curP.XPos)+(v.YPos-curP.YPos)*(v.YPos-curP.YPos);
             if (dif<currdist){
                 currdist = dif;
                 closest = v;
@@ -88,7 +96,7 @@ public class Graph {
 
     public static Vertex getTarget(Vertex position){
         //System.out.println("printing the target position");
-        if (Blue){
+        if (Blue>0){
             if (position.XPos<= -12){
                 //System.out.println("BackDropB");
                 return allVertexs.get("BackdropB");
@@ -106,6 +114,13 @@ public class Graph {
             }
         }
     }
+    public static TrajectorySequence getLazySequence(){
+        Pose2d currentPose = RobotHardware.autodrive.getPoseEstimate();
+        Vertex currentPosition = new Vertex(currentPose.getX(),currentPose.getY(),"currentPosition");
+                Vertex closestVertex = getClosestVertex(currentPosition);
+        return getFunction(closestVertex.id);
+    }
+
     public static double calculateHeuristic(Vertex currentNode, Vertex target){
         return Math.sqrt((target.XPos-currentNode.XPos)*(target.XPos-currentNode.XPos)+(target.YPos-currentNode.YPos)*(target.YPos-currentNode.YPos));
     }
@@ -271,6 +286,8 @@ public class Graph {
 
 
     public void createGraph(){
+
+
         //backstage nodes
         Vertex centerBack = new Vertex(30,0,"centerBack");
         Vertex BridgeBackBL = new Vertex(13,60,"BridgeBackBL");
@@ -280,19 +297,40 @@ public class Graph {
         Vertex BridgeBackRL = new Vertex(13,-36,"BridgeBackRL");
         Vertex BridgeBackRR = new Vertex(13,-60,"BridgeBackRR");
 
+
+
+
         //front side nodes
         Vertex centerFront = new Vertex(-50,0,"centerFront");
         Vertex BridgeFrontBL = new Vertex(-37,60,"BridgeFrontBL");
         Vertex BridgeFrontBR = new Vertex(-37,36,"BridgeFrontBR");
+
         Vertex BridgeFrontCL = new Vertex(-37,12,"BridgeFrontCL");
         Vertex BridgeFrontCR = new Vertex(-37,-12,"BridgeFrontCR");
+
+
         Vertex BridgeFrontRL = new Vertex(-37,-36,"BridgeFrontRL");
+
         Vertex BridgeFrontRR = new Vertex(-37,-60,"BridgeFrontRR");
 
-
+        addToList(centerBack);
+        addToList(BridgeBackBL);
+        addToList(BridgeBackBR);
+        addToList(BridgeBackCL);
+        addToList(BridgeBackCR);
+        addToList(BridgeBackRL);
+        addToList(BridgeBackRR);
         //addition of all common nodes to the allVertexs list
         //allVertexs.this.put(key, closest)
         //put(centerBack);
+
+        addToList(centerFront);
+        addToList(BridgeFrontBL);
+        addToList(BridgeFrontBR);
+        addToList(BridgeFrontCL);
+        addToList(BridgeFrontCR);
+        addToList(BridgeFrontRL);
+        addToList(BridgeFrontRR);
 
 
 
@@ -301,26 +339,18 @@ public class Graph {
 
 
         //ADD EXCLUSIVE BLUE SIDE CONNECTIONS AND NODES
-        if (Blue){
+        if (Blue>0){
             Vertex BackdropB = new Vertex(48,36,"BackdropB");
             Vertex behindBBack = new Vertex(36,36,"behindBBack");
             Vertex collectBlue = new Vertex(-60,-64,"collectBlue");
             Vertex BehindBCollect = new Vertex(-50,-64,"BehindBCollect");
 
-            doubleEdge(BackdropB,behindBBack);
-
-            doubleEdge(behindBBack,centerBack);
-            doubleEdge(behindBBack,BridgeBackBL);
-            doubleEdge(behindBBack,BridgeBackBR);
-            doubleEdge(behindBBack,BridgeBackCL);
+            addToList(BackdropB);
+            addToList(behindBBack);
 
 
-            doubleEdge(BehindBCollect,collectBlue);
-
-            doubleEdge(BehindBCollect,centerFront);
-            doubleEdge(BehindBCollect,BridgeFrontCR);
-            doubleEdge(BehindBCollect,BridgeFrontRL);
-            doubleEdge(BehindBCollect,BridgeFrontRR);
+            addToList(BehindBCollect);
+            addToList(collectBlue);
         }
         else{
 
@@ -330,46 +360,171 @@ public class Graph {
             Vertex collectRed = new Vertex(-60,64,"collectRed");
             Vertex BehindRCollect = new Vertex(-50,64,"BehindRCollect");
 
-            doubleEdge(BackdropR,behindRBack);
+            addToList(BackdropR);
 
-            doubleEdge(behindRBack,centerBack);
-            doubleEdge(behindRBack,BridgeBackCR);
-            doubleEdge(behindRBack,BridgeBackRL);
-            doubleEdge(behindRBack,BridgeBackRR);
+            addToList(behindRBack);
 
-            doubleEdge(collectRed,BehindRCollect);
 
-            doubleEdge(BehindRCollect,centerFront);
-            doubleEdge(BehindRCollect,BridgeFrontBL);
-            doubleEdge(BehindRCollect,BridgeFrontBR);
-            doubleEdge(BehindRCollect,BridgeFrontCL);
+            addToList(BehindRCollect);
+            addToList(collectRed);
 
         }
 
         //MAKE THE COMMON CONNECTIONS (EDGES BETWEEN VERTEXES)
-        doubleEdge(centerBack,BridgeBackBL);
-        doubleEdge(centerBack,BridgeBackBR);
-        doubleEdge(centerBack,BridgeBackCL);
-        doubleEdge(centerBack,BridgeBackCR);
-        doubleEdge(centerBack,BridgeBackRL);
-        doubleEdge(centerBack,BridgeBackRR);
-
-        doubleEdge(BridgeBackBL,BridgeFrontBL);
-        doubleEdge(BridgeBackBR,BridgeFrontBR);
-
-        doubleEdge(BridgeBackRL,BridgeFrontRL);
-        doubleEdge(BridgeBackRR,BridgeFrontRR);
-
-        singleEdge(BridgeFrontCL,BridgeBackCL);
-        singleEdge(BridgeFrontCR,BridgeBackCR);
 
 
-        doubleEdge(centerFront,BridgeFrontBL);
-        doubleEdge(centerFront,BridgeFrontBR);
-        doubleEdge(centerFront,BridgeFrontCL);
-        doubleEdge(centerFront,BridgeFrontCR);
-        doubleEdge(centerFront,BridgeFrontRL);
-        doubleEdge(centerFront,BridgeFrontRR);
         /**/
     }
+    public static TrajectorySequence getFunction(String VertexID){
+        if (VertexID=="centerBack"){
+
+            return RobotHardware.autodrive.trajectorySequenceBuilder(RobotHardware.autodrive.getPoseEstimate())
+                    .splineToLinearHeading(new Pose2d(13,-60*Blue,Math.toRadians(180)),Math.toRadians(180))
+                    .splineToConstantHeading(new Vector2d(-45,-60*Blue),Math.toRadians(180))
+                    .build();
+
+        } else if (VertexID=="BridgeBackBL"){
+            return RobotHardware.autodrive.trajectorySequenceBuilder(RobotHardware.autodrive.getPoseEstimate())
+                    .splineToLinearHeading(new Pose2d(13,60,Math.toRadians(180)),Math.toRadians(180))
+                    .splineToConstantHeading(new Vector2d(-40,60),Math.toRadians(180))
+                    .lineToConstantHeading(new Vector2d(-45,-60*Blue))
+                    .build();
+        } else if (VertexID=="BridgeBackBR"){
+            return RobotHardware.autodrive.trajectorySequenceBuilder(RobotHardware.autodrive.getPoseEstimate())
+                    .splineToLinearHeading(new Pose2d(13,36,Math.toRadians(180)),Math.toRadians(180))
+                    .splineToConstantHeading(new Vector2d(-40,36),Math.toRadians(180))
+                    .lineToConstantHeading(new Vector2d(-45,-60*Blue))
+                    .build();
+        } else if (VertexID=="BridgeBackCL"){
+            return RobotHardware.autodrive.trajectorySequenceBuilder(RobotHardware.autodrive.getPoseEstimate())
+                    .splineToLinearHeading(new Pose2d(30,0,Math.toRadians(180)),Math.toRadians(0))
+                    .splineToConstantHeading(new Vector2d(13,-60*Blue),Math.toRadians(180))
+                    .splineToConstantHeading(new Vector2d(-45,-60*Blue),Math.toRadians(180))
+                    .build();
+        } else if (VertexID=="BridgeBackCR"){
+            return RobotHardware.autodrive.trajectorySequenceBuilder(RobotHardware.autodrive.getPoseEstimate())
+                    .splineToLinearHeading(new Pose2d(30,0,Math.toRadians(180)),Math.toRadians(0))
+                    .splineToConstantHeading(new Vector2d(13,-60*Blue),Math.toRadians(180))
+                    .splineToConstantHeading(new Vector2d(-45,-60*Blue),Math.toRadians(180))
+                    .build();
+        } else if (VertexID=="BridgeBackRL"){
+            return RobotHardware.autodrive.trajectorySequenceBuilder(RobotHardware.autodrive.getPoseEstimate())
+                    .splineToLinearHeading(new Pose2d(13,-36,Math.toRadians(180)),Math.toRadians(180))
+                    .splineToConstantHeading(new Vector2d(-40,-36),Math.toRadians(180))
+                    .lineToConstantHeading(new Vector2d(-45,-60*Blue))
+                    .build();
+        }else if (VertexID=="BridgeBackRR"){
+            return RobotHardware.autodrive.trajectorySequenceBuilder(RobotHardware.autodrive.getPoseEstimate())
+                    .splineToLinearHeading(new Pose2d(13,-60,Math.toRadians(180)),Math.toRadians(180))
+                    .splineToConstantHeading(new Vector2d(-40,-60),Math.toRadians(180))
+                    .lineToConstantHeading(new Vector2d(-45,-60*Blue))
+                    .build();
+        }
+
+        else if (VertexID=="centerFront"){
+            return RobotHardware.autodrive.trajectorySequenceBuilder(RobotHardware.autodrive.getPoseEstimate())
+                    .splineToLinearHeading(new Pose2d(-40,36*Blue,Math.toRadians(180)),Math.toRadians(0))
+                    .splineToConstantHeading(new Vector2d(13,36*Blue),Math.toRadians(0))
+                    .build();
+        } else if (VertexID=="BridgeFrontBL"){
+            return RobotHardware.autodrive.trajectorySequenceBuilder(RobotHardware.autodrive.getPoseEstimate())
+                    .splineToLinearHeading(new Pose2d(-40,60,Math.toRadians(180)),Math.toRadians(0))
+                    .splineToConstantHeading(new Vector2d(13,60),Math.toRadians(0))
+
+                    .splineToConstantHeading(new Vector2d(36,36*Blue),Math.toRadians(0))
+                    .build();
+        } else if (VertexID=="BridgeFrontBR"){
+            return RobotHardware.autodrive.trajectorySequenceBuilder(RobotHardware.autodrive.getPoseEstimate())
+                    .splineToLinearHeading(new Pose2d(-37,36,Math.toRadians(180)),Math.toRadians(0))
+                    .splineToConstantHeading(new Vector2d(13,36),Math.toRadians(0))
+                    .splineToConstantHeading(new Vector2d(36,36*Blue),Math.toRadians(0))
+                    .build();
+        } else if (VertexID=="BridgeFrontCL"){
+            return RobotHardware.autodrive.trajectorySequenceBuilder(RobotHardware.autodrive.getPoseEstimate())
+                    .splineToLinearHeading(new Pose2d(-40,12,Math.toRadians(180)),Math.toRadians(0))
+                    .splineToConstantHeading(new Vector2d(13,12),Math.toRadians(0))
+                    .splineToConstantHeading(new Vector2d(36,36*Blue),Math.toRadians(0))
+                    .build();
+
+        } else if (VertexID=="BridgeFrontCR"){
+            return RobotHardware.autodrive.trajectorySequenceBuilder(RobotHardware.autodrive.getPoseEstimate())
+                    .splineToLinearHeading(new Pose2d(-40,-12,Math.toRadians(180)),Math.toRadians(0))
+                    .splineToConstantHeading(new Vector2d(13,-12),Math.toRadians(0))
+                    .splineToConstantHeading(new Vector2d(36,36*Blue),Math.toRadians(0))
+                    .build();
+
+        } else if (VertexID=="BridgeFrontRL"){
+            return RobotHardware.autodrive.trajectorySequenceBuilder(RobotHardware.autodrive.getPoseEstimate())
+                    .splineToLinearHeading(new Pose2d(-40,-36,Math.toRadians(180)),Math.toRadians(0))
+                    .splineToConstantHeading(new Vector2d(13,-36),Math.toRadians(0))
+                    .splineToConstantHeading(new Vector2d(36,36*Blue),Math.toRadians(0))
+                    .build();
+
+        }else if (VertexID=="BridgeFrontRR"){
+            return RobotHardware.autodrive.trajectorySequenceBuilder(RobotHardware.autodrive.getPoseEstimate())
+                    .splineToLinearHeading(new Pose2d(-40,-60,Math.toRadians(180)),Math.toRadians(0))
+                    .splineToConstantHeading(new Vector2d(13,-60),Math.toRadians(0))
+                    .splineToConstantHeading(new Vector2d(36,36*Blue),Math.toRadians(0))
+                    .build();
+        }
+
+        else  if (VertexID=="BackdropB"){
+            return RobotHardware.autodrive.trajectorySequenceBuilder(RobotHardware.autodrive.getPoseEstimate())
+                    .splineToLinearHeading(new Pose2d(13,36,Math.toRadians(180)),Math.toRadians(0))
+                    .splineToConstantHeading(new Vector2d(-45,36),Math.toRadians(0))
+                    .build();
+
+        } else if (VertexID=="behindBBack"){
+            return RobotHardware.autodrive.trajectorySequenceBuilder(RobotHardware.autodrive.getPoseEstimate())
+                    .splineToLinearHeading(new Pose2d(13,36,Math.toRadians(180)),Math.toRadians(0))
+                    .splineToConstantHeading(new Vector2d(-45,36*Blue),Math.toRadians(0))
+                    .build();
+
+        } else if (VertexID=="BehindBCollect"){
+            return RobotHardware.autodrive.trajectorySequenceBuilder(RobotHardware.autodrive.getPoseEstimate())
+                    .lineToSplineHeading(new Pose2d(-40,-12,Math.toRadians(180)))
+                    .splineToConstantHeading(new Vector2d(13,12),Math.toRadians(30))
+                    .splineToConstantHeading(new Vector2d(36,36),Math.toRadians(0))
+                    .build();
+
+        } else if (VertexID=="collectBlue"){
+            return RobotHardware.autodrive.trajectorySequenceBuilder(RobotHardware.autodrive.getPoseEstimate())
+                    .lineToSplineHeading(new Pose2d(-40,-12,Math.toRadians(180)))
+                    .splineToConstantHeading(new Vector2d(13,12),Math.toRadians(30))
+                    .splineToConstantHeading(new Vector2d(36,36),Math.toRadians(0))
+                    .build();
+
+        }
+
+
+        else  if (VertexID=="BackdropR"){
+            return RobotHardware.autodrive.trajectorySequenceBuilder(RobotHardware.autodrive.getPoseEstimate())
+                    .splineToLinearHeading(new Pose2d(13,-36,Math.toRadians(180)),Math.toRadians(0))
+                    .splineToConstantHeading(new Vector2d(-45,-36),Math.toRadians(0))
+                    .build();
+
+        } else if (VertexID=="behindRBack"){
+            return RobotHardware.autodrive.trajectorySequenceBuilder(RobotHardware.autodrive.getPoseEstimate())
+                    .splineToLinearHeading(new Pose2d(13,-36,Math.toRadians(180)),Math.toRadians(0))
+                    .splineToConstantHeading(new Vector2d(-45,-36),Math.toRadians(0))
+                    .build();
+
+        } else if (VertexID=="BehindRCollect"){
+            return RobotHardware.autodrive.trajectorySequenceBuilder(RobotHardware.autodrive.getPoseEstimate())
+                    .lineToSplineHeading(new Pose2d(-40,12,Math.toRadians(180)))
+                    .splineToConstantHeading(new Vector2d(13,-12),Math.toRadians(30))
+                    .splineToConstantHeading(new Vector2d(36,-36),Math.toRadians(0))
+                    .build();
+
+        } else if (VertexID=="collectRed"){
+            return RobotHardware.autodrive.trajectorySequenceBuilder(RobotHardware.autodrive.getPoseEstimate())
+                    .lineToSplineHeading(new Pose2d(-40,12,Math.toRadians(180)))
+                    .splineToConstantHeading(new Vector2d(13,-12),Math.toRadians(30))
+                    .splineToConstantHeading(new Vector2d(36,-36),Math.toRadians(0))
+                    .build();
+
+        }
+        return null;
+    }
+
 }

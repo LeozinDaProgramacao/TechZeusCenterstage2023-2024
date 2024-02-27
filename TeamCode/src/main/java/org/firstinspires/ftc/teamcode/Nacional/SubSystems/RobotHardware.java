@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
+import org.firstinspires.ftc.teamcode.Nacional.Graphs.Graph;
 import org.firstinspires.ftc.teamcode.drive.PoseStorage;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDriveCancelable;
@@ -44,7 +45,7 @@ public class RobotHardware {
         hardwareMap = map;
     }
 
-    public static void initAll(){
+    public static void initAll(int BLUESIDE){
         //inicializa hardware
         imu = hardwareMap.get(IMU.class, "imu");
         frontRight = hardwareMap.get(DcMotor.class, "FRmotor");
@@ -114,6 +115,8 @@ public class RobotHardware {
         mainArm.setPower(-0.2);
         AutonomousDrive = new SampleMecanumDrive(hardwareMap);
         AutonomousDrive.setPoseEstimate(PoseStorage.currentPose);
+        DriveBase.initGraph(BLUESIDE);
+
     }
     public static void startup(){
         //inicializa o robô para o teleop
@@ -139,6 +142,7 @@ public class RobotHardware {
         ArmMovement.finalArmGoal=0;
         HangRobot.currentDesiredHeight=0;
         HangRobot.goalhang=0;
+
     }
     public static void setArtPosition(double ArtPos){
         ArticulationL.setPosition(ArtPos);

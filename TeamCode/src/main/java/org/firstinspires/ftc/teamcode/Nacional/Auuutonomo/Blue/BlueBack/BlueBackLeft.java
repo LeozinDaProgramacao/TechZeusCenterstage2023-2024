@@ -21,7 +21,7 @@ public class BlueBackLeft{
                 })
                 .setReversed(true)
                 .back(3)
-                .splineToLinearHeading(new Pose2d(-51,14,Math.toRadians(180)),Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-50,14,Math.toRadians(180)),Math.toRadians(180))
                 .forward(5)
 
                 //moves to get the  extra pixel
@@ -34,12 +34,12 @@ public class BlueBackLeft{
                 .splineToLinearHeading(new Pose2d(20,8,Math.toRadians(180)),Math.toRadians(0))
                 .UNSTABLE_addDisplacementMarkerOffset(-10,()->
                 {
-                    ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_BACK_AUTO);
+                    ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_BACK);
                 })
                 //.splineToConstantHeading(new Vector2d(45,36),0)
 
                 //moves to backdrop to deposit pixel
-                .splineToConstantHeading(new Vector2d(49,37),0)
+                .splineToConstantHeading(new Vector2d(47.5,37.5),0)
                 .waitSeconds(0.5)
                 .back(4)
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{

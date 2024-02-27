@@ -23,7 +23,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 import org.firstinspires.ftc.teamcode.Nacional.Auuutonomo.Blue.BlueBack.BlueBackLeft;
 import org.firstinspires.ftc.teamcode.Nacional.Auuutonomo.Blue.BlueBack.BlueBackMid;
 import org.firstinspires.ftc.teamcode.Nacional.Auuutonomo.Blue.BlueBack.BlueBackRight;
-@Autonomous(name="BlueBackYipee!", group="BlueAuto")
+@Autonomous(name="BlueBackYipee!♿", group="BlueAuto")
 public class AutoBlueBackOpmode extends LinearOpMode {
 
     BlueDetector.Location registred;
@@ -36,8 +36,8 @@ public class AutoBlueBackOpmode extends LinearOpMode {
         Pose2d startPose = new Pose2d(-36, 63, Math.toRadians(90));
         PoseStorage.currentPose = startPose;
         RobotHardware.setHardwareMap(hardwareMap);
-        RobotHardware.initAll();
-        RobotHardware.startup();
+        RobotHardware.initAll(1);
+
 
         RobotHardware.AutonomousDrive.setPoseEstimate(startPose);
 
@@ -62,6 +62,7 @@ public class AutoBlueBackOpmode extends LinearOpMode {
         ArmMovement.ControlRightClaw(ArmMovement.CLAW_STATE.CLOSED);
 
         waitForStart();
+        RobotHardware.startup();
 
         //a câmera detecta em qual posição está o objeto de jogo
         registred = detector.getLocation();
