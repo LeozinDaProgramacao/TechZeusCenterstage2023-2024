@@ -46,7 +46,7 @@ public class DuoBlue extends LinearOpMode {
 
     public void loopRobot() {
         defineArmHeight();
-        ArmMovement.ControlClawTeleop(LClawSwitch.click(gamepad2.left_bumper), RClawSwitch.click(gamepad2.right_bumper));
+        ArmMovement.ControlClawTeleop(gamepad2.left_bumper,gamepad2.right_bumper);
         ArmMovement.armPIDLoop(gamepad2.y);
         Pose2d estimate = WebcamAprilTags.LocateWithAprilTag(telemetry,RobotHardware.autodrive);
 

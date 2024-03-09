@@ -19,7 +19,7 @@ public class BlueFrontRight {
                 })
                 .waitSeconds(0.12)
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
-                    ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_BACK);
+                    ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_BACK_AUTO);
                 })
                 .setReversed(true)
                 .splineToLinearHeading(new Pose2d(49,28,Math.toRadians(180)),0)
@@ -66,7 +66,7 @@ public class BlueFrontRight {
                 .splineToLinearHeading(new Pose2d(-30,60,Math.toRadians(180)),Math.toRadians(0))
                 .splineToConstantHeading(new Vector2d(13,60),Math.toRadians(0))
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
-                    ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_BACK);
+                    ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_BACK_AUTO);
                 })
                 .splineToConstantHeading(new Vector2d(47,39),0)
                 .waitSeconds(0.2)

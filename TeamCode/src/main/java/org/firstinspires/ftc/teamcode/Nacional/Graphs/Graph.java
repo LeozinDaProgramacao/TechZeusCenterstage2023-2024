@@ -472,12 +472,14 @@ public class Graph {
             return RobotHardware.autodrive.trajectorySequenceBuilder(RobotHardware.autodrive.getPoseEstimate())
                     .splineToLinearHeading(new Pose2d(13,36,Math.toRadians(180)),Math.toRadians(0))
                     .splineToConstantHeading(new Vector2d(-45,36),Math.toRadians(0))
+                    .lineToConstantHeading(new Vector2d(-45,-60))
                     .build();
 
         } else if (VertexID=="behindBBack"){
             return RobotHardware.autodrive.trajectorySequenceBuilder(RobotHardware.autodrive.getPoseEstimate())
                     .splineToLinearHeading(new Pose2d(13,36,Math.toRadians(180)),Math.toRadians(0))
-                    .splineToConstantHeading(new Vector2d(-45,36*Blue),Math.toRadians(0))
+                    .splineToConstantHeading(new Vector2d(-45,36),Math.toRadians(0))
+                    .lineToConstantHeading(new Vector2d(-45,-60))
                     .build();
 
         } else if (VertexID=="BehindBCollect"){
@@ -501,12 +503,14 @@ public class Graph {
             return RobotHardware.autodrive.trajectorySequenceBuilder(RobotHardware.autodrive.getPoseEstimate())
                     .splineToLinearHeading(new Pose2d(13,-36,Math.toRadians(180)),Math.toRadians(0))
                     .splineToConstantHeading(new Vector2d(-45,-36),Math.toRadians(0))
+                    .lineToConstantHeading(new Vector2d(-45,60))
                     .build();
 
         } else if (VertexID=="behindRBack"){
             return RobotHardware.autodrive.trajectorySequenceBuilder(RobotHardware.autodrive.getPoseEstimate())
                     .splineToLinearHeading(new Pose2d(13,-36,Math.toRadians(180)),Math.toRadians(0))
                     .splineToConstantHeading(new Vector2d(-45,-36),Math.toRadians(0))
+                    .lineToConstantHeading(new Vector2d(-45,60))
                     .build();
 
         } else if (VertexID=="BehindRCollect"){

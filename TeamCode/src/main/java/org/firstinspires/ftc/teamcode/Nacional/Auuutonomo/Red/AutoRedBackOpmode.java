@@ -36,7 +36,7 @@ public class AutoRedBackOpmode extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        Pose2d startPose = new Pose2d(-36, -63, Math.toRadians(-90));
+        Pose2d startPose = new Pose2d(-36, -63+0.5, Math.toRadians(-90));
         PoseStorage.currentPose = startPose;
         RobotHardware.setHardwareMap(hardwareMap);
         RobotHardware.initAll(-1);
@@ -63,8 +63,11 @@ public class AutoRedBackOpmode extends LinearOpMode {
 
         ArmMovement.ControlLeftClaw(ArmMovement.CLAW_STATE.CLOSED);
         ArmMovement.ControlRightClaw(ArmMovement.CLAW_STATE.CLOSED);
-
+        RobotHardware.moveArm(-0.2);
         waitForStart();
+        RobotHardware.mainArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        RobotHardware.mainArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        RobotHardware.moveArm(0);
 
         //a câmera detecta em qual posição está o objeto de jogo
         registred = detector.getLocation();
@@ -87,6 +90,7 @@ public class AutoRedBackOpmode extends LinearOpMode {
                 RobotHardware.AutonomousDrive.followTrajectorySequenceAsync(RedBackRight.getRightSequence(RobotHardware.AutonomousDrive,startPose));
                 break;
         }
+
 
         while (opModeIsActive()){
             RobotHardware.AutonomousDrive.update();

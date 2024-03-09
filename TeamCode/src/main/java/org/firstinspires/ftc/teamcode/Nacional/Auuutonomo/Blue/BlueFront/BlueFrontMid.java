@@ -19,7 +19,7 @@ public class BlueFrontMid {
                 })
                 .waitSeconds(0.25)
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
-                    ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_BACK);
+                    ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_BACK_AUTO);
                 })
                 .setReversed(true)
 
@@ -69,7 +69,7 @@ public class BlueFrontMid {
                 .splineToLinearHeading(new Pose2d(-30,60,Math.toRadians(180)),Math.toRadians(0))
                 .splineToConstantHeading(new Vector2d(13,60),Math.toRadians(0))
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
-                    ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_BACK);
+                    ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_BACK_AUTO);
                 })
                 .splineToConstantHeading(new Vector2d(45,33),0)
                 .waitSeconds(0.1)

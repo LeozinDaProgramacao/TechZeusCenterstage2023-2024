@@ -10,6 +10,7 @@ import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
 public class RedBackLeft {
     public static TrajectorySequence getLeftSequence(SampleMecanumDrive drive, Pose2d startPose){
         TrajectorySequence leftSequence= drive.trajectorySequenceBuilder(startPose)
+                .waitSeconds(5.5)
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
                     ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL5UP);
                 })
@@ -22,7 +23,7 @@ public class RedBackLeft {
                 .turn(Math.toRadians(-90))
                 //moves to get the  extra pixel
                 .splineToLinearHeading(new Pose2d(-49,-15,Math.toRadians(180)),Math.toRadians(180))
-                .forward(4.5)
+                .forward(3.5)
                 .UNSTABLE_addDisplacementMarkerOffset(0,()-> {
                     ArmMovement.ControlRightClaw(ArmMovement.CLAW_STATE.CLOSED);
                 })
@@ -34,7 +35,7 @@ public class RedBackLeft {
                 .splineToLinearHeading(new Pose2d(20,-8,Math.toRadians(180)),Math.toRadians(0))
                 .UNSTABLE_addDisplacementMarkerOffset(-10,()->
                 {
-                    ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_BACK);
+                    ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_BACK_AUTO);
                 })
                 //.splineToConstantHeading(new Vector2d(45,36),0)
                 .splineToConstantHeading(new Vector2d(47,-26.5),0)

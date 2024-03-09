@@ -25,7 +25,7 @@ public class RedFrontMid {
                 .setReversed(true)
 
                 //move to place on backdrop
-                .splineToLinearHeading(new Pose2d(49,-34.5,Math.toRadians(180)),0)
+                .splineToLinearHeading(new Pose2d(49,-35.2,Math.toRadians(180)),0)
                 .waitSeconds(0.1)
                 .back(6)
                 .setReversed(false)

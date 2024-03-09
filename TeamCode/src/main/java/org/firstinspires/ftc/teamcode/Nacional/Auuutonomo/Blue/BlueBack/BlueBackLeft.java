@@ -12,6 +12,7 @@ public class BlueBackLeft{
     public static TrajectorySequence getLeftSequence(SampleMecanumDrive drive, Pose2d startPose){
 
         TrajectorySequence leftSequence= drive.trajectorySequenceBuilder(startPose)
+                .waitSeconds(5.5)
                 .UNSTABLE_addTemporalMarkerOffset(2,()->{
                     ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL5UP);
                 })
@@ -22,7 +23,7 @@ public class BlueBackLeft{
                 .setReversed(true)
                 .back(3)
                 .splineToLinearHeading(new Pose2d(-50,14,Math.toRadians(180)),Math.toRadians(180))
-                .forward(5)
+                .forward(4)
 
                 //moves to get the  extra pixel
                 .UNSTABLE_addDisplacementMarkerOffset(0,()-> {
@@ -31,10 +32,10 @@ public class BlueBackLeft{
                 .back(3)
                 //.lineToLinearHeading(new Pose2d(-54.5,25.5-12,Math.toRadians(180)))
                 //.waitSeconds(1)
-                .splineToLinearHeading(new Pose2d(20,8,Math.toRadians(180)),Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(20,6,Math.toRadians(180)),Math.toRadians(0))
                 .UNSTABLE_addDisplacementMarkerOffset(-10,()->
                 {
-                    ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_BACK);
+                    ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_BACK_AUTO);
                 })
                 //.splineToConstantHeading(new Vector2d(45,36),0)
 

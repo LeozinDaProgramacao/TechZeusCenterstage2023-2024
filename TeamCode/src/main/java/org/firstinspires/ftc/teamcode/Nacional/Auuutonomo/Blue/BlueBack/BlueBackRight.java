@@ -11,6 +11,7 @@ public class BlueBackRight {
     public static TrajectorySequence getRightSequence(SampleMecanumDrive drive, Pose2d startPose){
 
         TrajectorySequence rightSequence= drive.trajectorySequenceBuilder(startPose)
+                .waitSeconds(5.5)
                 .UNSTABLE_addTemporalMarkerOffset(0.5,()->{
                     ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL5UP);
                 })
@@ -23,20 +24,20 @@ public class BlueBackRight {
                 .turn(Math.toRadians(90))
                 //moves to get the  extra pixel
                 .splineToLinearHeading(new Pose2d(-51,14,Math.toRadians(180)),Math.toRadians(180))
-                .forward(4.5)
+                .forward(3)
                 .UNSTABLE_addDisplacementMarkerOffset(0,()-> {
                     ArmMovement.ControlLeftClaw(ArmMovement.CLAW_STATE.CLOSED);
                 })
                 .setReversed(true)
                 //.lineToLinearHeading(new Pose2d(-54.5,25.5-12,Math.toRadians(180)))
                 //.waitSeconds(1)
-                .splineToLinearHeading(new Pose2d(20,8,Math.toRadians(180)),Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(20,6,Math.toRadians(180)),Math.toRadians(0))
                 .UNSTABLE_addDisplacementMarkerOffset(-10,()->
                 {
-                    ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_BACK);
+                    ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_BACK_AUTO);
                 })
                 //.splineToConstantHeading(new Vector2d(45,36),0)
-                .splineToConstantHeading(new Vector2d(49,28.5),0)
+                .splineToConstantHeading(new Vector2d(49,26.5),0)
                 .waitSeconds(0.5)
                 .back(4)
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{

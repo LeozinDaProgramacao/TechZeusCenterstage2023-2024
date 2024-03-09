@@ -20,6 +20,15 @@ public class RedDetector extends OpenCvPipeline {
     public static int E=255;
     public static int F=255;
 
+    /*
+    public static int A=165;
+    public static int B=200;
+    public static int C=120;
+    public static int D=230;
+    public static int E=240;
+    public static int F=190;
+     */
+
     Telemetry telemetry;
     Scalar green = new Scalar(0,255,0);
     Mat mat = new Mat();
@@ -73,20 +82,20 @@ public class RedDetector extends OpenCvPipeline {
         Imgproc.cvtColor(mat,mat,Imgproc.COLOR_GRAY2RGB);
         if (leftValue>middleValue){
             if (leftValue>rightValue){
-                Imgproc.rectangle(input,LEFT,green);
+                Imgproc.rectangle(input,LEFT,green,10);
                 location= RedDetector.Location.LEFT;
                 telemetry.addData("side","left");
             } else {
-                Imgproc.rectangle(input,RIGHT,green);
+                Imgproc.rectangle(input,RIGHT,green,10);
                 location= RedDetector.Location.RIGHT;
                 telemetry.addData("side","right");
             }
         } else if (middleValue>rightValue){
-            Imgproc.rectangle(input,MIDDLE,green);
+            Imgproc.rectangle(input,MIDDLE,green,10);
             location = RedDetector.Location.MIDDLE;
             telemetry.addData("side","middle");
         } else {
-            Imgproc.rectangle(input,RIGHT,green);
+            Imgproc.rectangle(input,RIGHT,green,10);
             location= RedDetector.Location.RIGHT;
             telemetry.addData("side","right");
         }

@@ -20,6 +20,16 @@ public class BlueDetector extends OpenCvPipeline {
     public static int E=240;
     public static int F=220;
 
+    /*
+    public static int A=110;
+    public static int B=130;
+    public static int C=90;
+    public static int D=120;
+    public static int E=255;
+    public static int F=200;
+
+     */
+
     Telemetry telemetry;
     Scalar green = new Scalar(0,255,0);
     public enum Location{

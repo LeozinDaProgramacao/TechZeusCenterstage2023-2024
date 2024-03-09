@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Nacional.SubSystems;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -36,6 +37,8 @@ public class RobotHardware {
     //public  Servo servoGarra;
     public static IMU imu;
     public static DistanceSensor distance;
+    public static ColorSensor LeftColorSensor;
+    public static ColorSensor RightColorSensor;
     YawPitchRollAngles orientation;
 
     static HardwareMap hardwareMap;
@@ -66,6 +69,8 @@ public class RobotHardware {
 
         distance = hardwareMap.get(DistanceSensor.class,"DistanceSensorBack");
 
+        LeftColorSensor = hardwareMap.get(ColorSensor.class,"LeftColorSensor");
+        RightColorSensor = hardwareMap.get(ColorSensor.class,"RightColorSensor");
 
 
         CoreEsq.setDirection(DcMotorSimple.Direction.FORWARD);

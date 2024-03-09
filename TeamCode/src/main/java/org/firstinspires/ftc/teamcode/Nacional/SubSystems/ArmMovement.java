@@ -4,8 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 
 import org.firstinspires.ftc.teamcode.Nacional.Utility.PID;
+import org.firstinspires.ftc.teamcode.Nacional.Utility.simpleSwitch;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,7 +56,7 @@ public class ArmMovement {
     public static double ARTICULATION_HANG=-0.03;
     public static double ARTICULATION_POS_2NDPIXEL_UP=-0.06;
     public static double ARTICULATION_POS_3NDPIXEL_UP=-0.08;
-    public static double ARTICULATION_POS_4NDPIXEL_UP=-0.11;
+    public static double ARTICULATION_POS_4NDPIXEL_UP=-0.12;
     public static double ARTICULATION_POS_5NDPIXEL_UP=-0.15;
     public static double ARTICULATION_DEPOSIT_NO_ARM = 0;
 
@@ -64,12 +66,12 @@ public class ArmMovement {
     public static double WRIST_POS_DEPOSIT_BACK_AUTO=-0.3;
     public static double WRIST_POS_COLLECT_GROUND=-0.05;
     public static double WRIST_STORE_CLAW=-0.25;
-    public static double WRIST_MIDDLE=0.47;
+    public static double WRIST_MIDDLE=0.53;
     public static double WRIST_HANG;
     public static double WRIST_POS_2NDPIXEL_UP=-0.05;
     public static double WRIST_POS_3NDPIXEL_UP=-0.05;
     public static double WRIST_POS_4NDPIXEL_UP=-0.03;
-    public static double WRIST_POS_5NDPIXEL_UP=0.02;
+    public static double WRIST_POS_5NDPIXEL_UP=0.0;
     public static double WRIST_DEPOSIT_NO_ARM =0;
 
     public static double OPEN_CLAW_POS=0.6;
@@ -89,7 +91,11 @@ public class ArmMovement {
     public static double armPower=0;
     static boolean effectiveLeft;
     static boolean effectiveRight;
+    static boolean dettectedLeft;
+    static boolean dettectedRight;
     static PID armPID = new PID(0.003,0,0,0);
+    static simpleSwitch LClawSwitch = new simpleSwitch();
+    static simpleSwitch RClawSwitch = new simpleSwitch();
 
     public static void setArmState(ARM_STATE desiredState){
         currentArmState = desiredState;
@@ -105,9 +111,9 @@ public class ArmMovement {
                 RobotHardware.setWristPos(WRIST_MIDDLE+WRIST_POS_DEPOSIT_BACK);
                 break;
             case DEPOSIT_BACK_AUTO:
-                finalArmGoal = ARM_DEPOSIT_BACK_AUTO+ARM_DEAD_ZONE;
-                RobotHardware.setArtPosition(ARTICULATION_MIDDLE+ARTICULATION_POS_DEPOSIT_BACK_AUTO);
-                RobotHardware.setWristPos(ARTICULATION_MIDDLE+WRIST_POS_DEPOSIT_BACK_AUTO);
+                finalArmGoal = ARM_DEPOSIT_BACK+ARM_DEAD_ZONE+78;
+                RobotHardware.setArtPosition(ARTICULATION_MIDDLE+ARTICULATION_POS_DEPOSIT_BACK);
+                RobotHardware.setWristPos(WRIST_MIDDLE+WRIST_POS_DEPOSIT_BACK);
                 break;
             case STORED:
                 finalArmGoal=ARM_DOWN;
@@ -158,12 +164,31 @@ public class ArmMovement {
     }
     public static void ControlClawTeleop(boolean leftState,boolean rightState){
 
-        if(RobotHardware.mainArm.getCurrentPosition()<1000){
-            effectiveRight = rightState;
-            effectiveLeft = leftState;
+        LClawSwitch.click(leftState);
+
+        if (currentArmState == ARM_STATE.PIXEL1UP){
+            dettectedLeft= ClawColorSensor.isPixelInClaw(RobotHardware.LeftColorSensor);
+            dettectedRight=ClawColorSensor.isPixelInClaw(RobotHardware.RightColorSensor);
+
         } else {
-            effectiveRight = leftState;
-            effectiveLeft = rightState;
+            dettectedLeft=true;
+            dettectedRight=true;
+        }
+
+        if(RobotHardware.mainArm.getCurrentPosition()<1000){
+            if(currentArmState==ARM_STATE.PIXEL1UP){
+                if (!effectiveLeft&&!leftState) {
+                    effectiveLeft = LClawSwitch.click(dettectedLeft);
+                }
+                if (!effectiveRight&&!rightState){
+                    effectiveRight = RClawSwitch.click(dettectedRight);
+                }
+            }
+            effectiveRight = RClawSwitch.click(rightState);
+            effectiveLeft= LClawSwitch.click(leftState);
+        } else {
+            effectiveRight = RClawSwitch.click(leftState);
+            effectiveLeft= LClawSwitch.click(rightState);
         }
 
 
@@ -201,6 +226,7 @@ public class ArmMovement {
                 break;
         }
     }
+
     public static void armPIDLoop(boolean ARM_STOP_REQUESTED){
 
         currentArmGoal+= PVARIATION*(finalArmGoal-currentArmGoal);

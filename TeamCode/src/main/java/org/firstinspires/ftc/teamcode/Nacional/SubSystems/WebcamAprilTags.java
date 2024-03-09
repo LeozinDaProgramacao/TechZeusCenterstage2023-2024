@@ -32,6 +32,7 @@ public class WebcamAprilTags {
                 hardwareMap.get(WebcamName.class, "Webcam 1"), aprilTag
         );
 
+
     }   // end method initAprilTag()
 
     /**
@@ -51,10 +52,72 @@ public class WebcamAprilTags {
                 if (detection.metadata != null) {
                     double xtag = 0;
                     double ytag = 0;
+                    double pos =0;
                     switch (detection.id) {
+                        //caso certo
+
                         case 1:
                             xtag = 63;
+                            ytag = 41.5;
+                            pos = 1;
+                            break;
+                        case 2:
+                            xtag = 63;
+                            ytag = 35.5;
+                            pos = 1;
+                            break;
+                        case 3:
+                            xtag = 63;
+                            ytag = 29.5;
+                            pos = 1;
+                            break;
+                        case 4:
+                            xtag = 63;
+                            ytag= -29.5;
+                            pos = 1;
+                            break;
+                        case 5:
+                            xtag = 63;
+                            ytag =-35.5;
+                            pos = 1;
+                            break;
+                        case 6:
+                            xtag = 63;
                             ytag = -41.5;
+                            pos = 1;
+                            break;
+                            /*
+                        case 7:
+                            xtag= e78e91e;
+                            ytag = 7748329;
+                            pos = -1
+                            break;
+                        case 8:
+                            xtag= -
+                            ytag = -24;
+                            pos = -1
+                            break;
+                        case 9
+                            xtag= e78e91e;
+                            ytag = 7748329;
+                            pos = -1
+                            break;
+                        case 10:
+                            xtag= e78e91e;
+                            ytag = 24;
+                            pos = -1
+                            break;
+                            */
+
+
+
+
+
+                        //caso treino aqui na arena
+                        /*
+                        case 1:
+                            xtag = 63;
+                            ytag = -29.5;
                             break;
                         case 2:
                             xtag = 63;
@@ -62,24 +125,14 @@ public class WebcamAprilTags {
                             break;
                         case 3:
                             xtag = 63;
-                            ytag = -29.5;
-                            break;
-                        case 4:
-                            xtag = 63;
-                            ytag= -29.5;
-                            break;
-                        case 5:
-                            xtag = 63;
-                            ytag =-35.5;
-                            break;
-                        case 6:
-                            xtag = 63;
                             ytag = -41.5;
                             break;
+
+                         */
                     }
                     actualHead = -(detection.ftcPose.yaw - detection.ftcPose.bearing);
-                    ytrans = Math.sin(Math.toRadians(actualHead)) * detection.ftcPose.range;
-                    xtrans = Math.cos(Math.toRadians(actualHead)) * detection.ftcPose.range;
+                    ytrans = Math.sin(Math.toRadians(actualHead)) * detection.ftcPose.range*pos;
+                    xtrans = Math.cos(Math.toRadians(actualHead)) * detection.ftcPose.range*pos;
 
                     telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
                     //telemetry.addLine(String.format("Xtrans %6.1f Ytrans %6.1f",xtrans,ytrans));
@@ -93,7 +146,7 @@ public class WebcamAprilTags {
                     telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
                     avgX+= (xtag - xtrans) - (Math.cos(Math.toRadians(-detection.ftcPose.yaw)) * CAM_DIST_TO_CENTER);
                     avgY += (ytag - ytrans) - (Math.sin(Math.toRadians(-detection.ftcPose.yaw)) * CAM_DIST_TO_CENTER);
-                    avgHead += detection.ftcPose.yaw+180;
+                    avgHead += detection.ftcPose.yaw+90+90*pos;
                 } else {
                     telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
                     telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));

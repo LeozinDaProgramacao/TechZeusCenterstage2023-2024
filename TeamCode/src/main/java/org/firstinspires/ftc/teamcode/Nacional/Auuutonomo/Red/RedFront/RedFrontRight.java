@@ -38,7 +38,7 @@ public class RedFrontRight {
                 .UNSTABLE_addDisplacementMarkerOffset(0,()->{
                     ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL4UP);
                 })
-                .splineToLinearHeading(new Pose2d(-52,-34.5,Math.toRadians(180)),Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-52,-35.2,Math.toRadians(180)),Math.toRadians(180))
 
 
                 .waitSeconds(0.2)
