@@ -14,7 +14,7 @@ public class HangRobot {
     static PID rgtHexPIDf = new PID(0.03,0,0,0);
     public static double goalhang;
 
-
+    //TODO make it so that when robot is attempting to hang the drivebase slows down to make it easier for hooks to not fold themselves the wrong way
     public static void extendHooksToGrab(){
         currentDesiredHeight = HOOK_HEIGHT_GRAB;
         //pidf set goal to HOOK_EIGHT_GRAB
@@ -40,11 +40,11 @@ public class HangRobot {
             goalhang+=HANGVARIATION;
         }
         if (currentDesiredHeight == HOOK_HEIGHT_GRAB){
-            RobotHardware.CoreEsq.setPower(lftHexPIDf.CalculatePID(RobotHardware.CoreEsq.getCurrentPosition(),goalhang,false)-0.06);
-            RobotHardware.CoreDir.setPower(rgtHexPIDf.CalculatePID(RobotHardware.CoreDir.getCurrentPosition(),goalhang,false)-0.06);
+            RobotHardware.CoreEsq.setPower(lftHexPIDf.CalculatePID(RobotHardware.CoreEsq.getCurrentPosition(),goalhang)-0.05);
+            RobotHardware.CoreDir.setPower(rgtHexPIDf.CalculatePID(RobotHardware.CoreDir.getCurrentPosition(),goalhang)-0.05);
         } else{
-            RobotHardware.CoreEsq.setPower(lftHexPIDf.CalculatePID(RobotHardware.CoreEsq.getCurrentPosition(),goalhang,false));
-            RobotHardware.CoreDir.setPower(rgtHexPIDf.CalculatePID(RobotHardware.CoreDir.getCurrentPosition(),goalhang,false));
+            RobotHardware.CoreEsq.setPower(lftHexPIDf.CalculatePID(RobotHardware.CoreEsq.getCurrentPosition(),goalhang));
+            RobotHardware.CoreDir.setPower(rgtHexPIDf.CalculatePID(RobotHardware.CoreDir.getCurrentPosition(),goalhang));
 
         }
     }

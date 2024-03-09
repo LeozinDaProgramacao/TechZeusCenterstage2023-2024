@@ -1,7 +1,5 @@
 package org.firstinspires.ftc.teamcode.Nacional.Utility;
 
-import org.firstinspires.ftc.teamcode.Nacional.SubSystems.ArmMovement;
-
 public class simpleSwitchIncrease{
     private boolean previouslyPressed=false;
     private boolean currentState = false;

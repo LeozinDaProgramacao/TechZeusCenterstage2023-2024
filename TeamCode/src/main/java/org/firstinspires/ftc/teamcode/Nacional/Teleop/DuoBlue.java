@@ -12,20 +12,17 @@ import org.firstinspires.ftc.teamcode.Nacional.SubSystems.DriveBase;
 import org.firstinspires.ftc.teamcode.Nacional.SubSystems.HangRobot;
 import org.firstinspires.ftc.teamcode.Nacional.SubSystems.RobotHardware;
 import org.firstinspires.ftc.teamcode.Nacional.SubSystems.WebcamAprilTags;
-import org.firstinspires.ftc.teamcode.Nacional.Utility.ArtStateMachine;
-import org.firstinspires.ftc.teamcode.Nacional.Utility.counterSwitch;
-import org.firstinspires.ftc.teamcode.Nacional.Utility.simpleSwitch;
 @Config
 
 @TeleOp (name="Duo Blue >:D 🥶💙")
 public class DuoBlue extends LinearOpMode {
-    simpleSwitch LClawSwitch = new simpleSwitch();
-    simpleSwitch RClawSwitch = new simpleSwitch();
-    counterSwitch stateMachine = new counterSwitch(4);
-    ArtStateMachine sm = new ArtStateMachine();
+    //simpleSwitch LClawSwitch = new simpleSwitch();
+    //simpleSwitch RClawSwitch = new simpleSwitch();
+    //counterSwitch stateMachine = new counterSwitch(4);
+    //ArtStateMachine sm = new ArtStateMachine();
 
     public enum BASE_MODE {
-        NORMAL, GRAPH;
+        NORMAL, GRAPH
     }
 
     public static BASE_MODE currentMode = BASE_MODE.NORMAL;

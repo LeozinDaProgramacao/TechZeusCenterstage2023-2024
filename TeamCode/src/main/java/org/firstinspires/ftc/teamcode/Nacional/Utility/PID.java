@@ -6,7 +6,7 @@ public class PID {
     double kI;
     double kD;
     double MaxI;
-    private double speed;
+
     public PID(double newkP, double newkI, double newkD, double newMaxI){
         kP =newkP;
         kI = newkI;
@@ -42,14 +42,14 @@ public class PID {
 
 
 
-    public double CalculatePID(double current_position,double current_goal,boolean base){
+    public double CalculatePID(double current_position,double current_goal){
         goal = current_goal;
         position = current_position;
         error = goal-position;
 
-        speed = P(kP)+I(kI)+D(kD);
+        double speed = P(kP) + I(kI) + D(kD);
 
-        if (speed>previous_speed+max_acceleration){
+        if (speed >previous_speed+max_acceleration){
             previous_speed += max_acceleration;
             speed = previous_speed;
         }else if (speed < (previous_speed - max_acceleration)){
@@ -57,7 +57,7 @@ public class PID {
             speed = previous_speed;
         }
         if (Math.abs(speed)>max_speed){
-            speed = max_speed*Math.abs(speed)/speed;
+            speed = max_speed*Math.abs(speed)/ speed;
         }
 
         lastError = error;

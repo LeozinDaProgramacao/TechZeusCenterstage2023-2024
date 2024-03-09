@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.Nacional.Teleop;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -10,7 +9,6 @@ import org.firstinspires.ftc.teamcode.Nacional.SubSystems.ArmMovement;
 import org.firstinspires.ftc.teamcode.Nacional.SubSystems.DriveBase;
 import org.firstinspires.ftc.teamcode.Nacional.SubSystems.HangRobot;
 import org.firstinspires.ftc.teamcode.Nacional.SubSystems.RobotHardware;
-import org.firstinspires.ftc.teamcode.Nacional.Utility.ArtStateMachine;
 import org.firstinspires.ftc.teamcode.Nacional.Utility.counterSwitch;
 import org.firstinspires.ftc.teamcode.Nacional.Utility.simpleSwitch;
 

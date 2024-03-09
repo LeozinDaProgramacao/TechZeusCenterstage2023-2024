@@ -68,7 +68,6 @@ public class BlueDetector extends OpenCvPipeline {
         double rightValue = Core.sumElems(right).val[0]/RIGHT.area()/255;
 
         telemetry.addData("lftraw",(int) Core.sumElems(left).val[0]);
-        telemetry.addData("midraw",(int) Core.sumElems(middle).val[0]);
         telemetry.addData("rgtraw",(int) Core.sumElems(right).val[0]);
         telemetry.addData("lftval",leftValue);
         telemetry.addData("midval",middleValue);
