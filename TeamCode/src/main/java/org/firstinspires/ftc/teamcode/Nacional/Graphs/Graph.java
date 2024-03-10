@@ -1,13 +1,10 @@
 package org.firstinspires.ftc.teamcode.Nacional.Graphs;
 
-import android.text.GetChars;
-
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 
 import org.firstinspires.ftc.teamcode.Nacional.SubSystems.RobotHardware;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
-import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequenceBuilder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,33 +12,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
-import java.util.Vector;
+
+import org.firstinspires.ftc.teamcode.Nacional.Utility.Pair;
 
 /**
  *
  * @author carlo
  */
 public class Graph {
-    public static class Pair {
-        double XPos;
-        double YPos;
-        Pair(double nXPos,double nYPos){
-            XPos = nXPos;
-            YPos = nYPos;
-        }
-        double getX(){
-            return XPos;
-        }
-        double getY(){
-            return YPos;
-        }
-        void setX(double X){
-            XPos=X;
-        }
-        void setY(double Y){
-            YPos = Y;
-        }
-    }
 
     public static double currdist = Double.MAX_VALUE;
     public static Vertex closest = null;
@@ -114,12 +92,12 @@ public class Graph {
             }
         }
     }
-    public static TrajectorySequence getLazySequence(){
+    /*public static TrajectorySequence getLazySequence(){
         Pose2d currentPose = RobotHardware.autodrive.getPoseEstimate();
         Vertex currentPosition = new Vertex(currentPose.getX(),currentPose.getY(),"currentPosition");
                 Vertex closestVertex = getClosestVertex(currentPosition);
         return getFunction(closestVertex.id);
-    }
+    }*/
 
     public static double calculateHeuristic(Vertex currentNode, Vertex target){
         return Math.sqrt((target.XPos-currentNode.XPos)*(target.XPos-currentNode.XPos)+(target.YPos-currentNode.YPos)*(target.YPos-currentNode.YPos));
@@ -166,7 +144,7 @@ public class Graph {
         return null;
     }
 
-    public static TrajectorySequence recalculateRoute(List<ManualObstacleDetector.Obstacle> obstacleList,Vertex position,Vertex startingPosition){
+    public static List<Pair> recalculateRoute(List<ManualObstacleDetector.Obstacle> obstacleList, Vertex position, Vertex startingPosition){
 
         Vertex current = getClosestVertex(position);
         Vertex goal = getTarget(startingPosition);
@@ -228,7 +206,7 @@ public class Graph {
         return null;
     }
 
-    public static TrajectorySequence printPath(Vertex currentP, Vertex target /*,SampleMecanumDrive autodrive*/){
+    public static List<Pair> printPath(Vertex currentP, Vertex target /*,SampleMecanumDrive autodrive*/){
         Vertex start = getClosestVertex(currentP);
         //System.out.println("printing first node visited (START)");
         //System.out.println(start.XPos+" "+ start.YPos);
@@ -259,29 +237,7 @@ public class Graph {
 
         System.out.println("lineToLinearHeading("+Coord.XPos+" "+ Coord.YPos+")");
 
-
-        TrajectorySequenceBuilder path = RobotHardware.autodrive.trajectorySequenceBuilder(RobotHardware.autodrive.getPoseEstimate());
-
-        //path.lineToLinearHeading(new Pose2d(n.XPos,n.YPos,Math.toRadians(0)));//this is fine
-        for(Pair coord : Coords){
-
-            if (start.XPos>target.XPos){
-            path = path.splineToConstantHeading(new Vector2d(coord.getX(),coord.getY()),Math.toRadians(180));
-            heading = 180;
-            } else{
-            path = path.splineToConstantHeading(new Vector2d(coord.getX(),coord.getY()),Math.toRadians(0));
-            heading = 0;
-            }
-
-           /*System.out.println("splineToConstantHeading(new Pose2d(" +
-                    Coords.get(index).getX()+
-                    ","+
-                    Coords.get(index).getY()+
-                    " ),"+ heading+ ")   ");/**/
-        index++;
-        }
-        //System.out.println("");
-        return path.build();
+        return Coords;
     }
 
 
@@ -375,7 +331,7 @@ public class Graph {
 
         /**/
     }
-    public static TrajectorySequence getFunction(String VertexID){
+    /*public static TrajectorySequence getFunction(String VertexID){
         if (VertexID=="centerBack"){
 
             return RobotHardware.autodrive.trajectorySequenceBuilder(RobotHardware.autodrive.getPoseEstimate())
@@ -529,6 +485,6 @@ public class Graph {
 
         }
         return null;
-    }
+    }*/
 
 }

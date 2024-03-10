@@ -5,10 +5,15 @@ import com.acmerobotics.dashboard.config.Config;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 import org.firstinspires.ftc.teamcode.Nacional.Graphs.Graph;
+import org.firstinspires.ftc.teamcode.Nacional.Graphs.ManualObstacleDetector;
+import org.firstinspires.ftc.teamcode.Nacional.Graphs.PurePursuitGraphFollower.PurePursuitRunner;
 import org.firstinspires.ftc.teamcode.Nacional.Graphs.Vertex;
 import org.firstinspires.ftc.teamcode.Nacional.Teleop.DuoBlue;
 import org.firstinspires.ftc.teamcode.Nacional.Utility.PID;
 import org.firstinspires.ftc.teamcode.trajectorysequence.TrajectorySequence;
+
+import java.util.ArrayList;
+
 @Config
 public class DriveBase {
     public static double BASE_DRIVING_SPEED = 0.7;
@@ -22,6 +27,7 @@ public class DriveBase {
     private static double currentStateMultiplier;
     public static double CurrentDistTo0;
     static Vertex startPosition;
+    static PurePursuitRunner pp = new PurePursuitRunner();
     public static void initGraph(int BLUESIDE){
         Graph graph = new Graph(BLUESIDE);
         graph.resetGraph();
@@ -31,19 +37,19 @@ public class DriveBase {
 
     public static void startGraphMode(int BLUESIDE){
         RobotHardware.moveArm(0);
+        startPosition = new Vertex(RobotHardware.autodrive.getPoseEstimate().getX(),RobotHardware.autodrive.getPoseEstimate().getY(),"startPosition");
+        pp.start(Graph.recalculateRoute(new ArrayList<ManualObstacleDetector.Obstacle>(), startPosition,startPosition));
 
-        TrajectorySequence sequence = Graph.getLazySequence();
-        RobotHardware.autodrive.followTrajectorySequenceAsync(sequence);
-        RobotHardware.autodrive.update();
 
     }
     public static boolean loopMoveGraph(boolean up, boolean down, boolean left, boolean right,double heading,boolean exit){
         if (exit){
             DuoBlue.currentMode = DuoBlue.BASE_MODE.NORMAL;
-            RobotHardware.autodrive.breakFollowing();
+            pp.brick();
             return false;
         }
-        return RobotHardware.autodrive.isBusy();
+
+        return pp.loop();
     }
 
     public static void moveWithIMU(double drive,double strafe,double turn,boolean resetIMUorNO,boolean SLOW_MODE){
@@ -103,7 +109,7 @@ public class DriveBase {
 
         //se não houver uma curva manual, um PID é usado para manter a orientação do robô
         if (Math.abs(Gturn)<0.001){
-            Gturn = turnPID.CalculatePID(ConvertAngle(CurrentAngle,CurrentFront),0,true)*-1;
+            Gturn = turnPID.CalculatePID(ConvertAngle(CurrentAngle,CurrentFront),0)*-1;
             if (Math.abs(Gturn)<0.1){
                 Gturn =0;
             }
@@ -119,6 +125,23 @@ public class DriveBase {
             angleError = angleError +2*Math.PI;
         }
         return angleError;
+    }
+
+    public static void runMotorsXY(double vx, double vy) {
+        double rotX = vx * Math.cos(CurrentFront) + vy * Math.sin(CurrentFront);
+        double rotY = vx * Math.sin(-CurrentFront) + vy * Math.cos(-CurrentFront);
+
+        double turn =turnPID.CalculatePID(RobotHardware.autodrive.getPoseEstimate().getHeading(),0)*-1;
+
+        //define as velocidades de cada motor
+        double maximo = Math.max(Math.abs(rotX) + Math.abs(rotY) + Math.abs(turn), 1);
+
+        double fL = (rotY + rotX + turn) / maximo;
+        double fR = (rotY - rotX - turn) / maximo;
+        double bL = (rotY - rotX + turn) / maximo;
+        double bR = (rotY + rotX - turn) / maximo;
+
+        RobotHardware.setDrivebasePower(fL,fR,bL,bR,1);
     }
 //this cv function should work better for the new code that does not reset the imu
 }

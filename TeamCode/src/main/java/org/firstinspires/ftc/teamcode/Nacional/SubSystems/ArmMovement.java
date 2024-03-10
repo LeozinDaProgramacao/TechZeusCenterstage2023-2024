@@ -235,7 +235,7 @@ public class ArmMovement {
         } else {
             currentArmGoal+= PVARIATION*(finalArmGoal-currentArmGoal);
         }
-        armPower= armPID.CalculatePID(RobotHardware.mainArm.getCurrentPosition(), currentArmGoal, false);
+        armPower= armPID.CalculatePID(RobotHardware.mainArm.getCurrentPosition(), currentArmGoal);
         if (ARM_STOP_REQUESTED) {
             RobotHardware.moveArm(-0.1);
             finalArmGoal = RobotHardware.mainArm.getCurrentPosition();
