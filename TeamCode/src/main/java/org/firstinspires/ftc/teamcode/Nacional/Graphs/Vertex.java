@@ -34,7 +34,7 @@ public class Vertex implements Comparable<Vertex>{
         this.neighbors = new ArrayList<String>();
     }
 
-    public void addEdge(String id,Vertex newNeighbor){
+    public void addEdge(String id){
         neighbors.add(id);
     }
     public void removeEdge(String id){

@@ -4,13 +4,13 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
-import org.firstinspires.ftc.teamcode.Nacional.Graphs.Graph;
 import org.firstinspires.ftc.teamcode.drive.PoseStorage;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDrive;
 import org.firstinspires.ftc.teamcode.drive.SampleMecanumDriveCancelable;
@@ -39,6 +39,10 @@ public class RobotHardware {
     public static DistanceSensor distance;
     public static ColorSensor LeftColorSensor;
     public static ColorSensor RightColorSensor;
+    public static DigitalChannel leftRedLed;
+    public static DigitalChannel leftGreenLed;
+    public static DigitalChannel rightRedLed;
+    public static DigitalChannel rightGreenLed;
     YawPitchRollAngles orientation;
 
     static HardwareMap hardwareMap;
@@ -71,6 +75,16 @@ public class RobotHardware {
 
         LeftColorSensor = hardwareMap.get(ColorSensor.class,"LeftColorSensor");
         RightColorSensor = hardwareMap.get(ColorSensor.class,"RightColorSensor");
+
+        leftGreenLed= hardwareMap.get(DigitalChannel.class,"led1");
+        leftRedLed= hardwareMap.get(DigitalChannel.class,"led2");
+        rightGreenLed= hardwareMap.get(DigitalChannel.class,"led3");
+        rightRedLed = hardwareMap.get(DigitalChannel.class,"led4");
+
+        leftRedLed.setMode(DigitalChannel.Mode.OUTPUT);
+        leftGreenLed.setMode(DigitalChannel.Mode.OUTPUT);
+        rightRedLed.setMode(DigitalChannel.Mode.OUTPUT);
+        rightGreenLed.setMode(DigitalChannel.Mode.OUTPUT);
 
 
         CoreEsq.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -120,7 +134,7 @@ public class RobotHardware {
         mainArm.setPower(-0.2);
         AutonomousDrive = new SampleMecanumDrive(hardwareMap);
         AutonomousDrive.setPoseEstimate(PoseStorage.currentPose);
-        DriveBase.initGraph(BLUESIDE);
+        //DriveBase.initGraph(BLUESIDE);
 
     }
     public static void startup(){

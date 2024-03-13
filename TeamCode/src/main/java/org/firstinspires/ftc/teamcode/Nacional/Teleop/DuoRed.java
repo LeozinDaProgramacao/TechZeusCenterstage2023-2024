@@ -74,7 +74,7 @@ public class DuoRed extends LinearOpMode {
                     gamepad1.dpad_left,
                     gamepad1.dpad_right,
                     RobotHardware.autodrive.getPoseEstimate().getHeading(),
-                    gamepad1.b)) {
+                    gamepad1.b,telemetry)) {
                 currentMode = BASE_MODE.NORMAL;
             }
         }

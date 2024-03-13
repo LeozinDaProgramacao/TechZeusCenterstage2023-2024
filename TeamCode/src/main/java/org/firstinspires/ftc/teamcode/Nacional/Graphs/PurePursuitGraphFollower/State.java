@@ -8,9 +8,9 @@ package org.firstinspires.ftc.teamcode.Nacional.Graphs.PurePursuitGraphFollower;
  *
  * @author carlo
  */
-class State {
-        double x=0;
-        double y=0;
+public class State {
+        public static double x=0;
+        public static double y=0;
         double vx=0;
         double vy=0;
         double yawVec=0;
@@ -18,7 +18,9 @@ class State {
         
         public void update(double ax, double ay){
             this.vx += ax;
+
             this.vy += ay;
+
             //this.x += vx;
             //this.y +=vy;
         }

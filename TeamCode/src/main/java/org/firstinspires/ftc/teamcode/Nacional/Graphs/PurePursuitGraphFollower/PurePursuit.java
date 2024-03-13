@@ -12,19 +12,17 @@ import org.firstinspires.ftc.teamcode.Nacional.Utility.Pair;
  * @author carlo
  */
 public class PurePursuit {
-    double kP = PurePursuitConstants.kP;
-    public double MAXACELL= PurePursuitConstants.MAXACCEL;
+
     public AccelVector accel = new AccelVector();
-    private double MAXSPEED= PurePursuitConstants.MAXSPEED;
-    double spp = PurePursuitConstants.spp;
+
     
     
-    public AccelVector PIDControl(double XTarget,double YTarget, State state){
+    public AccelVector PIDControl(double XVTarget,double YVTarget, State state){
         
-        double ax = this.kP * (XTarget-state.x);
-        double ay = this.kP * (YTarget-state.y);
+        double ax = PurePursuitConstants.kP * (XVTarget-state.vx);
+        double ay = PurePursuitConstants.kP * (YVTarget-state.vy);
         double div =Math.abs(ax)+Math.abs(ay);
-        double rdiv = Math.max(1,div/MAXACELL);
+        double rdiv = Math.max(1,div/PurePursuitConstants.MAXACCEL);
         this.accel.setAccel(ax/rdiv, ay/rdiv);
         
         return this.accel;
@@ -43,8 +41,8 @@ public class PurePursuit {
         double ty = trajectory.cy.get(tind);
         double alpha = Math.atan2(ty-state.y, tx-state.x);
         
-        double xacell = Math.cos(alpha)*MAXSPEED;
-        double yacell = Math.sin(alpha)*MAXSPEED;
+        double xacell = Math.cos(alpha)*PurePursuitConstants.MAXSPEED;
+        double yacell = Math.sin(alpha)*PurePursuitConstants.MAXSPEED;
         
         //if (Math.abs(state.vx+xacell)>MAXSPEED){
         //    xacell = 0;
@@ -59,12 +57,11 @@ public class PurePursuit {
     }
     public TargetCourse makeTargetCourse(List<Pair> Coords){
         TargetCourse trajectory = new TargetCourse();
-        double spp = 30;
         for (int pos=0;pos<Coords.size()-1;pos++){
-            double xDist = (Coords.get(pos+1).getX()-Coords.get(pos).getX())/(spp-1);
-            double yDist = (Coords.get(pos+1).getY()-Coords.get(pos).getY())/(spp-1);
+            double xDist = (Coords.get(pos+1).getX()-Coords.get(pos).getX())/(PurePursuitConstants.spp-1);
+            double yDist = (Coords.get(pos+1).getY()-Coords.get(pos).getY())/(PurePursuitConstants.spp-1);
         
-            for (int x = 0; x<spp-1;x++){
+            for (int x = 0; x<PurePursuitConstants.spp-1;x++){
                 trajectory.cx.add(Coords.get(pos).getX()+x*xDist);
                 trajectory.cy.add(Coords.get(pos).getY()+x*yDist);
             }

@@ -134,6 +134,7 @@ public class WebcamAprilTags {
                     ytrans = Math.sin(Math.toRadians(actualHead)) * detection.ftcPose.range*pos;
                     xtrans = Math.cos(Math.toRadians(actualHead)) * detection.ftcPose.range*pos;
 
+                    /*
                     telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
                     //telemetry.addLine(String.format("Xtrans %6.1f Ytrans %6.1f",xtrans,ytrans));
                     telemetry.addLine(String.format("CAM FIELD XY %6.1f %6.1f", xtag - xtrans, ytag - ytrans, detection.ftcPose.bearing));
@@ -144,12 +145,16 @@ public class WebcamAprilTags {
                     //telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
                     telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.ftcPose.pitch, detection.ftcPose.roll, detection.ftcPose.yaw));
                     telemetry.addLine(String.format("RBE %6.1f %6.1f %6.1f  (inch, deg, deg)", detection.ftcPose.range, detection.ftcPose.bearing, detection.ftcPose.elevation));
+                    */
+
+
+
                     avgX+= (xtag - xtrans) - (Math.cos(Math.toRadians(-detection.ftcPose.yaw)) * CAM_DIST_TO_CENTER);
                     avgY += (ytag - ytrans) - (Math.sin(Math.toRadians(-detection.ftcPose.yaw)) * CAM_DIST_TO_CENTER);
                     avgHead += detection.ftcPose.yaw+90+90*pos;
                 } else {
-                    telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
-                    telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
+                    //telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
+                    //telemetry.addLine(String.format("Center %6.0f %6.0f   (pixels)", detection.center.x, detection.center.y));
                 }
             }   // end for() loop
 

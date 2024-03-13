@@ -10,11 +10,12 @@ import java.util.List;
  *
  * @author carlo
  */
-class TargetCourse{
+public class TargetCourse{
         double Lfc=PurePursuitConstants.Lfc;//look forward distance
         double PPk = PurePursuitConstants.PPk;
-        List<Double> cx= new ArrayList<>();
-        List<Double> cy = new ArrayList<>();
+        public List<Double> cx= new ArrayList<>();
+        public List<Double> cy = new ArrayList<>();
+        public int ind;
         
         Integer old_nearest_point;
         List<Double> dist = new ArrayList<>();
@@ -25,9 +26,9 @@ class TargetCourse{
         
         public PursuitData SearchTargetIndex (State state){
             double mindist = Double.MAX_VALUE;
-            int ind = Integer.MAX_VALUE;
+            ind = Integer.MAX_VALUE;
             if (old_nearest_point==null){
-                for (int i=0;i<=cx.size();i++){
+                for (int i=0;i<cx.size();i++){
                     double disttoI = Math.hypot(state.x-cx.get(i), state.y-cy.get(i));
                     if (disttoI<mindist){
                         mindist = disttoI;
@@ -41,6 +42,9 @@ class TargetCourse{
                 distThisInd = state.calcDist(state,this.cx.get(ind+1), this.cy.get(ind+1));
                 
                 while (true){
+                    if (ind+1 >=this.cx.size()){
+                        break;
+                    }
                     distNextInd = state.calcDist(state, this.cx.get(ind+1), this.cy.get(ind+1));
                     if (distThisInd<distNextInd){
                         break;
@@ -52,9 +56,13 @@ class TargetCourse{
                 this.old_nearest_point=ind;
             }
             double Lf = PPk* Math.hypot(state.vx,state.vy)+Lfc;
-            
+
+            if (ind+1>cx.size()){
+                PursuitData data = new PursuitData(ind,Lf);
+                return data;
+            }
             while (Lf > state.calcDist(state,this.cx.get(ind),this.cy.get(ind))){
-                if (ind+1>cx.size()){
+                if (ind+1>=cx.size()){
                     break;
                 }
                 ind++;

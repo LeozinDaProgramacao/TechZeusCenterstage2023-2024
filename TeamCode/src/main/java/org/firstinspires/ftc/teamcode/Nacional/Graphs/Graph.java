@@ -33,7 +33,7 @@ public class Graph {
 
     public static Map<String,TrajectorySequence> allSequences = new HashMap<String,TrajectorySequence>();
 
-    public void resetGraph(){
+    public static void resetGraph(){
         allVertexs.clear();
         createGraph();
         //creates all vertexes again
@@ -42,32 +42,35 @@ public class Graph {
     public void put(Vertex v){
         allVertexs.put(v.id, v);
     }
-    public void doubleEdge(Vertex v1,Vertex v2){
-        v1.addEdge(v2.id, v2);
-        v2.addEdge(v1.id, v2);
-        allVertexs.put(v1.id,v1);
-        allVertexs.put(v2.id,v2);
+    public static void doubleEdge(Vertex v1,Vertex v2){
+        allVertexs.putIfAbsent(v1.id, v1);
+        allVertexs.putIfAbsent(v2.id, v2);
+        Vertex Rv1 = allVertexs.get(v1.id);
+        Vertex Rv2 = allVertexs.get(v2.id);
+        Rv1.addEdge(Rv2.id);
+        Rv2.addEdge(Rv1.id);
+        allVertexs.put(Rv1.id,Rv1);
+        allVertexs.put(Rv2.id,Rv2);
 
     }
     public void addToList(Vertex v){
         allVertexs.put(v.id, v);
     }
-    public void singleEdge(Vertex src,Vertex dst){
-        src.addEdge(dst.id,dst);
+    public static void singleEdge(Vertex src,Vertex dst){
+        src.addEdge(dst.id);
         allVertexs.put(src.id,src);
     }
     public static Vertex getClosestVertex(Vertex curP) {
         currdist = Double.MAX_VALUE;
         closest = new Vertex(9999,9999,"9999");
         allVertexs.forEach((k,v)->{
-            double dif = (v.XPos-curP.XPos)*(v.XPos-curP.XPos)+(v.YPos-curP.YPos)*(v.YPos-curP.YPos);
+            double dif = Math.sqrt((v.XPos-curP.XPos)*(v.XPos-curP.XPos)+(v.YPos-curP.YPos)*(v.YPos-curP.YPos));
             if (dif<currdist){
                 currdist = dif;
                 closest = v;
             }
             //System.out.println(k+currdist);
         });
-
 
         return closest;
     }
@@ -102,7 +105,7 @@ public class Graph {
     public static double calculateHeuristic(Vertex currentNode, Vertex target){
         return Math.sqrt((target.XPos-currentNode.XPos)*(target.XPos-currentNode.XPos)+(target.YPos-currentNode.YPos)*(target.YPos-currentNode.YPos));
     }
-    public static Vertex aStar(Vertex start, Vertex target){
+    public static  Vertex aStar(Vertex start, Vertex target){
         PriorityQueue<String> closedList = new PriorityQueue<>();
         PriorityQueue<String> openList = new PriorityQueue<>();
         start.g=0;
@@ -142,6 +145,7 @@ public class Graph {
             closedList.add(n.id);
         }
         return null;
+        //return null;
     }
 
     public static List<Pair> recalculateRoute(List<ManualObstacleDetector.Obstacle> obstacleList, Vertex position, Vertex startingPosition){
@@ -215,7 +219,8 @@ public class Graph {
         Vertex n = aStar(start, target);
         if(n==null){
             //System.out.println(allVertexs.get("centerBack").neighbors);
-            System.out.println("NODE N RETURNED = NULL");
+            System.out.println(1/0);
+
             return null;
         }
         List<Pair> Coords = new ArrayList<Pair>();
@@ -236,57 +241,40 @@ public class Graph {
         double heading = 69420;
 
         System.out.println("lineToLinearHeading("+Coord.XPos+" "+ Coord.YPos+")");
+        //List<Pair> fart = new ArrayList<>();
+
+        //fart.add(new Pair(currentP.XPos,currentP.YPos));
+        //fart.add(new Pair(currentP.XPos,-currentP.YPos));
+        //fart.add(new Pair(currentP.XPos,currentP.YPos));
+        //return fart;
 
         return Coords;
     }
 
 
-    public void createGraph(){
-
-
+    public static void createGraph(){
         //backstage nodes
         Vertex centerBack = new Vertex(30,0,"centerBack");
-        Vertex BridgeBackBL = new Vertex(13,60,"BridgeBackBL");
-        Vertex BridgeBackBR = new Vertex(13,36,"BridgeBackBR");
-        Vertex BridgeBackCL = new Vertex(13,12,"BridgeBackCL");
-        Vertex BridgeBackCR = new Vertex(13,-12,"BridgeBackCR");
-        Vertex BridgeBackRL = new Vertex(13,-36,"BridgeBackRL");
-        Vertex BridgeBackRR = new Vertex(13,-60,"BridgeBackRR");
-
-
-
+        Vertex BridgeBackBL = new Vertex(23,60,"BridgeBackBL");
+        Vertex BridgeBackBR = new Vertex(23,36,"BridgeBackBR");
+        Vertex BridgeBackCL = new Vertex(23,12,"BridgeBackCL");
+        Vertex BridgeBackCR = new Vertex(23,-12,"BridgeBackCR");
+        Vertex BridgeBackRL = new Vertex(23,-36,"BridgeBackRL");
+        Vertex BridgeBackRR = new Vertex(23,-60,"BridgeBackRR");
 
         //front side nodes
         Vertex centerFront = new Vertex(-50,0,"centerFront");
-        Vertex BridgeFrontBL = new Vertex(-37,60,"BridgeFrontBL");
-        Vertex BridgeFrontBR = new Vertex(-37,36,"BridgeFrontBR");
+        Vertex BridgeFrontBL = new Vertex(-45,60,"BridgeFrontBL");
+        Vertex BridgeFrontBR = new Vertex(-45,36,"BridgeFrontBR");
+        Vertex BridgeFrontCL = new Vertex(-45,12,"BridgeFrontCL");
+        Vertex BridgeFrontCR = new Vertex(-45,-12,"BridgeFrontCR");
+        Vertex BridgeFrontRL = new Vertex(-45,-36,"BridgeFrontRL");
+        Vertex BridgeFrontRR = new Vertex(-45,-60,"BridgeFrontRR");
 
-        Vertex BridgeFrontCL = new Vertex(-37,12,"BridgeFrontCL");
-        Vertex BridgeFrontCR = new Vertex(-37,-12,"BridgeFrontCR");
 
-
-        Vertex BridgeFrontRL = new Vertex(-37,-36,"BridgeFrontRL");
-
-        Vertex BridgeFrontRR = new Vertex(-37,-60,"BridgeFrontRR");
-
-        addToList(centerBack);
-        addToList(BridgeBackBL);
-        addToList(BridgeBackBR);
-        addToList(BridgeBackCL);
-        addToList(BridgeBackCR);
-        addToList(BridgeBackRL);
-        addToList(BridgeBackRR);
         //addition of all common nodes to the allVertexs list
         //allVertexs.this.put(key, closest)
         //put(centerBack);
-
-        addToList(centerFront);
-        addToList(BridgeFrontBL);
-        addToList(BridgeFrontBR);
-        addToList(BridgeFrontCL);
-        addToList(BridgeFrontCR);
-        addToList(BridgeFrontRL);
-        addToList(BridgeFrontRR);
 
 
 
@@ -295,40 +283,75 @@ public class Graph {
 
 
         //ADD EXCLUSIVE BLUE SIDE CONNECTIONS AND NODES
-        if (Blue>0){
+        if (Blue==1){
             Vertex BackdropB = new Vertex(48,36,"BackdropB");
             Vertex behindBBack = new Vertex(36,36,"behindBBack");
-            Vertex collectBlue = new Vertex(-60,-64,"collectBlue");
-            Vertex BehindBCollect = new Vertex(-50,-64,"BehindBCollect");
+            Vertex collectBlue = new Vertex(-46,-64,"collectBlue");
+            Vertex BehindBCollect = new Vertex(-44,-64,"BehindBCollect");
 
-            addToList(BackdropB);
-            addToList(behindBBack);
+            doubleEdge(BackdropB,behindBBack);
+
+            doubleEdge(behindBBack,centerBack);
+            doubleEdge(behindBBack,BridgeBackBL);
+            doubleEdge(behindBBack,BridgeBackBR);
+            doubleEdge(behindBBack,BridgeBackCL);
 
 
-            addToList(BehindBCollect);
-            addToList(collectBlue);
+            doubleEdge(BehindBCollect,collectBlue);
+
+            doubleEdge(BehindBCollect,centerFront);
+            doubleEdge(BehindBCollect,BridgeFrontCR);
+            doubleEdge(BehindBCollect,BridgeFrontRL);
+            doubleEdge(BehindBCollect,BridgeFrontRR);
         }
         else{
 
             //ADD EXCLUSIVE RED SIDE CONNECTIONS AND NODES
             Vertex BackdropR = new Vertex(48,-36,"BackdropR");
             Vertex behindRBack = new Vertex(36,-36,"behindRBack");
-            Vertex collectRed = new Vertex(-60,64,"collectRed");
-            Vertex BehindRCollect = new Vertex(-50,64,"BehindRCollect");
+            Vertex collectRed = new Vertex(-46,64,"collectRed");
+            Vertex BehindRCollect = new Vertex(-44,64,"BehindRCollect");
 
-            addToList(BackdropR);
+            doubleEdge(BackdropR,behindRBack);
 
-            addToList(behindRBack);
+            doubleEdge(behindRBack,centerBack);
+            doubleEdge(behindRBack,BridgeBackCR);
+            doubleEdge(behindRBack,BridgeBackRL);
+            doubleEdge(behindRBack,BridgeBackRR);
 
+            doubleEdge(collectRed,BehindRCollect);
 
-            addToList(BehindRCollect);
-            addToList(collectRed);
+            doubleEdge(BehindRCollect,centerFront);
+            doubleEdge(BehindRCollect,BridgeFrontBL);
+            doubleEdge(BehindRCollect,BridgeFrontBR);
+            doubleEdge(BehindRCollect,BridgeFrontCL);
 
         }
 
         //MAKE THE COMMON CONNECTIONS (EDGES BETWEEN VERTEXES)
+        doubleEdge(centerBack,BridgeBackBL);
+        doubleEdge(centerBack,BridgeBackBR);
+        doubleEdge(centerBack,BridgeBackCL);
+        doubleEdge(centerBack,BridgeBackCR);
+        doubleEdge(centerBack,BridgeBackRL);
+        doubleEdge(centerBack,BridgeBackRR);
+
+        doubleEdge(BridgeBackBL,BridgeFrontBL);
+        doubleEdge(BridgeBackBR,BridgeFrontBR);
+
+        doubleEdge(BridgeBackRL,BridgeFrontRL);
+        doubleEdge(BridgeBackRR,BridgeFrontRR);
+
+        doubleEdge(BridgeFrontCL,BridgeBackCL);
+        doubleEdge(BridgeFrontCR,BridgeBackCR);
 
 
+        doubleEdge(centerFront,BridgeFrontBL);
+        doubleEdge(centerFront,BridgeFrontBR);
+        doubleEdge(centerFront,BridgeFrontCL);
+        doubleEdge(centerFront,BridgeFrontCR);
+        doubleEdge(centerFront,BridgeFrontRL);
+        doubleEdge(centerFront,BridgeFrontRR);
         /**/
     }
     /*public static TrajectorySequence getFunction(String VertexID){

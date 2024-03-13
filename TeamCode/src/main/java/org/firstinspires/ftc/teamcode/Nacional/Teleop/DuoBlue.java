@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.teamcode.Nacional.Graphs.PurePursuitGraphFollower.PurePursuitRunner;
 import org.firstinspires.ftc.teamcode.Nacional.SubSystems.AirplaneLauncher;
 import org.firstinspires.ftc.teamcode.Nacional.SubSystems.ArmMovement;
 import org.firstinspires.ftc.teamcode.Nacional.SubSystems.DriveBase;
@@ -74,19 +75,22 @@ public class DuoBlue extends LinearOpMode {
                     gamepad1.dpad_left,
                     gamepad1.dpad_right,
                     RobotHardware.autodrive.getPoseEstimate().getHeading(),
-                    gamepad1.b)) {
+                    gamepad1.b,telemetry)) {
                 currentMode = BASE_MODE.NORMAL;
             }
         }
         AirplaneLauncher.launchAirplane(gamepad1.left_trigger, gamepad1.right_trigger);
         HangRobot.HangLoop(gamepad2.x && gamepad2.y, gamepad2.right_trigger > 0.7 && gamepad2.left_trigger > 0.7);
 
-        telemetry.addData("ARM GOAL", ArmMovement.currentArmGoal);
+        /*telemetry.addData("ARM GOAL", ArmMovement.currentArmGoal);
         telemetry.addData("ARM POSITION", RobotHardware.mainArm.getCurrentPosition());
         telemetry.addData("CURF",DriveBase.CurrentFront);
         telemetry.addData("CURD",DriveBase.CurrentDistTo0);
         telemetry.addData("AP",ArmMovement.armPower);
         telemetry.addData("miu",RobotHardware.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
+        */
+
+
         telemetry.update();
 
 
