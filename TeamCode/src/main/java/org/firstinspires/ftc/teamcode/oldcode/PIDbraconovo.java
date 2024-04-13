@@ -19,7 +19,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Config
 @TeleOp(name = "PIDbraconovo")
-@Disabled
+//@Disabled
 public class PIDbraconovo extends LinearOpMode {
     FtcDashboard dashboard;
     public static double KP=0.005;
@@ -32,6 +32,7 @@ public class PIDbraconovo extends LinearOpMode {
     boolean yOn = false;
 
     private DcMotor mainArm;
+    private
 
     //private Servo servoArticulacao;
     //private Servo servoGarra;
@@ -174,13 +175,14 @@ public class PIDbraconovo extends LinearOpMode {
             } else {
                     goalbraco+= PVARIATION*(finalgoalbraco-goalbraco);
             }
+            /**/
 
 
 
 
             //goalbraco = finalgoalbraco;
-                /*
-            if (!((goalbraco > finalgoalbraco - PVARIATION) && (goalbraco < finalgoalbraco + PVARIATION))) {
+
+            /*if (!((goalbraco > finalgoalbraco - PVARIATION) && (goalbraco < finalgoalbraco + PVARIATION))) {
                 if (goalbraco > finalgoalbraco) {
                     goalbraco -= PVARIATION;
                 } else {

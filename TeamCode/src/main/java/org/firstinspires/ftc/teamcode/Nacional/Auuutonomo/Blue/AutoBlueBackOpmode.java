@@ -23,7 +23,7 @@ import org.openftc.easyopencv.OpenCvWebcam;
 import org.firstinspires.ftc.teamcode.Nacional.Auuutonomo.Blue.BlueBack.BlueBackLeft;
 import org.firstinspires.ftc.teamcode.Nacional.Auuutonomo.Blue.BlueBack.BlueBackMid;
 import org.firstinspires.ftc.teamcode.Nacional.Auuutonomo.Blue.BlueBack.BlueBackRight;
-@Autonomous(name="BlueBackYipee!♿", group="BlueAuto")
+@Autonomous(name="BlueBackYipee!♿🟧⬛", group="BlueAuto")
 public class AutoBlueBackOpmode extends LinearOpMode {
 
     BlueDetector.Location registred;
@@ -38,6 +38,8 @@ public class AutoBlueBackOpmode extends LinearOpMode {
         RobotHardware.setHardwareMap(hardwareMap);
         RobotHardware.initAll(1);
         RobotHardware.startup();
+        ArmMovement.PVARIATION = 0.022;
+        ArmMovement.LVARIATION = 500;
 
         RobotHardware.AutonomousDrive.setPoseEstimate(startPose);
 
@@ -60,7 +62,7 @@ public class AutoBlueBackOpmode extends LinearOpMode {
 
         ArmMovement.ControlLeftClaw(ArmMovement.CLAW_STATE.CLOSED);
         ArmMovement.ControlRightClaw(ArmMovement.CLAW_STATE.CLOSED);
-
+        ArmMovement.setArmState(ArmMovement.ARM_STATE.STORED);
         RobotHardware.moveArm(-0.2);
         waitForStart();
         RobotHardware.mainArm.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -85,12 +87,12 @@ public class AutoBlueBackOpmode extends LinearOpMode {
             case RIGHT:
                 //posição direita
                 RobotHardware.AutonomousDrive.followTrajectorySequenceAsync(BlueBackRight.getRightSequence(RobotHardware.AutonomousDrive,startPose));
-                break;
         }
 
         while (opModeIsActive()){
             RobotHardware.AutonomousDrive.update();
             ArmMovement.armPIDLoop(false);
+            ArmMovement.AutoCloseClawSensor();
         }
 
         PoseStorage.currentPose = RobotHardware.AutonomousDrive.getPoseEstimate();

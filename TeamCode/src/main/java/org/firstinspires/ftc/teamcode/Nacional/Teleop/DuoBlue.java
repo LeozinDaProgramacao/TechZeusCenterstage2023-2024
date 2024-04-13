@@ -6,9 +6,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.teamcode.Nacional.Graphs.PurePursuitGraphFollower.PurePursuitRunner;
 import org.firstinspires.ftc.teamcode.Nacional.SubSystems.AirplaneLauncher;
 import org.firstinspires.ftc.teamcode.Nacional.SubSystems.ArmMovement;
+import org.firstinspires.ftc.teamcode.Nacional.SubSystems.ClawColorSensor;
 import org.firstinspires.ftc.teamcode.Nacional.SubSystems.DriveBase;
 import org.firstinspires.ftc.teamcode.Nacional.SubSystems.HangRobot;
 import org.firstinspires.ftc.teamcode.Nacional.SubSystems.RobotHardware;
@@ -30,11 +32,14 @@ public class DuoBlue extends LinearOpMode {
 
     @Override
     public void runOpMode() throws InterruptedException {
+
         RobotHardware.setHardwareMap(hardwareMap);
         RobotHardware.initAll(1);
         AirplaneLauncher.resetAirplaneServo();
         waitForStart();
         RobotHardware.startup();
+        ArmMovement.PVARIATION = 0.025;
+        ArmMovement.LVARIATION = 600;
         WebcamAprilTags.initAprilTag(hardwareMap);
         while (opModeIsActive()) {
             loopRobot();
@@ -89,8 +94,11 @@ public class DuoBlue extends LinearOpMode {
         telemetry.addData("AP",ArmMovement.armPower);
         telemetry.addData("miu",RobotHardware.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS));
         */
-
-
+        telemetry.addData("fechar?", ClawColorSensor.isPixelInClaw(RobotHardware.LeftColorSensor));
+        //telemetry.addData("dist",RobotHardware.distance.getDistance(DistanceUnit.CM));
+        telemetry.addData("Red", RobotHardware.LeftColorSensor.red());
+        telemetry.addData("Green", RobotHardware.LeftColorSensor.green());
+        telemetry.addData("Blue", RobotHardware.LeftColorSensor.blue());
         telemetry.update();
 
 
@@ -107,21 +115,33 @@ public class DuoBlue extends LinearOpMode {
         }
         if (gamepad2.dpad_down) {
             ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL1UP);
-            ArmMovement.currentArmState = ArmMovement.ARM_STATE.PIXEL1UP;
-            ArmMovement.Artheight = -1;
+
+            if (gamepad2.a){
+                ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL4UP);
+            } else if (gamepad2.b){
+                ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL2UP);
+            } else{
+                ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL1UP);
+                ArmMovement.currentArmState = ArmMovement.ARM_STATE.PIXEL1UP;
+            }
         }
         if (gamepad2.dpad_right) {
+            telemetry.addData("g2x",gamepad2.x);
             ArmMovement.setArmState(ArmMovement.ARM_STATE.STORED);
+            if (gamepad2.a){
+                ArmMovement.setArmState(ArmMovement.ARM_STATE.CORRECT1UP);
+            }else if (gamepad2.b){
+                ArmMovement.setArmState(ArmMovement.ARM_STATE.CORRECT2UP);
+            } else if (gamepad2.x){
+                ArmMovement.setArmState(ArmMovement.ARM_STATE.CORRECT3UP);
+            }else {
+                ArmMovement.setArmState(ArmMovement.ARM_STATE.STORED);
+            }
         }
         if (HangRobot.currentDesiredHeight == HangRobot.HOOK_HEIGHT_GRAB || HangRobot.currentDesiredHeight == HangRobot.HOOK_HEIGHT_HANG) {
             ArmMovement.setArmState(ArmMovement.ARM_STATE.STORED);
         }
-        if (gamepad2.dpad_down&&gamepad2.a){
-            ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL4UP);
-        }
-        if (gamepad2.dpad_down&&gamepad2.b){
-            ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL2UP);
-        }
+
     }
 }
 

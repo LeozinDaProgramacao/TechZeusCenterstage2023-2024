@@ -40,6 +40,8 @@ public class AutoRedFrontOpmode extends LinearOpMode {
         RobotHardware.setHardwareMap(hardwareMap);
         RobotHardware.initAll(-1);
         RobotHardware.startup();
+        ArmMovement.PVARIATION = 0.022;
+        ArmMovement.LVARIATION = 500;
 
         RobotHardware.AutonomousDrive.setPoseEstimate(startPose);
 
@@ -92,6 +94,7 @@ public class AutoRedFrontOpmode extends LinearOpMode {
         while (opModeIsActive()){
             RobotHardware.AutonomousDrive.update();
             ArmMovement.armPIDLoop(false);
+            ArmMovement.AutoCloseClawSensor();
         }
 
         PoseStorage.currentPose = RobotHardware.AutonomousDrive.getPoseEstimate();

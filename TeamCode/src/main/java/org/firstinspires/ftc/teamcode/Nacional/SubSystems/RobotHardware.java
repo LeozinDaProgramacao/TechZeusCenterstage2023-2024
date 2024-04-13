@@ -36,7 +36,7 @@ public class RobotHardware {
     //public  Servo servoArticulacao;
     //public  Servo servoGarra;
     public static IMU imu;
-    public static DistanceSensor distance;
+    //public static DistanceSensor distance;
     public static ColorSensor LeftColorSensor;
     public static ColorSensor RightColorSensor;
     public static DigitalChannel leftRedLed;
@@ -71,7 +71,7 @@ public class RobotHardware {
         Wrist = hardwareMap.get(Servo.class,"Wrist");
         PlaneServo = hardwareMap.get(Servo.class,"PlaneServo");
 
-        distance = hardwareMap.get(DistanceSensor.class,"DistanceSensorBack");
+        //distance = hardwareMap.get(DistanceSensor.class,"DistanceSensorBack");
 
         LeftColorSensor = hardwareMap.get(ColorSensor.class,"LeftColorSensor");
         RightColorSensor = hardwareMap.get(ColorSensor.class,"RightColorSensor");

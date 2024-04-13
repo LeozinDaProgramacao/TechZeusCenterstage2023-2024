@@ -255,21 +255,21 @@ public class Graph {
     public static void createGraph(){
         //backstage nodes
         Vertex centerBack = new Vertex(30,0,"centerBack");
-        Vertex BridgeBackBL = new Vertex(23,60,"BridgeBackBL");
+        Vertex BridgeBackBL = new Vertex(23,57.5,"BridgeBackBL");
         Vertex BridgeBackBR = new Vertex(23,36,"BridgeBackBR");
         Vertex BridgeBackCL = new Vertex(23,12,"BridgeBackCL");
         Vertex BridgeBackCR = new Vertex(23,-12,"BridgeBackCR");
         Vertex BridgeBackRL = new Vertex(23,-36,"BridgeBackRL");
-        Vertex BridgeBackRR = new Vertex(23,-60,"BridgeBackRR");
+        Vertex BridgeBackRR = new Vertex(23,-57.5,"BridgeBackRR");
 
         //front side nodes
         Vertex centerFront = new Vertex(-50,0,"centerFront");
-        Vertex BridgeFrontBL = new Vertex(-45,60,"BridgeFrontBL");
+        Vertex BridgeFrontBL = new Vertex(-45,57.5,"BridgeFrontBL");
         Vertex BridgeFrontBR = new Vertex(-45,36,"BridgeFrontBR");
         Vertex BridgeFrontCL = new Vertex(-45,12,"BridgeFrontCL");
         Vertex BridgeFrontCR = new Vertex(-45,-12,"BridgeFrontCR");
         Vertex BridgeFrontRL = new Vertex(-45,-36,"BridgeFrontRL");
-        Vertex BridgeFrontRR = new Vertex(-45,-60,"BridgeFrontRR");
+        Vertex BridgeFrontRR = new Vertex(-45,-57.5,"BridgeFrontRR");
 
 
         //addition of all common nodes to the allVertexs list

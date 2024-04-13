@@ -20,16 +20,18 @@ import java.util.List;
 @Config
 public class DriveBase {
     public static double BASE_DRIVING_SPEED = 0.7;
-    public static double BACKDROP_MULTIPLIER =0.55;
+    public static double BACKDROP_MULTIPLIER =0.5;
     public static double HANG_SPEED_MULTIPLIER=0.5;
     public static double Gturn=0;
     static YawPitchRollAngles orientation;
     static double CurrentAngle;
     public static double CurrentFront;
     public static PID turnPID = new PID(0.2,0,0,0);
+    public static double KP = 0.0;
     public static PID turnStrongPID = new PID(0.8,0,0,0);
     private static double currentStateMultiplier;
     public static double CurrentDistTo0;
+
     static Vertex startPosition;
     //public Graph graph;
     public static PurePursuitRunner pp = new PurePursuitRunner();
@@ -72,7 +74,8 @@ public class DriveBase {
 
     public static void moveWithIMU(double drive,double strafe,double turn,boolean resetIMUorNO,boolean SLOW_MODE){
         //RobotHardware.autodrive.update();
-        Gturn = turn;
+        turnPID.kP= KP;
+        Gturn= turn;
         manageIMU(resetIMUorNO);
 
         //muda a direção de movimento com base na orientação ro robo
@@ -80,12 +83,12 @@ public class DriveBase {
         double rotY = strafe * Math.sin(-CurrentFront) + drive * Math.cos(-CurrentFront);
 
         //define as velocidades de cada motor
-        double maximo = Math.max(Math.abs(rotX) + Math.abs(rotY) + Math.abs(turn), 1);
+        double maximo = Math.max(Math.abs(rotX) + Math.abs(rotY) + Math.abs(Gturn), 1);
 
-        double fL = (rotY + rotX + turn) / maximo;
-        double fR = (rotY - rotX - turn) / maximo;
-        double bL = (rotY - rotX + turn) / maximo;
-        double bR = (rotY + rotX - turn) / maximo;
+        double fL = (rotY + rotX + Gturn) / maximo;
+        double fR = (rotY - rotX - Gturn) / maximo;
+        double bL = (rotY - rotX + Gturn) / maximo;
+        double bR = (rotY + rotX - Gturn) / maximo;
         /**/
         /*
         geração de uma aceleração ao controlar o maximo dos motores
@@ -127,7 +130,7 @@ public class DriveBase {
 
         //se não houver uma curva manual, um PID é usado para manter a orientação do robô
         if (Math.abs(Gturn)<0.001){
-            Gturn = turnPID.CalculatePID(ConvertAngle(CurrentAngle,CurrentFront),0)*-1;
+            Gturn = turnPID.CalculatePID(ConvertAngle(CurrentFront,CurrentAngle),0)*-1;
             if (Math.abs(Gturn)<0.1){
                 Gturn =0;
             }
@@ -138,10 +141,11 @@ public class DriveBase {
     converts an angle based on front, used to control heading lock pid
      */
     public static double ConvertAngle(double currentAngle, double desiredAngle){
-        double angleError = currentAngle-desiredAngle;
-        if (angleError<=Math.PI){
-            angleError = angleError +2*Math.PI;
+        double angleError = Math.PI-Math.abs(Math.abs(currentAngle-desiredAngle)-Math.PI);
+        if (currentAngle+angleError%(2*Math.PI)!=desiredAngle){
+            angleError = - angleError;
         }
+
         return angleError;
     }
 

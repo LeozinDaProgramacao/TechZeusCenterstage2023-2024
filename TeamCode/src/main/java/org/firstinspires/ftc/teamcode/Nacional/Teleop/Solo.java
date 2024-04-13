@@ -48,7 +48,10 @@ public class Solo extends LinearOpMode {
 
         AirplaneLauncher.launchAirplane(gamepad1.left_trigger,gamepad1.right_trigger);
 
-        HangRobot.HangLoop(gamepad2.x,gamepad2.y);
+        //HangRobot.HangLoop(gamepad2.x,gamepad2.y);
+        telemetry.addData("lft",RobotHardware.CoreEsq.getCurrentPosition());
+        telemetry.addData("rgt",RobotHardware.CoreDir.getCurrentPosition());
+        telemetry.update();
     }
     public void defineArmHeight() {
 
@@ -59,10 +62,10 @@ public class Solo extends LinearOpMode {
             ArmMovement.setArmState(ArmMovement.ARM_STATE.DEBUG);
         }
         if (gamepad2.dpad_down) {
-            ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL4UP);
+            ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL3UP);
         }
         if (gamepad2.dpad_right) {
-            ArmMovement.setArmState(ArmMovement.ARM_STATE.STORED);
+            ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_NO_ARM);
         }
         if (HangRobot.currentDesiredHeight==HangRobot.HOOK_HEIGHT_GRAB||HangRobot.currentDesiredHeight==HangRobot.HOOK_HEIGHT_HANG){
             ArmMovement.setArmState(ArmMovement.ARM_STATE.STORED);
@@ -87,8 +90,8 @@ public class Solo extends LinearOpMode {
                     break;
 
             }
-            telemetry.addData("heit",ArmMovement.Artheight);
-            telemetry.update();
+            //telemetry.addData("heit",ArmMovement.Artheight);
+            //telemetry.update();
         }
 
     }
