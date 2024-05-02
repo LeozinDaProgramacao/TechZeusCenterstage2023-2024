@@ -15,6 +15,7 @@ public class RedFrontLeft{
                 .setReversed(true)
                 .UNSTABLE_addTemporalMarkerOffset(2,()->{
                     ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL4UP);
+                    ArmMovement.setClawMode(ArmMovement.CLAW_MODE.MANUAL);
                 })
                 .splineToLinearHeading(new Pose2d(15.5,-29,Math.toRadians(180)),Math.toRadians(180))
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
@@ -75,6 +76,8 @@ public class RedFrontLeft{
                         SampleMecanumDrive.getAccelerationConstraint(30))
 
 
+                // undo this comment to make it regular
+                /*
                 .UNSTABLE_addTemporalMarkerOffset(1.7,()->{
                     ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_FRONT);
                 })
@@ -99,6 +102,25 @@ public class RedFrontLeft{
                 .splineToConstantHeading(new Vector2d(55,-60),Math.toRadians(0),
                         SampleMecanumDrive.getVelocityConstraint(40, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(40))
+                /**/
+
+
+                //this is for the WX coop auto
+                .splineToLinearHeading(new Pose2d(43,-59,Math.toRadians(0)),Math.toRadians(0))
+                .waitSeconds(1.1)
+                .UNSTABLE_addTemporalMarkerOffset(0,()->{
+                    ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL1UP);
+                })
+                .UNSTABLE_addTemporalMarkerOffset(1,()->{
+                    ArmMovement.ControlLeftClaw(ArmMovement.CLAW_STATE.OPEN);
+                    ArmMovement.ControlRightClaw(ArmMovement.CLAW_STATE.OPEN);
+                })
+                .waitSeconds(1.2)
+
+
+
+
+
                 .build();
 
 

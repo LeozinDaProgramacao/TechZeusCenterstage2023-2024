@@ -14,6 +14,7 @@ public class BlueFrontMid {
         TrajectorySequence mideSequence= drive.trajectorySequenceBuilder(startPose)
                 .UNSTABLE_addTemporalMarkerOffset(1,()->{
                     ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL4UP);
+                    ArmMovement.setClawMode(ArmMovement.CLAW_MODE.MANUAL);
                 })
                 .splineToLinearHeading(new Pose2d(12,40,Math.toRadians(-90+0.01)),Math.toRadians(-90))
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
@@ -33,10 +34,10 @@ public class BlueFrontMid {
                 .UNSTABLE_addDisplacementMarkerOffset(2,()->{
                     ArmMovement.setArmState(ArmMovement.ARM_STATE.STORED);
                 })
-                .splineToLinearHeading(new Pose2d(13,58,Math.toRadians(180)),Math.toRadians(180),
+                .splineToLinearHeading(new Pose2d(13,59,Math.toRadians(180)),Math.toRadians(180),
                         SampleMecanumDrive.getVelocityConstraint(40, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(30))
-                .splineToLinearHeading(new Pose2d(-30,58,Math.toRadians(180)),Math.toRadians(180),
+                .splineToLinearHeading(new Pose2d(-30,59,Math.toRadians(180)),Math.toRadians(180),
                 SampleMecanumDrive.getVelocityConstraint(40, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                 SampleMecanumDrive.getAccelerationConstraint(30))
 
@@ -48,11 +49,11 @@ public class BlueFrontMid {
                 .UNSTABLE_addTemporalMarkerOffset(1,()->{
                     ArmMovement.setClawMode(ArmMovement.CLAW_MODE.SENSOR);
                 })
-                .splineToLinearHeading(new Pose2d(-47,35.3,Math.toRadians(180)),Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-47,35.5,Math.toRadians(180)),Math.toRadians(180))
                 //.UNSTABLE_addTemporalMarkerOffset(-4,()-> {
                     //ArmMovement.setClawMode(ArmMovement.CLAW_MODE.SENSOR);
                 //})
-                .splineToLinearHeading(new Pose2d(-54,35.3, Math.toRadians(180)),Math.toRadians(180),
+                .splineToLinearHeading(new Pose2d(-54,35.5, Math.toRadians(180)),Math.toRadians(180),
                         SampleMecanumDrive.getVelocityConstraint(8, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
 
@@ -61,20 +62,20 @@ public class BlueFrontMid {
                 //.splineToLinearHeading(new Pose2d(-56,12,Math.toRadians(180)),Math.toRadians(180))
 
                 //moves to get the  extra pixel
-                .splineToLinearHeading(new Pose2d(-47,35.3,Math.toRadians(180)),Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(-47,35.5,Math.toRadians(180)),Math.toRadians(0))
 
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
                     ArmMovement.setClawMode(ArmMovement.CLAW_MODE.MANUAL);
                     ArmMovement.setArmState(ArmMovement.ARM_STATE.STORED);
                 })
-                .splineToLinearHeading(new Pose2d(-35,60,Math.toRadians(180)),Math.toRadians(0),
+                .splineToLinearHeading(new Pose2d(-35,59,Math.toRadians(180)),Math.toRadians(0),
                         SampleMecanumDrive.getVelocityConstraint(40, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(30))
-                .splineToLinearHeading(new Pose2d(15,60,Math.toRadians(180)),Math.toRadians(0),
+                .splineToLinearHeading(new Pose2d(15,59,Math.toRadians(180)),Math.toRadians(0),
                         SampleMecanumDrive.getVelocityConstraint(40, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(30))
-
-
+                // undo this comment to make it regular
+                /*
                 .UNSTABLE_addTemporalMarkerOffset(1.7,()->{
                     ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_FRONT);
                 })
@@ -100,6 +101,22 @@ public class BlueFrontMid {
                 .splineToConstantHeading(new Vector2d(50,60),Math.toRadians(0),
                 SampleMecanumDrive.getVelocityConstraint(40, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                 SampleMecanumDrive.getAccelerationConstraint(40))
+                */
+
+
+
+                //this is for the WX coop auto
+                .splineToLinearHeading(new Pose2d(43,59,Math.toRadians(0)),Math.toRadians(0))
+                .waitSeconds(1.1)
+                .UNSTABLE_addTemporalMarkerOffset(0,()->{
+                    ArmMovement.setArmState(ArmMovement.ARM_STATE.CORRECT2UP);
+                })
+                .UNSTABLE_addTemporalMarkerOffset(1,()->{
+                    ArmMovement.ControlLeftClaw(ArmMovement.CLAW_STATE.OPEN);
+                    ArmMovement.ControlRightClaw(ArmMovement.CLAW_STATE.OPEN);
+                })
+                .waitSeconds(1.2)
+
                 .build();
         return mideSequence;
     }

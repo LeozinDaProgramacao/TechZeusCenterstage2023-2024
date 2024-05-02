@@ -103,21 +103,33 @@ public class DuoRed extends LinearOpMode {
         }
         if (gamepad2.dpad_down) {
             ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL1UP);
-            ArmMovement.currentArmState = ArmMovement.ARM_STATE.PIXEL1UP;
-            ArmMovement.Artheight = -1;
+
+            if (gamepad2.a){
+                ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL4UP);
+            } else if (gamepad2.b){
+                ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL2UP);
+            } else{
+                ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL1UP);
+                ArmMovement.currentArmState = ArmMovement.ARM_STATE.PIXEL1UP;
+            }
         }
         if (gamepad2.dpad_right) {
+            telemetry.addData("g2x",gamepad2.x);
             ArmMovement.setArmState(ArmMovement.ARM_STATE.STORED);
+            if (gamepad2.a){
+                ArmMovement.setArmState(ArmMovement.ARM_STATE.CORRECT1UP);
+            }else if (gamepad2.b){
+                ArmMovement.setArmState(ArmMovement.ARM_STATE.CORRECT2UP);
+            } else if (gamepad2.x){
+                ArmMovement.setArmState(ArmMovement.ARM_STATE.CORRECT3UP);
+            }else {
+                ArmMovement.setArmState(ArmMovement.ARM_STATE.STORED);
+            }
         }
         if (HangRobot.currentDesiredHeight == HangRobot.HOOK_HEIGHT_GRAB || HangRobot.currentDesiredHeight == HangRobot.HOOK_HEIGHT_HANG) {
             ArmMovement.setArmState(ArmMovement.ARM_STATE.STORED);
         }
-        if (gamepad2.dpad_down&&gamepad2.a){
-            ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL4UP);
-        }
-        if (gamepad2.dpad_down&&gamepad2.b){
-            ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL2UP);
-        }
+
     }
 }
 

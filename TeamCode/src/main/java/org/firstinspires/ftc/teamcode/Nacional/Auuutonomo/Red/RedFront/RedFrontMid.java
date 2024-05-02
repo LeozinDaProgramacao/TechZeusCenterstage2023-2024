@@ -15,8 +15,9 @@ public class RedFrontMid {
                 .setReversed(true)
                 .UNSTABLE_addTemporalMarkerOffset(2,()->{
                     ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL4UP);
+                    ArmMovement.setClawMode(ArmMovement.CLAW_MODE.MANUAL);
                 })
-                .splineToLinearHeading(new Pose2d(12,-38.5,Math.toRadians(90-0.01)),Math.toRadians(90))
+                .splineToLinearHeading(new Pose2d(12,-39.2,Math.toRadians(90-0.01)),Math.toRadians(90))
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
                     ArmMovement.ControlRightClaw(ArmMovement.CLAW_STATE.OPEN);
                 })
@@ -26,7 +27,7 @@ public class RedFrontMid {
                 .waitSeconds(0.3)
 
                 //move to place on backdrop
-                .splineToLinearHeading(new Pose2d(49,-33.4,Math.toRadians(180)),0)
+                .splineToLinearHeading(new Pose2d(49,-32,Math.toRadians(180)),0)
 
                 .setReversed(false)
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
@@ -77,6 +78,7 @@ public class RedFrontMid {
                         SampleMecanumDrive.getVelocityConstraint(40, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(30))
 
+                /*
 
                 .UNSTABLE_addTemporalMarkerOffset(1.7,()->{
                     ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_FRONT);
@@ -102,6 +104,24 @@ public class RedFrontMid {
                 .splineToConstantHeading(new Vector2d(55,-60),Math.toRadians(0),
                         SampleMecanumDrive.getVelocityConstraint(40, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(40))
+                /**/
+
+
+                //this is for the WX coop auto
+                .splineToLinearHeading(new Pose2d(43,-59,Math.toRadians(0)),Math.toRadians(0))
+                .waitSeconds(1.1)
+                .UNSTABLE_addTemporalMarkerOffset(0,()->{
+                    ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL1UP);
+                })
+                .UNSTABLE_addTemporalMarkerOffset(1,()->{
+                    ArmMovement.ControlLeftClaw(ArmMovement.CLAW_STATE.OPEN);
+                    ArmMovement.ControlRightClaw(ArmMovement.CLAW_STATE.OPEN);
+                })
+                .waitSeconds(1.2)
+
+
+
+
                 .build();
 
 

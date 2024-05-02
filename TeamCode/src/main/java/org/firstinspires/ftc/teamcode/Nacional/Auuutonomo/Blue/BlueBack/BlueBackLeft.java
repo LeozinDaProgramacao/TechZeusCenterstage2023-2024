@@ -14,8 +14,10 @@ public class BlueBackLeft{
 
         TrajectorySequence leftSequence= drive.trajectorySequenceBuilder(startPose)
                 .setReversed(true)
+                //.waitSeconds(10)
                 .UNSTABLE_addTemporalMarkerOffset(2,()->{
                     ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL5UP);
+                    ArmMovement.setClawMode(ArmMovement.CLAW_MODE.MANUAL);
                 })
 
                 .splineToLinearHeading(new Pose2d(-42,29,0),Math.toRadians(-90))
@@ -25,22 +27,28 @@ public class BlueBackLeft{
                 })
 
                 .turn(Math.toRadians(+180-0.001))
-                .splineToConstantHeading(new Vector2d(-50,14.3),Math.toRadians(180))
+                .splineToConstantHeading(new Vector2d(-47,14.3),Math.toRadians(180))
 
                 .UNSTABLE_addDisplacementMarkerOffset(0,()-> {
                     ArmMovement.setClawMode(ArmMovement.CLAW_MODE.SENSOR);
                     //slow down
                 })
 
-                .splineToConstantHeading(new Vector2d(-53,14.3),Math.toRadians(180),
+                .splineToConstantHeading(new Vector2d(-52.2,14.3),Math.toRadians(180),
                         SampleMecanumDrive.getVelocityConstraint(7, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
+                .UNSTABLE_addTemporalMarkerOffset(0.3,()->{
+                    ArmMovement.setArmState(ArmMovement.ARM_STATE.CORRECT1UP);
+                })
                 //.forward(5)
 
                 //moves to get the  extra pixel
                 .splineToConstantHeading(new Vector2d(-50,14.3),Math.toRadians(0),
                         SampleMecanumDrive.getVelocityConstraint(40, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(25))
+                .UNSTABLE_addTemporalMarkerOffset(0,()->{
+                    ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL5UP);
+                })
                 .splineToConstantHeading(new Vector2d(-30,10),Math.toRadians(0),
                         SampleMecanumDrive. getVelocityConstraint(50, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(30))
@@ -71,19 +79,26 @@ public class BlueBackLeft{
                 .UNSTABLE_addDisplacementMarkerOffset(0,()->{
                     ArmMovement.setArmState(ArmMovement.ARM_STATE.STORED);
                 })
+                .splineToConstantHeading(new Vector2d(40,-24),Math.toRadians(-90))
+                .splineToConstantHeading(new Vector2d(58,-10),Math.toRadians(20))
+
+
+
+                /*
+                //.forward(6)
                 .splineToConstantHeading(new Vector2d(20,6),Math.toRadians(180),
                         SampleMecanumDrive. getVelocityConstraint(45, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(35))
                 .UNSTABLE_addDisplacementMarkerOffset(16,()->{
                     ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL3UP);
                 })
-                .splineToConstantHeading(new Vector2d(-45,10.9),Math.toRadians(180),
+                .splineToConstantHeading(new Vector2d(-45,10.5),Math.toRadians(180),
                         SampleMecanumDrive. getVelocityConstraint(40, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(35))
                 .UNSTABLE_addDisplacementMarkerOffset(0,()-> {
                     ArmMovement.setClawMode(ArmMovement.CLAW_MODE.SENSOR);
                 })
-                .splineToConstantHeading(new Vector2d(-55.2,10.9),Math.toRadians(180),
+                .splineToConstantHeading(new Vector2d(-55.2,10.5),Math.toRadians(180),
                         SampleMecanumDrive. getVelocityConstraint(7, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
 
@@ -92,7 +107,7 @@ public class BlueBackLeft{
                     ArmMovement.setClawMode(ArmMovement.CLAW_MODE.MANUAL);
                 })
 
-                .lineToSplineHeading(new Pose2d(12,10.9,Math.toRadians(-0.0001)),
+                .lineToSplineHeading(new Pose2d(12,10.5,Math.toRadians(-0.0001)),
                         SampleMecanumDrive.getVelocityConstraint(45, 3, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(30))
 
@@ -116,6 +131,8 @@ public class BlueBackLeft{
                     ArmMovement.setArmState(ArmMovement.ARM_STATE.STORED);
                 })
                 .back(0.1)
+
+                 /**/
                 .build();
 
         return leftSequence;

@@ -12,8 +12,10 @@ public class RedBackMid {
     public static TrajectorySequence getMidSequence(SampleMecanumDrive drive, Pose2d startPose){
         TrajectorySequence mideSequence= drive.trajectorySequenceBuilder(startPose)
                 .setReversed(true)
+                //.waitSeconds(10)//todo remove me
                 .UNSTABLE_addTemporalMarkerOffset(2,()->{
                     ArmMovement.setArmState(ArmMovement.ARM_STATE.PIXEL5UP);
+                    ArmMovement.setClawMode(ArmMovement.CLAW_MODE.MANUAL);
                 })
                 .splineToLinearHeading(new Pose2d(-39,-7,Math.toRadians(-90)),Math.toRadians(90))
 
@@ -21,11 +23,11 @@ public class RedBackMid {
                     ArmMovement.ControlRightClaw(ArmMovement.CLAW_STATE.OPEN);
                 })
                 //moves to get the  extra pixel
-                .splineToLinearHeading(new Pose2d(-49,-15,Math.toRadians(180)),Math.toRadians(180))
+                .splineToLinearHeading(new Pose2d(-47,-15,Math.toRadians(180)),Math.toRadians(180))
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
                     ArmMovement.setClawMode(ArmMovement.CLAW_MODE.SENSOR);
                 })
-                .splineToLinearHeading(new Pose2d(-53 , -15,Math.toRadians(180)),Math.toRadians(180),
+                .splineToLinearHeading(new Pose2d(-52 , -15,Math.toRadians(180)),Math.toRadians(180),
                         SampleMecanumDrive.getVelocityConstraint(7, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
                 .splineToConstantHeading(new Vector2d(-50,-15),Math.toRadians(0),
@@ -59,9 +61,14 @@ public class RedBackMid {
                 .UNSTABLE_addDisplacementMarkerOffset(2,()->{
                     ArmMovement.setArmState(ArmMovement.ARM_STATE.STORED);
                 })
+                //.forward(6)
+                .splineToConstantHeading(new Vector2d(40,-24),Math.toRadians(-90))
+                .splineToConstantHeading(new Vector2d(58,-10),Math.toRadians(20))
 
 
 
+
+                /*
                 .splineToConstantHeading(new Vector2d(20,-6),Math.toRadians(180),
                         SampleMecanumDrive. getVelocityConstraint(45, DriveConstants.MAX_ANG_VEL, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(35))
@@ -92,10 +99,10 @@ public class RedBackMid {
                     ArmMovement.setArmState(ArmMovement.ARM_STATE.DEPOSIT_FRONT);
                 })
 
-                .splineToLinearHeading(new Pose2d(40,-27,Math.toRadians(0)),Math.toRadians(0),
+                .splineToLinearHeading(new Pose2d(40,-27.3,Math.toRadians(0)),Math.toRadians(0),
                         SampleMecanumDrive. getVelocityConstraint(40, 3, DriveConstants.TRACK_WIDTH),
                         SampleMecanumDrive.getAccelerationConstraint(DriveConstants.MAX_ACCEL))
-                .splineToLinearHeading(new Pose2d(53,-27, Math.toRadians(0)),Math.toRadians(0))
+                .splineToLinearHeading(new Pose2d(53,-27.3, Math.toRadians(0)),Math.toRadians(0))
                 .UNSTABLE_addTemporalMarkerOffset(0,()->{
                     ArmMovement.ControlLeftClaw(ArmMovement.CLAW_STATE.OPEN);
                     ArmMovement.ControlRightClaw(ArmMovement.CLAW_STATE.OPEN);

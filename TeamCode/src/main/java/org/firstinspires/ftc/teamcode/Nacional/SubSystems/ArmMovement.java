@@ -69,15 +69,15 @@ public class ArmMovement {
     public static double WRIST_POS_DEPOSIT_BACK_AUTO=-0.25;
     public static double WRIST_POS_COLLECT_GROUND=-0.04;
     public static double WRIST_STORE_CLAW=-0.25;
-    public static double WRIST_MIDDLE=0.4;
+    public static double WRIST_MIDDLE=0.45;
     public static double WRIST_HANG;
     public static double WRIST_POS_CORRECT_1ND =0.13;
     public static double WRIST_POS_CORRECT_2ND =0.04;
     public static double WRIST_POS_CORRECT_3ND =0;
     public static double WRIST_POS_2NDPIXEL_UP=-0.05;
     public static double WRIST_POS_3NDPIXEL_UP=-0.05;
-    public static double WRIST_POS_4NDPIXEL_UP=-0.03;
-    public static double WRIST_POS_5NDPIXEL_UP=-0.03;
+    public static double WRIST_POS_4NDPIXEL_UP=-0.04;
+    public static double WRIST_POS_5NDPIXEL_UP=-0.03;// TODO LATER TRY 0.04
     public static double WRIST_DEPOSIT_NO_ARM =-0.25;
 
     public static double OPEN_CLAW_POS=0.6;
@@ -87,7 +87,7 @@ public class ArmMovement {
     public static double ARM_DEAD_ZONE=0;
     public static double ARM_DOWN=0;
     public static double ARM_DEPOSIT_FRONT=1200;
-    public static double ARM_DEPOSIT_BACK=3900;
+    public static double ARM_DEPOSIT_BACK=3800;
     public static double ARM_DEPOSIT_BACK_AUTO = 3900;
     public static double PVARIATION=0.02;
     //revert to previous way to work TODO TODO TODO this with urgency
@@ -120,7 +120,7 @@ public class ArmMovement {
                 RobotHardware.setWristPos(WRIST_MIDDLE+WRIST_POS_DEPOSIT_BACK);
                 break;
             case DEPOSIT_BACK_AUTO:
-                finalArmGoal = ARM_DEPOSIT_BACK+ARM_DEAD_ZONE+78;
+                finalArmGoal = ARM_DEPOSIT_BACK+ARM_DEAD_ZONE+78+50;
                 RobotHardware.setArtPosition(ARTICULATION_MIDDLE+ARTICULATION_POS_DEPOSIT_BACK);
                 RobotHardware.setWristPos(WRIST_MIDDLE+WRIST_POS_DEPOSIT_BACK);
                 break;
