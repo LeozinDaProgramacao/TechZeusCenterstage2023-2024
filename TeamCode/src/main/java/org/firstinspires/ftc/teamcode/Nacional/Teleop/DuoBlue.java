@@ -5,9 +5,6 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.teamcode.Nacional.Graphs.PurePursuitGraphFollower.PurePursuitRunner;
 import org.firstinspires.ftc.teamcode.Nacional.SubSystems.AirplaneLauncher;
 import org.firstinspires.ftc.teamcode.Nacional.SubSystems.ArmMovement;
 import org.firstinspires.ftc.teamcode.Nacional.SubSystems.ClawColorSensor;
@@ -16,7 +13,6 @@ import org.firstinspires.ftc.teamcode.Nacional.SubSystems.HangRobot;
 import org.firstinspires.ftc.teamcode.Nacional.SubSystems.RobotHardware;
 import org.firstinspires.ftc.teamcode.Nacional.SubSystems.WebcamAprilTags;
 @Config
-
 @TeleOp (name="Duo Blue >:D 🥶💙")
 public class DuoBlue extends LinearOpMode {
     //simpleSwitch LClawSwitch = new simpleSwitch();
@@ -36,14 +32,18 @@ public class DuoBlue extends LinearOpMode {
         RobotHardware.setHardwareMap(hardwareMap);
         RobotHardware.initAll(1);
         AirplaneLauncher.resetAirplaneServo();
+
         waitForStart();
+
         RobotHardware.startup();
         ArmMovement.PVARIATION = 0.025;
         ArmMovement.LVARIATION = 600;
         WebcamAprilTags.initAprilTag(hardwareMap);
+
         while (opModeIsActive()) {
             loopRobot();
         }
+
         AirplaneLauncher.resetAirplaneServo();
     }
 
